@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -266,13 +267,14 @@ private fun ChecklistPanel(vm: AppViewModel, c: Countdown, accent: Color) {
 private fun NotesPanel(vm: AppViewModel, c: Countdown) {
     val pc = LocalPaw.current
     var text by remember(c.id) { mutableStateOf(c.notes) }
+    val focus = remember { androidx.compose.ui.focus.FocusRequester() }
     // save a moment after typing stops (every save also re-plans reminders, so don't do it per keystroke)
     LaunchedEffect(text) { if (text != c.notes) { delay(700); vm.upsert(c.copy(notes = text)) } }
     Panel {
         PanelTitle("Notes")
-        BasicTextField(text, { text = it }, Modifier.fillMaxWidth(), textStyle = T.body(16), cursorBrush = SolidColor(pc.kibble), minLines = 3,
+        BasicTextField(text, { text = it }, Modifier.fillMaxWidth().focusRequester(focus), textStyle = T.body(16), cursorBrush = SolidColor(pc.kibble), minLines = 3,
             decorationBox = { inner ->
-                Box(Modifier.fillMaxWidth().heightIn(min = 92.dp).clip(RoundedCornerShape(18.dp)).background(pc.surface).background(pc.ink.copy(alpha = 0.03f)).padding(14.dp)) {
+                Box(Modifier.fillMaxWidth().heightIn(min = 92.dp).clip(RoundedCornerShape(18.dp)).background(pc.surface).background(pc.ink.copy(alpha = 0.03f)).clickable(indication = null, interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }) { focus.requestFocus() }.padding(14.dp)) {
                     if (text.isEmpty()) Text("Itinerary, ideas, inside jokes…", style = T.body(16).copy(color = pc.ink2.copy(alpha = 0.6f))); inner()
                 }
             })

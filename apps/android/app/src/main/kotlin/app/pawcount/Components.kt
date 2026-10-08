@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -231,13 +232,17 @@ fun Divider() = Box(Modifier.fillMaxWidth().height(1.dp).background(LocalPaw.cur
 @Composable
 fun Field(label: String, value: String, onChange: (String) -> Unit, modifier: Modifier = Modifier, placeholder: String = "", keyboard: KeyboardOptions = KeyboardOptions.Default, accent: Color = LocalPaw.current.kibble, maxLen: Int = 60, minHeight: Dp = 54.dp, singleLine: Boolean = true) {
     val c = LocalPaw.current
+    // the real text area is only as wide as the text, so tapping anywhere in the rounded box must focus it
+    val focus = remember { androidx.compose.ui.focus.FocusRequester() }
+    val kb = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
     Column(modifier.padding(top = 16.dp)) {
         if (label.isNotEmpty()) Text(label, Modifier.padding(bottom = 7.dp), style = T.muted(14, FontWeight.ExtraBold))
         BasicTextField(
-            value, { if (it.length <= maxLen) onChange(it) }, Modifier.fillMaxWidth(), singleLine = singleLine, keyboardOptions = keyboard,
+            value, { if (it.length <= maxLen) onChange(it) }, Modifier.fillMaxWidth().focusRequester(focus), singleLine = singleLine, keyboardOptions = keyboard,
             textStyle = T.body(17), cursorBrush = SolidColor(accent),
             decorationBox = { inner ->
-                Box(Modifier.fillMaxWidth().heightIn(min = minHeight).clip(RoundedCornerShape(18.dp)).background(c.surface).border(2.dp, c.line, RoundedCornerShape(18.dp)).padding(horizontal = 16.dp, vertical = 14.dp), contentAlignment = Alignment.CenterStart) {
+                Box(Modifier.fillMaxWidth().heightIn(min = minHeight).clip(RoundedCornerShape(18.dp)).background(c.surface).border(2.dp, c.line, RoundedCornerShape(18.dp))
+                    .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) { focus.requestFocus(); kb?.show() }.padding(horizontal = 16.dp, vertical = 14.dp), contentAlignment = Alignment.CenterStart) {
                     if (value.isEmpty()) Text(placeholder, style = T.body(17).copy(color = c.ink2.copy(alpha = 0.6f)))
                     inner()
                 }
