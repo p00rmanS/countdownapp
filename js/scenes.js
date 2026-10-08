@@ -47,13 +47,12 @@
         <g class="prop cake"><rect x="300" y="196" width="80" height="40" rx="6" fill="#B07A4A"/><rect x="310" y="168" width="60" height="30" rx="8" fill="#FFB3CC"/><path d="M310 180q8 8 15 0t15 0 15 0 15 0v-8H310z" fill="#fff"/><rect x="338" y="152" width="4" height="16" fill="#5DADE8"/><path class="flame" d="M340 140c-5 6-3 11 0 12 3-1 5-6 0-12z" fill="#FFB020"/></g>`;
       case 'anniversary':
         return `
-        <defs><linearGradient id="${u}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD3CF"/><stop offset="1" stop-color="#FFF0D2"/></linearGradient><pattern id="${u}g" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#fff"/><rect width="12" height="24" fill="#EE8FA0" opacity=".35"/><rect width="24" height="12" fill="#EE8FA0" opacity=".35"/></pattern></defs>
+        <defs><linearGradient id="${u}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD3CF"/><stop offset="1" stop-color="#FFF0D2"/></linearGradient></defs>
         <rect width="400" height="300" fill="url(#${u}s)"/>
         <circle cx="320" cy="70" r="30" fill="#FFE29A" opacity=".9"/>
         <ellipse cx="90" cy="206" rx="200" ry="50" fill="#CBE5B6"/><ellipse cx="330" cy="214" rx="190" ry="44" fill="#A9D49A"/>
         <g class="prop"><rect x="326" y="120" width="10" height="70" fill="#9A6B43"/><circle cx="331" cy="108" r="40" fill="#8CC57F"/><circle cx="306" cy="124" r="26" fill="#9FD292"/></g>
-        <path d="M-20 300 40 232H360L420 300z" fill="url(#${u}g)"/><path d="M40 232H360" stroke="#EE8FA0" stroke-opacity=".5" stroke-width="3"/>
-        <g class="prop"><rect x="330" y="236" width="44" height="30" rx="6" fill="#C98A52"/><path d="M336 236q16-22 32 0" stroke="#9A6B43" stroke-width="4" fill="none"/></g>
+        <path d="M-20 300 40 232H360L420 300z" fill="#fff"/><g opacity=".36" fill="#EE8FA0">${gingham()}</g><g class="prop"><rect x="330" y="236" width="44" height="30" rx="6" fill="#C98A52"/><path d="M336 236q16-22 32 0" stroke="#9A6B43" stroke-width="4" fill="none"/></g>
         <g class="prop">${[[44, 252, '#F6B7B0'], [58, 244, '#FFE08A'], [32, 242, '#fff']].map(([x, y, f]) => `<path d="M${x} ${y}v22" stroke="#5FA55F" stroke-width="3"/><circle cx="${x}" cy="${y}" r="8" fill="${f}"/><circle cx="${x}" cy="${y}" r="2.8" fill="#E8A15C"/>`).join('')}</g>
         <g class="hearts-bg" fill="#E5574F"><text x="70" y="110" font-size="22" class="hf h1">♥</text><text x="240" y="90" font-size="16" class="hf h2">♥</text><text x="150" y="140" font-size="13" class="hf h3">♥</text></g>`;
       case 'holiday':
@@ -78,11 +77,26 @@
     }
   }
 
+  // gingham picnic blanket as plain polygons (no <pattern>, so the native renderers can draw it too)
+  function gingham() {
+    const left = (y) => 40 - (60 * (y - 232)) / 68, right = (y) => 360 + (60 * (y - 232)) / 68;
+    let out = '';
+    for (let i = 0; i < 12; i++) {
+      const t0 = 40 + 28 * i, t1 = t0 + 14, b0 = -20 + 36 * i, b1 = b0 + 18;
+      if (t1 <= 360 + 14) out += `<path d="M${t0} 232H${Math.min(t1, 360)}L${Math.min(b1, 420)} 300H${b0}z"/>`;
+    }
+    [236, 252, 268, 284].forEach((y) => { out += `<path d="M${left(y).toFixed(1)} ${y}H${right(y).toFixed(1)}L${right(y + 8).toFixed(1)} ${y + 8}H${left(y + 8).toFixed(1)}z"/>`; });
+    return out;
+  }
+
   function door(type) {
     if (type === 'vacation' || type === 'anniversary' || type === 'holiday')
       return `<g class="door"><rect x="8" y="132" width="12" height="104" rx="4" fill="#B98456"/><rect x="74" y="132" width="12" height="104" rx="4" fill="#B98456"/><path d="M20 152h54M20 196h54" stroke="#D2A06E" stroke-width="10" stroke-linecap="round"/><path d="M22 150 72 198M72 150 22 198" stroke="#C48F5E" stroke-width="6" stroke-linecap="round"/><circle cx="14" cy="128" r="7" fill="#D2A06E"/><circle cx="80" cy="128" r="7" fill="#D2A06E"/></g>`;
     return `<g class="door"><rect x="6" y="96" width="82" height="140" rx="6" fill="#A9784B"/><rect x="14" y="106" width="66" height="122" rx="4" fill="#BD8A58"/><rect x="22" y="116" width="50" height="42" rx="4" fill="#A9784B" opacity=".55"/><rect x="22" y="168" width="50" height="52" rx="4" fill="#A9784B" opacity=".55"/><circle cx="68" cy="170" r="5" fill="#F4C542"/><rect x="6" y="230" width="82" height="6" fill="#FFE9B0" opacity=".7"/></g>`;
   }
+
+  // used by the native export (tools/export-native.js): just the backdrop drawing, optionally with the door/gate
+  P.sceneBgSVG = (type, accent, withDoor) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">${bg(type, accent, 's0')}${withDoor ? door(type) : ''}</svg>`;
 
   const rand = (a, b) => a + Math.random() * (b - a);
   function fx(stage, size) {

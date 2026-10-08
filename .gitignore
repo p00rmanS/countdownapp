@@ -14,3 +14,8 @@ android/app/build/
 android/.idea/
 ios/App/build/
 .DS_Store
+apps/android/local.properties
+apps/android/build/
+apps/android/app/build/
+apps/android/.gradle/
+apps/android/keystore.properties

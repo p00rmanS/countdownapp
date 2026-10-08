@@ -85,7 +85,10 @@
   // colour helpers
   const hex = (s) => { s = s.replace('#', ''); if (s.length === 3) s = s.split('').map((x) => x + x).join(''); return [0, 2, 4].map((i) => parseInt(s.substr(i, 2), 16)); };
   const toHex = (a) => '#' + a.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
-  P.mix = (a, b, t) => { const x = hex(a), y = hex(b); return toHex(x.map((v, i) => v + (y[i] - v) * t)); };
+  P.mix = (a, b, t) => {
+    if (P.tokenMode && (a[0] === '$' || a.startsWith('mix('))) return `mix(${a},${b},${t})`;
+    const x = hex(a), y = hex(b); return toHex(x.map((v, i) => v + (y[i] - v) * t));
+  };
   const lum = (c) => { const [r, g, b] = hex(c).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
   P.onColor = (c) => {
     const L = lum(c), dark = (L + 0.05) / (lum('#3B2314') + 0.05), light = 1.05 / (L + 0.05);

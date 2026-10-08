@@ -29,6 +29,8 @@
 
   function palette(dog) {
     const b = BREEDS[dog.breed] || BREEDS.mutt;
+    // Native export: keep colours symbolic ($fur ...) so the Kotlin/Swift apps can recolour the same drawing
+    if (P.tokenMode) return { ...b, fur: '$fur', dark: '$dark', light: '$light', paw: '$paw', inner: b.face === 'mask' ? '$light' : '#F6B7B0', ears: dog.ears || b.ears };
     const c = { ...b, inner: b.face === 'mask' ? b.light : '#F6B7B0' };
     if (dog.breed === 'mutt') {
       const fur = (dog.colors && dog.colors.fur) || b.fur;
@@ -50,6 +52,15 @@
     return side === 'r' ? `<g transform="translate(240 0) scale(-1 1)">${g}</g>` : g;
   }
 
+  // last 22% of the husky tail curve (de Casteljau split at t = .78) drawn in the light colour
+  function tailTip() {
+    const P0 = [164, 204], P1 = [208, 214], P2 = [228, 176], P3 = [206, 136], t = 0.78;
+    const lerp = (a, b) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    const a = lerp(P0, P1), b = lerp(P1, P2), c = lerp(P2, P3), d = lerp(a, b), e = lerp(b, c), f = lerp(d, e);
+    const r = (v) => Math.round(v * 10) / 10;
+    return `M${r(f[0])} ${r(f[1])}C${r(e[0])} ${r(e[1])} ${r(c[0])} ${r(c[1])} ${P3[0]} ${P3[1]}`;
+  }
+
   function tail(c) {
     const w = { normal: 16, curl: 18, stub: 0, thin: 9, bushy: 24 }[c.tail];
     const path = {
@@ -59,7 +70,7 @@
       bushy: 'M164 204C208 214 228 176 206 136',
     }[c.tail];
     if (c.tail === 'stub') return `<g class="tail"><ellipse cx="170" cy="204" rx="13" ry="10" fill="${c.fur}"/></g>`;
-    const tip = c.tail === 'bushy' ? `<path d="${path}" stroke="${c.light}" stroke-width="10" fill="none" stroke-linecap="round" opacity=".9" pathLength="1" stroke-dasharray=".25 1" stroke-dashoffset="-.78"/>` : '';
+    const tip = c.tail === 'bushy' ? `<path d="${tailTip()}" stroke="${c.light}" stroke-width="10" fill="none" stroke-linecap="round" opacity=".9"/>` : '';
     return `<g class="tail"><path d="${path}" stroke="${c.fur}" stroke-width="${w}" fill="none" stroke-linecap="round"/>${tip}</g>`;
   }
 
@@ -206,8 +217,8 @@
   };
 
   // little head portrait for app icons / favicon
-  P.dogIconSVG = function (breed, bg) {
-    const dog = { breed, name: '' };
+  P.dogIconSVG = function (breed, bg, ears) {
+    const dog = { breed, name: '', ears };
     const c = palette(dog);
     const id = 'ic' + ++uid;
     const inner = `${ear(c.ears, c, 'l')}${ear(c.ears, c, 'r')}<clipPath id="${id}"><ellipse cx="120" cy="104" rx="58" ry="50"/></clipPath><ellipse cx="120" cy="104" rx="58" ry="50" fill="${c.fur}"/><g clip-path="url(#${id})">${faceLayers(c)}</g>${eyeOpen(98)}${eyeOpen(142)}<path d="M108 113Q120 105 132 113Q130 126 120 129Q110 126 108 113z" fill="${INK}"/><path d="M120 129v6M120 135c-3 7-12 8-17 2M120 135c3 7 12 8 17 2" stroke="${INK}" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M85 151Q120 170 155 151" stroke="#E5574F" stroke-width="9" fill="none" stroke-linecap="round"/>`;
