@@ -3,7 +3,7 @@ import XCTest
 
 /* Unit tests for Logic.swift. They mirror tests/countdown.test.js and the Android LogicTest so all platforms agree. */
 final class LogicTests: XCTestCase {
-    let now = Date(timeIntervalSince1970: 1_906_286_400)      // 2030-06-01 12:00 UTC
+    let now = Date(timeIntervalSince1970: 1_906_545_600)      // 2030-06-01 12:00 UTC
 
     func utc(_ y: Int, _ m: Int, _ d: Int, _ h: Int = 0, _ mi: Int = 0) -> Date {
         var cal = Calendar(identifier: .gregorian); cal.timeZone = TimeZone(identifier: "UTC")!
