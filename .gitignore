@@ -19,3 +19,8 @@ apps/android/build/
 apps/android/app/build/
 apps/android/.gradle/
 apps/android/keystore.properties
+apps/ios/Pawcount.xcodeproj/
+apps/ios/build/
+apps/ios/shots/
+apps/ios/test.log
+apps/ios/Pawcount/Info.plist

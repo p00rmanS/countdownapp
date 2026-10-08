@@ -1,0 +1,64 @@
+# XcodeGen spec: `brew install xcodegen && xcodegen generate` creates Pawcount.xcodeproj
+name: Pawcount
+options:
+  bundleIdPrefix: app.pawcount
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+    CODE_SIGN_STYLE: Automatic
+targets:
+  Pawcount:
+    type: application
+    platform: iOS
+    sources:
+      - path: Pawcount
+      # the dog/scene art, animation table and fonts are shared with the Android app
+      - path: ../../native/assets
+        buildPhase: resources
+      - path: ../../native/fonts
+        buildPhase: resources
+    info:
+      path: Pawcount/Info.plist
+      properties:
+        CFBundleDisplayName: Pawcount
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIAppFonts:
+          - Fredoka-Medium.ttf
+          - Fredoka-SemiBold.ttf
+          - Fredoka-Bold.ttf
+          - Nunito-Regular.ttf
+          - Nunito-Bold.ttf
+          - Nunito-ExtraBold.ttf
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pawcount.countdown
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+  PawcountTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [PawcountTests]
+    dependencies:
+      - target: Pawcount
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pawcount.countdown.tests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Pawcount:
+    build:
+      targets:
+        Pawcount: all
+        PawcountTests: [test]
+    test:
+      targets: [PawcountTests]
