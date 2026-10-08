@@ -1,34 +1,43 @@
 # 🐾 Pawcount
 
-Countdowns with a dog who can't wait either. Full spec: [PROJECT_1.md](PROJECT_1.md).
+Countdowns with a dog who can't wait either. Full product spec: [PROJECT_1.md](PROJECT_1.md).
 
-## Run it (any device)
-```bash
-python serve.py        # http://localhost:5173
-```
-Open it on your phone via your computer's LAN address (same Wi-Fi), or host the folder on any static host (Netlify, Vercel, GitHub Pages — needs HTTPS for install/notifications).
+Three apps, one design:
 
-## Install as an app (PWA)
-- **iPhone/iPad (Safari):** Share → *Add to Home Screen*. Reminders work once installed (iOS 16.4+).
-- **Android (Chrome):** Settings → *Install app* button, or ⋮ → *Install app*.
+| | Tech | Folder |
+|---|---|---|
+| **Android** | Kotlin + Jetpack Compose (native) | `apps/android` |
+| **iPhone** | Swift + SwiftUI (native) | `apps/ios` |
+| **Web / PWA** | HTML + CSS + JS (installable) | repo root (`index.html`, `js/`, `css/`) |
 
-## Ship to the App Store / Google Play (Capacitor)
-Same code, real native shell, with real haptics and **scheduled local notifications that fire with the app closed**.
+Live web app: https://p00rmans.github.io/countdownapp/
+
+## How the three stay the same
+- **Art.** The dogs and scenes are drawn once, in `js/dogs.js` and `js/scenes.js`. `node tools/export-native.js` turns them into
+  JSON scene graphs in `native/assets/` (plus `anim.json`, the animation table, and `meta.json`, the data tables). Both native
+  apps load those files and draw them with their own renderer (`Render.kt` / `Render.swift`), so a corgi looks identical everywhere.
+  CI fails if `native/assets` is out of date.
+- **Logic.** The countdown maths and dog stages live in `js/countdown.js`, `Logic.kt` and `Logic.swift`, covered by the same
+  tests on each platform (time zones, daylight saving, stages, yearly repeats, backups).
+- **Data.** All three read and write the same backup JSON.
+
+## Run and test
 ```bash
 npm install
-npx cap add ios        # needs a Mac + Xcode
-npx cap add android    # needs Android Studio
-npm run ios            # builds www/, syncs, opens Xcode
-npm run android        # builds www/, syncs, opens Android Studio
+npm start              # web app on http://localhost:5173  (python serve.py --lan to open it on a phone)
+npm test               # web: 21 maths tests + 24 screen/interaction tests
 ```
-Then set your signing team / bundle id (`app.pawcount.countdown` in `capacitor.config.json`) and archive.
-Android notification icon: add a white-on-transparent `ic_stat_paw` drawable in `android/app/src/main/res/drawable`.
+**Android** (JDK 21 + Android SDK): `cd apps/android && ./gradlew :app:testDebugUnitTest :app:assembleDebug`
+**iPhone** (Mac + Xcode): `brew install xcodegen && cd apps/ios && xcodegen generate && open Pawcount.xcodeproj`
 
-## Layout
-`js/countdown.js` time-zone-safe math + dog state machine · `js/dogs.js` SVG dogs · `js/scenes.js` backdrops ·
-`js/native.js` haptics/notification bridge · `js/app.js` screens · `css/styles.css` design system.
+GitHub Actions builds and tests all three on every push, runs the Swift tests in an iPhone simulator, and uploads simulator
+screenshots of every screen (artifact `ios-screenshots`). The web app is published to GitHub Pages automatically.
 
-## Tests
-```bash
-npm test     # countdown maths (time zones, DST, stages, yearly repeat) + every screen and interaction
-```
+## Releasing
+See [RELEASING.md](RELEASING.md) (Google Play, App Store / TestFlight).
+
+## Where things are
+`js/countdown.js` · `apps/android/.../Logic.kt` · `apps/ios/Pawcount/Logic.swift` - the countdown brain
+`tools/export-native.js`, `native/` - shared art, animation table, fonts
+`apps/*/…/Render.*`, `SceneView.*` - the shared-art renderer and the animated scene
+`apps/*/…/Services.*` - haptics, sounds, shake, reminders, photos, saving

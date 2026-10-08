@@ -5,5 +5,5 @@ const items = ['index.html', 'manifest.json', 'icon.svg', 'sw.js', 'css', 'js', 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 for (const i of items) fs.cpSync(path.join(root, i), path.join(out, i), { recursive: true });
-// Capacitor injects window.Capacitor itself; no service worker is needed inside the native shell.
+// The web app (and its PWA) is published from ./www by the Pages workflow.
 console.log('Built www/ with', items.length, 'entries');
