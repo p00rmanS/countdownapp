@@ -77,7 +77,7 @@ func parseWall(_ s: String) -> Wall {
     return Wall(y: at(0), mo: max(1, at(1)), d: max(1, at(2)), h: at(3), mi: at(4))
 }
 
-private func daysIn(year: Int, month: Int) -> Int {
+private func daysInMonth(year: Int, month: Int) -> Int {
     let cal = gregorian(TimeZone(identifier: "UTC")!)
     let d = cal.date(from: DateComponents(year: year, month: month, day: 1))!
     return cal.range(of: .day, in: .month, for: d)?.count ?? 30
@@ -89,7 +89,7 @@ func compute(_ c: Countdown, now: Date = Date()) -> Computed {
     let base = parseWall(c.targetAt)
 
     // 29 Feb falls back to 28 Feb in non-leap years
-    func occ(_ y: Int) -> (Int, Int, Int) { (y, base.mo, min(base.d, daysIn(year: y, month: base.mo))) }
+    func occ(_ y: Int) -> (Int, Int, Int) { (y, base.mo, min(base.d, daysInMonth(year: y, month: base.mo))) }
     func instant(_ d: (Int, Int, Int)) -> Date {
         cal.date(from: DateComponents(year: d.0, month: d.1, day: d.2, hour: c.allDay ? 0 : base.h, minute: c.allDay ? 0 : base.mi)) ?? now
     }

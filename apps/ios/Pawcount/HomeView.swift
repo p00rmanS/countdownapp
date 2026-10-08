@@ -9,7 +9,11 @@ struct HomeView: View {
     @State var sort = "soonest"
 
     var body: some View {
-        Ticker { now in
+        Ticker { now in content(now) }
+    }
+
+    /// everything on the screen for one tick of the clock (a normal function so it can use plain Swift statements)
+    func content(_ now: Date) -> some View {
             let all = store.data.countdowns.filter { !$0.archived }.map { ($0, compute($0, now: now)) }
             let items = all.filter { $0.1.phase != .past }.sorted { a, b in
                 let ra = a.1.phase == .today ? 0 : 1, rb = b.1.phase == .today ? 0 : 1
@@ -24,7 +28,7 @@ struct HomeView: View {
                     return ia != ib ? ia < ib : a.1.target < b.1.target
                 }
             }
-            ScrollView(showsIndicators: false) {
+            return ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 2) {
@@ -60,7 +64,6 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 20).padding(.top, 18).padding(.bottom, 120)
             }
-        }
     }
 
     private func dateLine(_ d: Date) -> String { let f = DateFormatter(); f.setLocalizedDateFormatFromTemplate("EEEEMMMMd"); return f.string(from: d) }
