@@ -1,0 +1,13 @@
+{
+  "appId": "app.pawcount.countdown",
+  "appName": "Pawcount",
+  "webDir": "www",
+  "backgroundColor": "#FFF8EE",
+  "ios": { "contentInset": "never", "scrollEnabled": false, "limitsNavigationsToAppBoundDomains": false },
+  "android": { "backgroundColor": "#FFF8EE", "allowMixedContent": false },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 800, "backgroundColor": "#FFF8EE", "showSpinner": false },
+    "StatusBar": { "overlaysWebView": true },
+    "LocalNotifications": { "smallIcon": "ic_stat_paw", "iconColor": "#E8A15C" }
+  }
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-motion="full">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pawcount">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>Pawcount — countdowns with a dog who can't wait either</title>
+<meta name="description" content="A warm, animated countdown app for couples. A dog companion gets more excited every day your trips, birthdays and big days get closer.">
+<meta name="theme-color" content="#FFF8EE">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" id="favicon" href="icons/favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preload" href="fonts/fredoka.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="stage">
+  <aside class="brand-panel" aria-label="About Pawcount">
+    <div class="brand-logo" id="brandLogo" aria-hidden="true"></div>
+    <p class="brand-eyebrow">iOS &amp; Android · interactive prototype</p>
+    <h1 class="brand-title">Paw<span>count</span></h1>
+    <p class="brand-tag">Every day closer is another tail wag.</p>
+    <ul class="brand-list">
+      <li><b>One dog, seven moods.</b> Napping, curious, waiting, packing, zoomies, party, memory.</li>
+      <li><b>Tap</b> to bark &nbsp;·&nbsp; <b>hold</b> to pet &nbsp;·&nbsp; <b>shake</b> to sneeze <kbd>S</kbd></li>
+      <li><b>Time-zone true.</b> Count to the moment in Tokyo, not your living room.</li>
+    </ul>
+    <button class="btn btn-ghost" id="brandSamples" type="button">Load the sample adventures</button>
+  </aside>
+
+  <div id="app" class="device">
+    <div id="pull" class="pull" aria-hidden="true"><span class="pull-ball"></span></div>
+    <main id="view" tabindex="-1"></main>
+    <nav id="tabbar" class="tabbar" aria-label="Main">
+      <a class="tab" data-tab="home" href="#/"><span class="tab-ic"></span><span class="tab-lab">Home</span></a>
+      <a class="tab-fab" href="#/new" aria-label="New countdown"><span></span></a>
+      <a class="tab" data-tab="memories" href="#/memories"><span class="tab-ic"></span><span class="tab-lab">Memories</span></a>
+    </nav>
+    <div id="sheet-root"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <canvas id="confetti" aria-hidden="true"></canvas>
+  </div>
+</div>
+<script src="js/util.js"></script>
+<script src="js/countdown.js"></script>
+<script src="js/store.js"></script>
+<script src="js/dogs.js"></script>
+<script src="js/scenes.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/native.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "name": "pawcount",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Countdowns with a dog who can't wait either.",
+  "scripts": {
+    "start": "python serve.py 5173",
+    "build": "node scripts/build-www.js",
+    "sync": "npm run build && cap sync",
+    "ios": "npm run sync && cap open ios",
+    "android": "npm run sync && cap open android",
+    "assets": "node scripts/build-www.js",
+    "test": "node tests/countdown.test.js && node tests/ui.test.js",
+    "release:android": "npm run build && cap sync android && cd android && gradlew bundleRelease assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/haptics": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
+    "@capacitor/local-notifications": "^7.0.0",
+    "@capacitor/splash-screen": "^7.0.0",
+    "@capacitor/status-bar": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0",
+    "jsdom": "^29.1.1"
+  }
+}

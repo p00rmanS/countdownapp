@@ -1,0 +1,25 @@
+{
+  "id": "/pawcount",
+  "name": "Pawcount",
+  "short_name": "Pawcount",
+  "description": "Countdowns with a dog who can't wait either.",
+  "lang": "en",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF8EE",
+  "theme_color": "#FFF8EE",
+  "categories": ["lifestyle", "utilities"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "New countdown", "short_name": "New", "url": "./index.html#/new", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Memories", "url": "./index.html#/memories", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
