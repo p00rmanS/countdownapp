@@ -135,7 +135,7 @@ func typeEmoji(_ type: String) -> String {
 
 /* ---------------- confetti ---------------- */
 
-private struct Bit { var x: Double, y: Double, vx: Double, vy: Double, rot: Double, vr: Double, color: Color, size: Double, life: Double, shape: Int }
+struct Bit { var x: Double, y: Double, vx: Double, vy: Double, rot: Double, vr: Double, color: Color, size: Double, life: Double, shape: Int }
 
 /// Full-screen confetti. Each time `burst` changes a new shower pops from the upper middle of the screen.
 struct ConfettiOverlay: View {
