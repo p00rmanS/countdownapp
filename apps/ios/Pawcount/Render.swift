@@ -280,7 +280,7 @@ func drawNode(_ ctx: inout GraphicsContext, _ n: Node, _ s: DrawState, alpha: Do
         let cap: CGLineCap = n.cap == "round" ? .round : (n.cap == "square" ? .square : .butt)
         let join: CGLineJoin = n.join == "round" ? .round : (n.join == "bevel" ? .bevel : .miter)
         c.stroke(shape, with: .color(solid(n, stroke: true, s.palette).opacity(a)),
-                 style: StrokeStyle(lineWidth: n.strokeWidth, lineCap: cap, lineJoin: join, dash: n.dash ?? []))
+                 style: StrokeStyle(lineWidth: n.strokeWidth, lineCap: cap, lineJoin: join, dash: (n.dash ?? []).map { CGFloat($0) }))
     }
 }
 
