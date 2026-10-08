@@ -189,8 +189,10 @@ private fun drawAtmosphere(c: android.graphics.Canvas, stage: Stage, w: Float, h
             p.shader = android.graphics.LinearGradient(0f, 0f, 0f, h, intArrayOf(0xFF10163F.toInt(), 0xFF272C66.toInt(), 0xFF3A3570.toInt()), floatArrayOf(0f, 0.7f, 1f), Shader.TileMode.CLAMP)
             p.alpha = (0.62f * 255).toInt(); c.drawRect(0f, 0f, w, h, p); p.shader = null; p.alpha = 255
             val mr = minOf(w, h) * 0.055f; val mx = w * 0.83f; val my = h * 0.15f
-            p.color = 0xFFFFF4CC.toInt(); c.drawCircle(mx, my, mr, p)
-            p.color = 0xFF272C66.toInt(); c.drawCircle(mx + mr * 0.55f, my - mr * 0.2f, mr * 0.9f, p)
+            // crescent: a full disc with a shifted disc cut out of it
+            val moon = Path().apply { addCircle(mx, my, mr, Path.Direction.CW) }
+            moon.op(Path().apply { addCircle(mx + mr * 0.55f, my - mr * 0.2f, mr * 0.9f, Path.Direction.CW) }, Path.Op.DIFFERENCE)
+            p.color = 0xFFFFF4CC.toInt(); c.drawPath(moon, p)
             repeat(if (mini) 4 else 8) {
                 val sx = w * (0.06f + rnd.nextFloat() * 0.88f); val sy = h * (0.06f + rnd.nextFloat() * 0.40f)
                 val tw = if (still) 0.8f else 0.25f + 0.75f * (0.5f + 0.5f * sin(t * 2.1f + it * 1.7f))

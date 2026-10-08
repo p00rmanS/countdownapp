@@ -191,8 +191,10 @@ private func drawAtmosphere(_ c: inout GraphicsContext, _ stage: Stage, _ sz: CG
         // dim the room and put a moon and stars in the sky
         c.fill(Path(CGRect(origin: .zero, size: sz)), with: .linearGradient(Gradient(stops: [.init(color: Color(hex: "#10163F").opacity(0.62), location: 0), .init(color: Color(hex: "#272C66").opacity(0.62), location: 0.7), .init(color: Color(hex: "#3A3570").opacity(0.62), location: 1)]), startPoint: .zero, endPoint: CGPoint(x: 0, y: h)))
         let mr = min(w, h) * 0.055, mx = w * 0.83, my = h * 0.15
-        c.fill(Path(ellipseIn: CGRect(x: mx - mr, y: my - mr, width: mr * 2, height: mr * 2)), with: .color(Color(hex: "#FFF4CC")))
-        c.fill(Path(ellipseIn: CGRect(x: mx + mr * 0.55 - mr * 0.9, y: my - mr * 0.2 - mr * 0.9, width: mr * 1.8, height: mr * 1.8)), with: .color(Color(hex: "#272C66")))
+        // crescent: a full disc with a shifted disc cut out of it
+        var moon = c
+        moon.clip(to: Path(ellipseIn: CGRect(x: mx + mr * 0.55 - mr * 0.9, y: my - mr * 0.2 - mr * 0.9, width: mr * 1.8, height: mr * 1.8)), options: .inverse)
+        moon.fill(Path(ellipseIn: CGRect(x: mx - mr, y: my - mr, width: mr * 2, height: mr * 2)), with: .color(Color(hex: "#FFF4CC")))
         for i in 0..<(mini ? 4 : 8) {
             let sx = w * (0.06 + r() * 0.88), sy = h * (0.06 + r() * 0.40)
             let tw = still ? 0.8 : 0.25 + 0.75 * (0.5 + 0.5 * sin(t * 2.1 + Double(i) * 1.7))
