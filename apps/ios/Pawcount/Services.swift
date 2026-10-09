@@ -28,7 +28,7 @@ final class AppStore: ObservableObject {
     /// bumps every time something should rain confetti (the overlay watches this)
     @Published var confettiBurst = 0
     /// the companion picked on the welcome screens, so the create flow can start with it
-    @Published var welcomeBreed = "golden"
+    @Published var welcomeBreed = "scott"
     @Published var welcomeBreedChosen = false
     @Published var systemReduceMotion = UIAccessibility.isReduceMotionEnabled
 

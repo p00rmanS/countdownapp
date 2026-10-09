@@ -54,7 +54,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     val stack = mutableStateListOf<Route>(if (repo.data.value.onboarded || repo.data.value.countdowns.isNotEmpty()) Route.Home else Route.Welcome)
     var toast by mutableStateOf<String?>(null)
     /** the companion picked during the welcome screens, so the create flow can start with it */
-    var welcomeBreed by mutableStateOf("golden")
+    var welcomeBreed by mutableStateOf("scott")
     var welcomeBreedChosen by mutableStateOf(false)
     /** bumps every time something should rain confetti (the overlay in PawApp watches this) */
     var confettiBurst by mutableStateOf(0)

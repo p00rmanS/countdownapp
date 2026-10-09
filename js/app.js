@@ -18,7 +18,7 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const view = $('#view'), tabbar = $('#tabbar'), sheetRoot = $('#sheet-root'), appEl = $('#app');
 
-  const ui = { stack: [location.hash || '#/'], sort: 'soonest', draft: null, step: 0, flow: 'new', welcome: 0, welcomeBreed: 'golden', preview: 'waiting', sceneApi: null, onFetch: null };
+  const ui = { stack: [location.hash || '#/'], sort: 'soonest', draft: null, step: 0, flow: 'new', welcome: 0, welcomeBreed: 'scott', preview: 'waiting', sceneApi: null, onFetch: null };
   const MODES = [['full', 'Full timer'], ['days', 'Days'], ['sleeps', 'Sleeps'], ['weeks', 'Weeks']];
 
   /* =============================== helpers =============================== */
@@ -155,7 +155,7 @@
 
     let body;
     if (!items.length) {
-      const empty = { id: 'empty', type: 'custom', dog: { breed: 'golden', name: 'Sunny' }, accent: '#E8A15C', title: '', displayMode: 'full' };
+      const empty = { id: 'empty', type: 'custom', dog: { breed: 'scott', name: 'Scott' }, accent: '#E8A15C', title: '', displayMode: 'full' };
       body = `<div class="empty">
         <div class="empty-scene">${P.sceneHTML(empty, { stage: 'nap', phase: 'upcoming', remaining: 1 }, { stage: 'nap', size: 'hero' })}</div>
         <h2>Nothing to wait for… yet</h2>

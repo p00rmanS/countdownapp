@@ -78,7 +78,7 @@ private struct EmptyHome: View {
     let pastCount: Int
     var body: some View {
         let demo = Countdown(id: "empty", title: "", type: "custom", targetAt: "2030-01-01T00:00", timeZone: "UTC", allDay: false, yearly: false, createdAt: Date().addingTimeInterval(-DAY),
-                             dog: Dog(breed: "golden", name: "Sunny"), accent: "#E8A15C", displayMode: .full)
+                             dog: Dog(breed: "scott", name: "Scott"), accent: "#E8A15C", displayMode: .full)
         VStack(spacing: 8) {
             SceneView(c: demo, k: compute(demo), art: store.art, size: .hero, stage: .nap, reduceMotion: store.reduceMotion)
                 .clipShape(RoundedRectangle(cornerRadius: 34)).shadow(color: .black.opacity(0.15), radius: 10, y: 4)
