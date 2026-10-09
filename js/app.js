@@ -465,7 +465,7 @@
     const cta = step === 4 ? (ui.flow === 'edit' ? 'Save changes' : `Meet ${esc(d.dogName || 'your dog')}`) : step === 3 ? 'Finish' : 'Next';
     return `<section class="flow" style="--accent:${accent};--on:${P.onColor(accent)};--accent-soft:color-mix(in srgb, ${accent} 18%, var(--surface))">
       <header class="flow-top"><button class="icon-btn" data-action="flow-back" aria-label="${step === 0 ? 'Close' : 'Previous step'}">${icon(step === 0 ? 'close' : 'back')}</button>
-        <ol class="trail" aria-label="Step ${step + 1} of 5: ${STEPS[step]}">${STEPS.map((s, i) => `<li class="${i < step ? 'done' : i === step ? 'now' : ''}"><span class="pawdot">${icon('paw')}</span><span class="tl">${s}</span></li>`).join('')}</ol><span class="icon-btn ghost-slot"></span></header>
+        <span class="icon-btn ghost-slot"></span></header>
       <div class="flow-head">${step < 4 ? `<p class="eyebrow">Step ${step + 1} of 5 · ${STEPS[step]}</p><h1>${HEADS[step]}</h1>` : ''}</div>
       <div id="flow-body" class="flow-body">${stepBody()}</div>
       <footer class="flow-cta"><button id="flowNext" class="btn btn-primary btn-xl" data-action="flow-next" ${stepValid() ? '' : 'disabled'}>${cta}</button></footer>

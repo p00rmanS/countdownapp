@@ -151,16 +151,7 @@ fun FlowScreen(vm: AppViewModel, editId: String?) {
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(if (step == 0) "close" else "back", if (step == 0) "Close" else "Previous step", { back() })
-            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)) {
-                STEPS.forEachIndexed { i, s ->
-                    Column(Modifier.width(58.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Box(Modifier.size(if (i == step) 36.dp else 30.dp).clip(CircleShape).background(if (i <= step) accent else pc.ink.copy(alpha = 0.08f)), contentAlignment = Alignment.Center) {
-                            Icon("paw", if (i <= step) onAccent(accent) else pc.ink2, 17.dp)
-                        }
-                        Text(s, style = T.body(10, FontWeight.ExtraBold).copy(color = if (i == step) pc.ink else pc.ink2), maxLines = 1)
-                    }
-                }
-            }
+            Box(Modifier.weight(1f))
             Box(Modifier.size(48.dp))
         }
         Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(scroll).padding(horizontal = 20.dp)) {

@@ -101,13 +101,6 @@ struct FlowView: View {
             HStack(spacing: 4) {
                 IconButton(icon: step == 0 ? "close" : "back", label: step == 0 ? "Close" : "Previous step") { back() }
                 Spacer(minLength: 0)
-                ForEach(0..<5, id: \.self) { i in
-                    VStack(spacing: 2) {
-                        PawIcon(name: "paw", color: i <= step ? accent.onColor : pc.ink2, size: 16).frame(width: i == step ? 34 : 28, height: i == step ? 34 : 28)
-                            .background(Circle().fill(i <= step ? accent : pc.ink.opacity(0.08)))
-                        Text(STEPS[i]).font(PawFont.body(10, 800)).foregroundColor(i == step ? pc.ink : pc.ink2).lineLimit(1).minimumScaleFactor(0.7)
-                    }.frame(width: 48)
-                }
                 Spacer(minLength: 0)
                 Color.clear.frame(width: 48, height: 48)
             }.padding(.horizontal, 20).padding(.vertical, 10)
