@@ -78,6 +78,13 @@ class SceneController {
     var fetchAt by mutableStateOf<Float?>(null)
     var hint by mutableStateOf(true)
     var clock = 0f
+    /** a sleeping dog opens his eyes for a few seconds when you play with him */
+    var awake by mutableStateOf(false)
+    private var wakeJob: kotlinx.coroutines.Job? = null
+    fun wake(scope: kotlinx.coroutines.CoroutineScope) {
+        awake = true; wakeJob?.cancel()
+        wakeJob = scope.launch { delay(6000); awake = false }
+    }
 }
 
 @Composable
@@ -98,9 +105,10 @@ fun SceneView(
     val palette = remember(dog, accent) { dogPalette(art.meta, dog, accent.toArgb()) }
     val showDoor = stage == Stage.WAITING || stage == Stage.PACKING
     val sceneNode = remember(type, showDoor) { art.scene(type, showDoor) }
-    val dogNode = remember(dog.variant, stage, type, bell) { art.dog(dog.variant, stage, type, bell) }
+    val dogStage = if (controller?.awake == true && stage == Stage.NAP) Stage.CURIOUS else stage
+    val dogNode = remember(dog.variant, dogStage, type, bell) { art.dog(dog.variant, dogStage, type, bell) }
     val clock by rememberClock()
-    val anims = remember(stage) { dogAnims(art.anim, stage) }
+    val anims = remember(dogStage) { dogAnims(art.anim, dogStage) }
     val seed = remember(c.id) { c.id.hashCode() }
     val ctrl = controller
     val scope = rememberCoroutineScope()
@@ -120,9 +128,9 @@ fun SceneView(
                 sceneNode?.let { drawScene(nc, it, w, h, bg) }
                 drawAtmosphere(nc, stage, w, h, t, seed, size == SceneSize.CARD, reduceMotion)
                 val dogSize = h * size.dogHeight
-                val st = DrawState(palette, t, stage, anims, ctrl?.reactions, art.anim.state, reduceMotion = reduceMotion)
+                val st = DrawState(palette, t, dogStage, anims, ctrl?.reactions, art.anim.state, reduceMotion = reduceMotion)
                 val fetching = ctrl?.fetchAt?.let { t - it }?.takeIf { it < 2f }
-                val stDog = if (fetching != null) DrawState(palette, t, stage, anims, ctrl.reactions, art.anim.state + ("fetching" to art.anim.state.getValue("fetching")), reduceMotion = reduceMotion) else st
+                val stDog = if (fetching != null) DrawState(palette, t, dogStage, anims, ctrl.reactions, art.anim.state + ("fetching" to art.anim.state.getValue("fetching")), reduceMotion = reduceMotion) else st
                 if (fetching != null && ctrl.reactions.since("fetching", t) == null) ctrl.reactions.start("fetching", ctrl.fetchAt!!)
                 dogNode?.let { drawDog(nc, it, (w - dogSize) / 2f, h - h * size.dogBottom - dogSize, dogSize, stDog) }
                 // floating hearts (pet) and the fetch ball

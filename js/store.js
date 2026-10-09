@@ -13,7 +13,7 @@
     countdowns: [],
     celebrated: {},
     lastNotified: '',
-    settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'scott', profileName: '', profilePhoto: '' },
+    settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'scott', profileName: '', profilePhoto: '', parentTitle: '' },
   });
   // settings come from storage / backups: keep only values of the right type
   function sanitizeSettings(s) {
@@ -24,6 +24,7 @@
     if (!['system', 'on', 'off'].includes(out.motion)) out.motion = 'system';
     if (!/^[a-z]+$/.test(out.icon)) out.icon = 'scott';
     out.profileName = out.profileName.slice(0, 30);
+    if (!['', 'mama', 'papa', 'parent'].includes(out.parentTitle)) out.parentTitle = '';
     if (out.profilePhoto && !P.PHOTO_RE.test(out.profilePhoto) && !/^[\w.-]{1,80}$/.test(out.profilePhoto)) out.profilePhoto = '';
     return out;
   }

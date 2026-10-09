@@ -202,6 +202,8 @@ struct SettingsView: View {
                             if !s.profilePhoto.isEmpty { SmallButton(title: "Remove photo", tint: pc.surface) { Photos.delete(s.profilePhoto); store.setSettings { $0.profilePhoto = "" } } }
                         }
                     }
+                    Muted("What does your dog call you?", 14).padding(.top, 14)
+                    Seg(options: [("mama", "Mama"), ("papa", "Papa"), ("parent", "Fur parent")], selected: s.parentTitle.isEmpty ? "parent" : s.parentTitle, label: "What your dog calls you") { v in store.setSettings { $0.parentTitle = v } }
                     Muted("Stays on this device and in your backup. Sign-in with Apple or Google, so your profile follows you between phones, is planned.", 14).padding(.top, 10)
                 }
 

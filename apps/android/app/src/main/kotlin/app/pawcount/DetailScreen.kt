@@ -94,16 +94,24 @@ fun DetailScreen(vm: AppViewModel, id: String) {
     LaunchedEffect(id) { delay(600); say(when (k.stage) { Stage.NAP -> "Zzz…"; Stage.TODAY -> "IT'S TODAY!!! 🎉"; Stage.ZOOMIES -> "ZOOM!"; Stage.MEMORY -> "Remember this? 💛"; else -> "Woof!" }) }
 
     // play: treat / feed / ball / tickle, and a joy meter that fades while you are away
+    Who.name = Who.of(settings.parentTitle)
     var joy by remember(id) { mutableStateOf(Joy.now(ctx, id)) }
+    var needs by remember(id) { mutableStateOf(Joy.needs(ctx, id)) }
+    LaunchedEffect(id) {
+        delay(2600)
+        val (food, water) = Joy.needs(ctx, id)
+        if (water < 30f) ctrl.bubble = dogLine(c, compute(c), "thirsty") else if (food < 30f) ctrl.bubble = dogLine(c, compute(c), "hungry")
+    }
     val scope = rememberCoroutineScope()
     fun play(what: String) {
-        ctrl.hint = false
-        val lines = when (what) { "Treat" -> listOf("Nom nom! 🦴", "Best human ever!", "More? 👀"); "Feed" -> listOf("Yum yum yum…"); "Tickle" -> listOf("Hehehe!!", "That tickles! 😆", "Again, again!"); else -> emptyList() }
+        ctrl.hint = false; ctrl.wake(scope)
+        val lines = when (what) { "Treat" -> listOf("Nom nom! 🦴", "Best human ever!", "More? 👀"); "Feed" -> listOf("Yum yum yum…"); "Tickle" -> listOf("Hehehe!!", "That tickles! 😆", "Again, again!"); "Water" -> listOf("Glug glug glug!", "Ahh, so refreshing!", "Thank you, ${Who.name}! 💧"); else -> emptyList() }
         when (what) {
             "Ball" -> { ctrl.fetchAt = ctrl.clock; Haptics.play(ctx, settings.haptics, "soft"); ctrl.bubble = dogLine(c, compute(c), "fetch") }
             "Tickle" -> { ctrl.reactions.start("petting", ctrl.clock); ctrl.bubble = lines.random(); Haptics.play(ctx, settings.haptics, "purr"); scope.launch { delay(1600); ctrl.reactions.stop("petting") } }
-            else -> { ctrl.bubble = lines.random(); Haptics.play(ctx, settings.haptics, if (what == "Feed") "purr" else "tick"); Sounds.play(settings.sound, "chime")
-                scope.launch { repeat(if (what == "Feed") 5 else 2) { ctrl.reactions.start("bark", ctrl.clock); delay(500) } } }
+            else -> { ctrl.bubble = lines.random(); Haptics.play(ctx, settings.haptics, if (what == "Treat") "tick" else "purr"); Sounds.play(settings.sound, "chime")
+                needs = when (what) { "Feed" -> Joy.fill(ctx, id, 55f, 0f); "Water" -> Joy.fill(ctx, id, 0f, 60f); else -> Joy.fill(ctx, id, 8f, 0f) }
+                scope.launch { repeat(if (what == "Feed" || what == "Water") 5 else 2) { ctrl.reactions.start("bark", ctrl.clock); delay(500) } } }
         }
         val before = joy; joy = Joy.add(ctx, id, when (what) { "Feed" -> 10f; "Ball" -> 6f; else -> 8f })
         if (before < 100f && joy >= 100f) { vm.confetti(); ctrl.bubble = "${c.dog.name} loves you! 💛"; Haptics.play(ctx, settings.haptics, "success") }
@@ -132,8 +140,8 @@ fun DetailScreen(vm: AppViewModel, id: String) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Box(Modifier.fillMaxWidth().height(sceneH)) {
                 SceneView(c, k, vm.art, vm.fonts, SceneSize.DETAIL, controller = ctrl, interactive = true, reduceMotion = reduce,
-                    onBark = { ctrl.bubble = dogLine(c, compute(c), "tap"); Haptics.play(ctx, settings.haptics, "tick"); Sounds.play(settings.sound, "bark") },
-                    onPetStart = { ctrl.bubble = dogLine(c, compute(c), "pet") }, onPetEnd = {})
+                    onBark = { ctrl.wake(scope); ctrl.bubble = dogLine(c, compute(c), "tap"); Haptics.play(ctx, settings.haptics, "tick"); Sounds.play(settings.sound, "bark") },
+                    onPetStart = { ctrl.wake(scope); ctrl.bubble = dogLine(c, compute(c), "pet") }, onPetEnd = {})
                 // dark strip so status-bar icons stay readable over a bright scene
                 Box(Modifier.fillMaxWidth().height(110.dp).background(Brush.verticalGradient(listOf(Color(0x52140C08), Color.Transparent))))
                 Row(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -148,9 +156,9 @@ fun DetailScreen(vm: AppViewModel, id: String) {
                 }
                 Column(Modifier.align(Alignment.BottomCenter).padding(bottom = 44.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     if (ctrl.hint) Text("Tap to bark · Hold to pet · Shake", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
-                    Text("♥  ${c.dog.name} is ${Joy.label(joy)}", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
+                    Text("♥  ${c.dog.name} is ${Joy.label(joy)}${if (needs.second < 30f) " · thirsty" else if (needs.first < 30f) " · hungry" else ""}", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
                     Row(Modifier.padding(horizontal = 10.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        listOf("bone" to "Treat", "bowl" to "Feed", "ball" to "Ball", "smile" to "Tickle").forEach { (iconName, label) ->
+                        listOf("bone" to "Treat", "bowl" to "Feed", "drop" to "Water", "ball" to "Ball", "smile" to "Tickle").forEach { (iconName, label) ->
                             Column(Modifier.weight(1f).shadow(4.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(Color(0xEBFFFFFF)).clickable(role = Role.Button, onClickLabel = "$label ${c.dog.name}") { play(label) }.padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Icon(iconName, Color(0xFF3D2616), 22.dp); Text(label, style = T.body(12, FontWeight.ExtraBold).copy(color = Color(0xFF3D2616)))
                             }
@@ -367,6 +375,17 @@ object Joy {
         val v = minOf(100f, now(ctx, id) + n)
         prefs(ctx).edit().putString(id, "$v|${System.currentTimeMillis()}").apply()
         return v
+    }
+    /** hunger and thirst (0-100, full = 100): they run down while you are away, about 5 and 8 points an hour */
+    fun needs(ctx: android.content.Context, id: String): Pair<Float, Float> {
+        val raw = prefs(ctx).getString("n.$id", null) ?: return 70f to 70f
+        val p = raw.split("|"); val h = (System.currentTimeMillis() - p[2].toLong()) / 3_600_000f
+        return maxOf(0f, p[0].toFloat() - h * 5f) to maxOf(0f, p[1].toFloat() - h * 8f)
+    }
+    fun fill(ctx: android.content.Context, id: String, food: Float, water: Float): Pair<Float, Float> {
+        val (f, w) = needs(ctx, id); val nf = minOf(100f, f + food); val nw = minOf(100f, w + water)
+        prefs(ctx).edit().putString("n.$id", "$nf|$nw|${System.currentTimeMillis()}").apply()
+        return nf to nw
     }
     fun label(v: Float) = when { v < 25f -> "sleepy"; v < 55f -> "content"; v < 85f -> "happy"; else -> "over the moon" }
 }

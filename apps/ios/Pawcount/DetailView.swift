@@ -16,20 +16,22 @@ struct DetailView: View {
     @State var sharing = false
     @State var shake = ShakeDetector()
     @State var joy: Double = 20
+    @State var needs: (food: Double, water: Double) = (70, 70)
 
     /// treat / feed / ball / tickle: the dog reacts and gets happier (the meter fades while you are away)
     func play(_ what: String, _ c: Countdown) {
         let s = store.settings
-        ctrl.hint = false
+        ctrl.hint = false; ctrl.wake()
         switch what {
         case "Ball": ctrl.fetchAt = ctrl.clock; Haptics.play(s.haptics, "soft"); ctrl.bubble = dogLine(c, compute(c), kind: "fetch")
         case "Tickle":
             ctrl.reactions.start("petting", ctrl.clock); ctrl.bubble = ["Hehehe!!", "That tickles! 😆", "Again, again!"].randomElement(); Haptics.play(s.haptics, "purr")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { ctrl.reactions.stop("petting") }
         default:
-            ctrl.bubble = (what == "Feed" ? ["Yum yum yum…"] : ["Nom nom! 🦴", "Best human ever!", "More? 👀"]).randomElement()
-            Haptics.play(s.haptics, what == "Feed" ? "purr" : "tick"); Sounds.play(s.sound, "chime")
-            for n in 0..<(what == "Feed" ? 5 : 2) { DispatchQueue.main.asyncAfter(deadline: .now() + Double(n) * 0.5) { ctrl.reactions.start("bark", ctrl.clock) } }
+            ctrl.bubble = (what == "Feed" ? ["Yum yum yum…"] : what == "Water" ? ["Glug glug glug!", "Ahh, so refreshing!", "Thank you, \(Who.name)! 💧"] : ["Nom nom! 🦴", "Best \(Who.name) ever!", "More? 👀"]).randomElement()
+            Haptics.play(s.haptics, what == "Treat" ? "tick" : "purr"); Sounds.play(s.sound, "chime")
+            needs = what == "Feed" ? Joy.fill(id, food: 55, water: 0) : what == "Water" ? Joy.fill(id, food: 0, water: 60) : Joy.fill(id, food: 8, water: 0)
+            for n in 0..<(what == "Feed" || what == "Water" ? 5 : 2) { DispatchQueue.main.asyncAfter(deadline: .now() + Double(n) * 0.5) { ctrl.reactions.start("bark", ctrl.clock) } }
         }
         let before = joy
         joy = Joy.add(id, what == "Feed" ? 10 : what == "Ball" ? 6 : 8)
@@ -58,8 +60,8 @@ struct DetailView: View {
                     VStack(spacing: 0) {
                         ZStack(alignment: .top) {
                             SceneView(c: c, k: k, art: store.art, size: .detail, controller: ctrl, reduceMotion: store.reduceMotion, interactive: true,
-                                      onBark: { ctrl.bubble = dogLine(c, compute(c), kind: "tap"); Haptics.play(s.haptics, "tick"); Sounds.play(s.sound, "bark") },
-                                      onPetStart: { ctrl.bubble = dogLine(c, compute(c), kind: "pet") })
+                                      onBark: { ctrl.wake(); ctrl.bubble = dogLine(c, compute(c), kind: "tap"); Haptics.play(s.haptics, "tick"); Sounds.play(s.sound, "bark") },
+                                      onPetStart: { ctrl.wake(); ctrl.bubble = dogLine(c, compute(c), kind: "pet") })
                                 .frame(height: sceneH + geo.safeAreaInsets.top).offset(y: 0)
                             LinearGradient(colors: [Color.black.opacity(0.32), .clear], startPoint: .top, endPoint: .bottom).frame(height: 110 + geo.safeAreaInsets.top).allowsHitTesting(false)
                             HStack {
@@ -73,9 +75,9 @@ struct DetailView: View {
                             VStack { Spacer()
                                 VStack(spacing: 6) {
                                     if ctrl.hint { Text("Tap to bark · Hold to pet · Shake").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66))) }
-                                    Text("♥  \(c.dog.name) is \(Joy.label(joy))").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66)))
+                                    Text("♥  \(c.dog.name) is \(Joy.label(joy))\(needs.water < 30 ? " · thirsty" : needs.food < 30 ? " · hungry" : "")").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66)))
                                     HStack(spacing: 6) {
-                                        ForEach([("bone", "Treat"), ("bowl", "Feed"), ("ball", "Ball"), ("smile", "Tickle")], id: \.1) { item in
+                                        ForEach([("bone", "Treat"), ("bowl", "Feed"), ("drop", "Water"), ("ball", "Ball"), ("smile", "Tickle")], id: \.1) { item in
                                             Button { play(item.1, c) } label: {
                                                 VStack(spacing: 0) { PawIcon(name: item.0, color: Color(hex: "#3D2616"), size: 22); Text(item.1).font(PawFont.body(12, 800)).foregroundColor(Color(hex: "#3D2616")) }
                                                     .frame(maxWidth: .infinity).padding(.vertical, 6).background(RoundedRectangle(cornerRadius: 16).fill(Color.white.opacity(0.92)))
@@ -145,7 +147,11 @@ struct DetailView: View {
             .onAppear { milestone(c, k) }
         }
         .onAppear {
-            joy = Joy.now(id)
+            joy = Joy.now(id); needs = Joy.needs(id); Who.name = Who.of(store.settings.parentTitle)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.6) {
+                let n = Joy.needs(id), cc = store.countdown(id) ?? c
+                if n.water < 30 { ctrl.bubble = dogLine(cc, compute(cc), kind: "thirsty") } else if n.food < 30 { ctrl.bubble = dogLine(cc, compute(cc), kind: "hungry") }
+            }
             shake.onShake = {
                 let cc = store.countdown(id) ?? c
                 ctrl.hint = false; ctrl.reactions.start("sneeze", ctrl.clock); ctrl.shakenAt = ctrl.clock
@@ -370,6 +376,19 @@ enum Joy {
         let v = min(100, now(id) + n)
         UserDefaults.standard.set("\(v)|\(Date().timeIntervalSince1970)", forKey: "joy." + id)
         return v
+    }
+    /// hunger and thirst (0-100, full = 100): they run down while you are away, about 5 and 8 points an hour
+    static func needs(_ id: String) -> (food: Double, water: Double) {
+        guard let raw = UserDefaults.standard.string(forKey: "needs." + id) else { return (70, 70) }
+        let p = raw.split(separator: "|")
+        guard p.count == 3, let f = Double(p[0]), let w = Double(p[1]), let t = Double(p[2]) else { return (70, 70) }
+        let h = (Date().timeIntervalSince1970 - t) / 3600
+        return (max(0, f - h * 5), max(0, w - h * 8))
+    }
+    @discardableResult static func fill(_ id: String, food: Double, water: Double) -> (food: Double, water: Double) {
+        let n = needs(id), f = min(100, n.food + food), w = min(100, n.water + water)
+        UserDefaults.standard.set("\(f)|\(w)|\(Date().timeIntervalSince1970)", forKey: "needs." + id)
+        return (f, w)
     }
     static func label(_ v: Double) -> String { v < 25 ? "sleepy" : v < 55 ? "content" : v < 85 ? "happy" : "over the moon" }
 }

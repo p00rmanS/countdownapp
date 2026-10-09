@@ -27,6 +27,13 @@ final class SceneController: ObservableObject {
     var shakenAt: Double? = nil
     var fetchAt: Double? = nil
     var clock = 0.0
+    /// a sleeping dog opens his eyes for a few seconds when you play with him
+    @Published var awake = false
+    private var wakeToken = UUID()
+    func wake() {
+        awake = true; let token = UUID(); wakeToken = token
+        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { [weak self] in if self?.wakeToken == token { self?.awake = false } }
+    }
 }
 
 /// seconds since the app started drawing (a small, continuous clock for the animations)
@@ -67,8 +74,9 @@ struct SceneView: View {
         let palette = dogPalette(art.meta, dog, accent: accent)
         let showDoor = st == .waiting || st == .packing
         let sceneNode = art.scene(type, door: showDoor)
-        let dogNode = art.dog(dog.variant, st, type, bell: bell)
-        let anims = art.anim.dogAnims(st)
+        let ds: Stage = (controller?.awake == true && st == .nap) ? .curious : st
+        let dogNode = art.dog(dog.variant, ds, type, bell: bell)
+        let anims = art.anim.dogAnims(ds)
         let seed = UInt64(truncatingIfNeeded: abs(c.id.hashValue))
 
         GeometryReader { geo in
@@ -83,7 +91,7 @@ struct SceneView: View {
                         if let s = sceneNode { drawScene(&c0, s, size: sz, bg) }
                         drawAtmosphere(&c0, st, sz, t, seed, mini: size == .card, still: reduceMotion)
                         let dogSize = sz.height * size.dogHeight
-                        var state = DrawState(palette: palette, time: t, stage: st, anims: anims, reactions: controller?.reactions, stateDefs: art.anim.state, reduceMotion: reduceMotion)
+                        var state = DrawState(palette: palette, time: t, stage: ds, anims: anims, reactions: controller?.reactions, stateDefs: art.anim.state, reduceMotion: reduceMotion)
                         if let ctrl = controller, let f = ctrl.fetchAt, t - f < 2 {
                             if ctrl.reactions.since("fetching", t) == nil { ctrl.reactions.start("fetching", f) }
                         }

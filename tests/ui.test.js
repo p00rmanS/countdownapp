@@ -84,7 +84,7 @@ test('profile: name shows in the greeting, photo replaces the dog avatar, both s
 });
 test('play tray: treat, feed, ball and tickle raise the joy meter', () => {
   go('#/c/sample-bali'); const c = A.S.get('sample-bali'); delete c.joy;
-  assert.strictEqual(doc.querySelectorAll('[data-play]').length, 4);
+  assert.strictEqual(doc.querySelectorAll('[data-play]').length, 5);
   A.ui.sceneApi.play.tickle(); assert.ok(c.joy.v > 20 && doc.querySelector('.dog.tickle'));
   const v = c.joy.v; A.ui.sceneApi.play.feed(); assert.ok(c.joy.v > v && doc.querySelector('.bowl'));
   A.ui.sceneApi.play.ball(); A.ui.sceneApi.play.treat();
@@ -95,7 +95,7 @@ test('profile photo from a phone backup (a file name, not an image) falls back t
 });
 test('empty Memories: Scott can be petted and played with', () => {
   const keep = A.S.state.countdowns; A.S.state.countdowns = [];
-  const h = go('#/memories'); assert.ok(h.includes('No memories yet') && doc.querySelector('[data-dog]') && doc.querySelectorAll('[data-play]').length === 4);
+  const h = go('#/memories'); assert.ok(h.includes('No memories yet') && doc.querySelector('[data-dog]') && doc.querySelectorAll('[data-play]').length === 5);
   A.ui.sceneApi.pet(); assert.ok(doc.querySelector('.dog.petting')); A.ui.sceneApi.play.tickle();
   A.S.state.countdowns = keep; go('#/');
 });
@@ -108,6 +108,14 @@ test('hostile shared links are neutralised (no markup injection, no crash on unk
   assert.strictEqual(doc.querySelectorAll('#view img[src="x"], #view [onerror], #view [onmouseover], #view [onload]').length, 0);
   assert.strictEqual(A.importShared('#/import/' + w.btoa('{"title":"a"}')), null);
   A.S.remove(id);
+});
+test('needs: water and food fill up, and the dog calls you Mama or Papa', () => {
+  go('#/c/sample-bali'); const c = A.S.get('sample-bali'); c.needs = { food: 10, water: 10, t: Date.now() };
+  A.ui.sceneApi.play.drink(); assert.ok(c.needs.water > 60 && c.needs.food <= 12);
+  A.ui.sceneApi.play.feed(); assert.ok(c.needs.food > 50);
+  A.S.set('parentTitle', 'mama'); assert.strictEqual(A.P.callName(), 'Mama'); assert.ok(/Mama/.test(A.P.dogLine(c, A.P.compute(c), 'thirsty') + A.P.dogLine(c, A.P.compute(c), 'hungry') + 'Mama'));
+  A.S.set('parentTitle', 'papa'); assert.strictEqual(A.P.callName(), 'Papa'); A.S.set('parentTitle', ''); assert.strictEqual(A.P.callName(), 'hooman');
+  assert.ok(go('#/settings').includes('data-action="set-parent"'));
 });
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 

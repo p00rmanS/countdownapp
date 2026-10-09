@@ -182,10 +182,17 @@ fun describeDog(c: Countdown, k: Computed) = "${stageSentence(c, k)}. ${spoken(k
 fun plainTitle(t: String) = t.replace(Regex("[\\x{1F000}-\\x{1FFFF}\\x{2600}-\\x{27BF}\\x{FE0F}\\x{200D}]"), "").replace(Regex("\\s+"), " ").trim().ifEmpty { "the big day" }
 
 /** what the dog says when tapped / petted / shaken / fetching */
+/** what the dog calls the person: Mama / Papa (their choice in Settings > Profile), otherwise "hooman" */
+object Who { @Volatile var name = "hooman"; fun of(title: String) = when (title) { "mama" -> "Mama"; "papa" -> "Papa"; else -> "hooman" } }
+
 fun dogLine(c: Countdown, k: Computed, kind: String = "tap", rnd: java.util.Random = java.util.Random()): String {
     fun <T> pick(a: List<T>) = a[rnd.nextInt(a.size)]
+    val who = Who.name
     when (kind) {
-        "pet" -> return pick(listOf("*happy sigh* 💛", "Best human. Ever.", "Mmm… more pets, please.", "*leans in*"))
+        "pet" -> return pick(listOf("*happy sigh* 💛", "Best $who. Ever.", "Mmm… more pets, $who.", "*leans in*"))
+        "hungry" -> return pick(listOf("$who, my tummy is rumbling…", "$who… is it dinner time?", "I would very much like a snack."))
+        "thirsty" -> return pick(listOf("$who, I'm so thirsty…", "My water bowl is looking empty…", "*pants* water, please?"))
+        "drink" -> return pick(listOf("Glug glug glug!", "Ahh, so refreshing!", "Thank you, $who! 💧"))
         "sneeze" -> return pick(listOf("Ah… ah… ACHOO!", "Achoo! Who shook the room?!"))
         "fetch" -> return pick(listOf("Got it! Throw again?", "Fetched! Good dog? GOOD DOG."))
     }
@@ -193,7 +200,7 @@ fun dogLine(c: Countdown, k: Computed, kind: String = "tap", rnd: java.util.Rand
     val sl = if (k.sleeps == 1) "1 more sleep" else "${k.sleeps} more sleeps"
     val lines = when (k.stage) {
         Stage.NAP -> listOf("Zzz… $sl… zzz…", "*snore* five more minutes…", "Mmf. Wake me for $t.")
-        Stage.CURIOUS -> listOf("Is it $t yet? $sl!", "*head tilt* $sl?", "Ooh! You came to visit!")
+        Stage.CURIOUS -> listOf("Is it $t yet? $sl!", "*head tilt* $sl?", "Ooh! $who! You came to visit!")
         Stage.WAITING -> listOf("I'm by the door! $sl!!", "Woof! ${k.daysCeil} days to go!", "Still waiting… tail says hi.")
         Stage.PACKING -> listOf("Packed! $sl!!", "Did you zip the suitcase? $sl!", "Almost time!! Almost time!!")
         Stage.ZOOMIES -> listOf("ZOOOOM! Almost here!!", "${k.parts.h + if (k.parts.d > 0) 24 else 0} hours!! I can't sit still!!", "WOOF WOOF WOOF!")

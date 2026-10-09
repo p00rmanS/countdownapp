@@ -257,9 +257,11 @@
 
   const playTray = (c) => `<div class="play-tray" role="group" aria-label="Play with ${esc(c.dog.name)}">
       <div class="joy" data-joy role="status" aria-live="polite"><span class="joy-h" aria-hidden="true">♥</span><span class="joy-bar"><i data-joy-fill></i></span><span class="joy-t" data-joy-text></span></div>
+          <div class="needs" aria-live="polite"><span class="need" data-need="food">${icon('bowl')}<i><b data-need-fill="food"></b></i></span><span class="need" data-need="water">${icon('drop')}<i><b data-need-fill="water"></b></i></span></div>
       <div class="play-btns">
         <button class="play-btn" data-play="treat">${icon('bone')}Treat</button>
         <button class="play-btn" data-play="feed">${icon('bowl')}Feed</button>
+        <button class="play-btn" data-play="drink">${icon('drop')}Water</button>
         <button class="play-btn" data-play="ball">${icon('ball')}Ball</button>
         <button class="play-btn" data-play="tickle">${icon('smile')}Tickle</button>
       </div>
@@ -302,6 +304,7 @@
         <button class="avatar-edit" data-action="profile-photo" aria-label="Choose a profile photo">${avatar(72)}<span class="avatar-cam">${icon('camera')}</span></button>
         <div class="profile-body"><label class="field"><span>Your name</span>
           <input id="profileName" data-profile-name maxlength="30" autocomplete="given-name" placeholder="What should Scott call you?" value="${esc(st.profileName || '')}"></label>
+          <div class="field"><span>What does your dog call you?</span>${seg('set-parent', [['mama', 'Mama'], ['papa', 'Papa'], ['parent', 'Fur parent']], st.parentTitle || 'parent', 'aria-label="What your dog calls you"')}</div>
           ${/^data:image\//.test(st.profilePhoto || '') ? `<button class="btn btn-small btn-ghost" data-action="profile-photo-clear">Remove photo</button>` : ''}</div>
         <input type="file" accept="image/*" hidden data-profile-input>
       </div>
@@ -612,21 +615,30 @@
   function bindScene(root) {
     const scene = $('.scene[data-cid]', root); if (!scene) return;
     const c = S.get(scene.dataset.cid) || (ui.demo && ui.demo.id === scene.dataset.cid ? ui.demo : null); if (!c) return;
-    const hit = $('[data-dog]', scene), svg = $('.dog', scene), bubble = $('.bubble', scene), fx2 = $('.scene-fx2', scene), hint = $('.scene-hint', root);
-    let hold, loop, petting = false, pt = null, sayT;
+    const hit = $('[data-dog]', scene), bubble = $('.bubble', scene), fx2 = $('.scene-fx2', scene), hint = $('.scene-hint', root);
+    let hold, loop, petting = false, pt = null, sayT, wakeT, napHTML = null;
+    const svgEl = () => $('.dog', scene);
+    // a sleeping dog opens his eyes for a few seconds when you play with him
+    const wake = () => {
+      if (K().stage !== 'nap') return;
+      if (napHTML == null) napHTML = hit.innerHTML;
+      hit.innerHTML = P.dogSVG(c.dog, 'curious', { type: c.type, accent: P.accentOf ? P.accentOf(c) : c.accent, label: c.dog.name });
+      clearTimeout(wakeT);
+      wakeT = setTimeout(() => { if (napHTML != null) { hit.innerHTML = napHTML; napHTML = null; } }, 6000);
+    };
     const K = () => P.compute(c);
     const say = (txt, ms = 2400) => { bubble.textContent = txt; bubble.classList.add('show'); clearTimeout(sayT); sayT = setTimeout(() => bubble.classList.remove('show'), ms); };
     const used = () => hint && hint.classList.add('gone');
-    const flash = (cls, ms) => { svg.classList.add(cls); setTimeout(() => svg.classList.remove(cls), ms); };
+    const flash = (cls, ms) => { wake(); const el = svgEl(); el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); };
 
     const bark = () => { used(); flash('bark', 520); say(P.dogLine(c, K(), 'tap')); P.haptic('tick'); P.sound('bark'); };
     const startPet = () => {
-      petting = true; used(); svg.classList.add('petting'); say(P.dogLine(c, K(), 'pet'), 3000);
+      petting = true; used(); wake(); svgEl().classList.add('petting'); say(P.dogLine(c, K(), 'pet'), 3000);
       let n = 0;
       loop = setInterval(() => { P.hearts(fx2, 1, pt && pt.x, pt && pt.y); if (n++ % 3 === 0) P.haptic('purr'); }, 280);
       P.hearts(fx2, 2, pt && pt.x, pt && pt.y);
     };
-    const endPet = () => { clearTimeout(hold); clearInterval(loop); if (petting) { petting = false; svg.classList.remove('petting'); } };
+    const endPet = () => { clearTimeout(hold); clearInterval(loop); if (petting) { petting = false; const el = svgEl(); if (el) el.classList.remove('petting'); } };
     hit.addEventListener('pointerdown', (e) => {
       if (e.button > 0) return; pt = { x: e.clientX, y: e.clientY }; petting = false;
       initMotion(true);
@@ -655,15 +667,22 @@
       if (before < 100 && c.joy.v >= 100) { P.confetti({ count: 70, power: 0.8 }); P.haptic('success'); say(`${c.dog.name} loves you! 💛`, 2600); }
     };
     const drop = (cls, emoji, ms) => { const el = document.createElement('i'); el.className = cls; el.innerHTML = icon(emoji); fx2.appendChild(el); setTimeout(() => el.remove(), ms); return el; };
+    /* hunger and thirst: they run down while you are away (food ~5 points an hour, water ~8) and Feed / Water fill them */
+    const needNow = () => { const n = c.needs || { food: 70, water: 70, t: Date.now() }, h = (Date.now() - n.t) / 3600000; return { food: Math.max(0, n.food - h * 5), water: Math.max(0, n.water - h * 8) }; };
+    const showNeeds = () => { const n = needNow(); ['food', 'water'].forEach((k) => { const f = $(`[data-need-fill="${k}"]`, root), w = $(`[data-need="${k}"]`, root); if (f) { f.style.width = Math.round(n[k]) + '%'; w.classList.toggle('low', n[k] < 30); } }); };
+    const fill = (food, water) => { const n = needNow(); c.needs = { food: Math.min(100, n.food + food), water: Math.min(100, n.water + water), t: Date.now() }; S.save(); showNeeds(); };
+    const nudge = () => { const n = needNow(); if (n.water < 30) say(P.dogLine(c, K(), 'thirsty'), 3200); else if (n.food < 30) say(P.dogLine(c, K(), 'hungry'), 3200); };
     const play = {
-      treat() { used(); drop('treat-drop', 'bone', 1000); setTimeout(() => { flash('munch', 1100); P.hearts(fx2, 2); say(k0(['Nom nom!', 'Best human ever!', 'More? 👀'])); P.haptic('tick'); P.sound('chime'); addJoy(8); }, 750); },
-      feed() { used(); const b = drop('bowl', 'bowl', 2600); flash('munch', 2300); say('Yum yum yum…', 2400); P.haptic('purr'); addJoy(10); },
+      drink() { used(); drop('bowl', 'drop', 2400); flash('munch', 2000); say(P.dogLine(c, K(), 'drink'), 2400); P.haptic('purr'); fill(0, 60); addJoy(6); },
+      treat() { used(); drop('treat-drop', 'bone', 1000); setTimeout(() => { fill(8, 0); flash('munch', 1100); P.hearts(fx2, 2); say(k0(['Nom nom!', 'Best human ever!', 'More? 👀'])); P.haptic('tick'); P.sound('chime'); addJoy(8); }, 750); },
+      feed() { used(); const b = drop('bowl', 'bowl', 2600); flash('munch', 2300); say('Yum yum yum…', 2400); P.haptic('purr'); fill(55, 0); addJoy(10); },
       ball() { fetchB(); addJoy(6); },
       tickle() { used(); flash('tickle', 1600); P.hearts(fx2, 5); say(k0(['Hehehe!!', 'That tickles! 😆', 'Again, again!']), 2000); P.haptic('purr'); addJoy(8); },
     };
     const k0 = (a) => a[Math.floor(Math.random() * a.length)];
     $$('[data-play]', root).forEach((b) => b.addEventListener('click', () => play[b.dataset.play]()));
-    showJoy();
+    showJoy(); showNeeds();
+    if (root === view && route().name === 'c') setTimeout(nudge, 2600);
     ui.sceneApi = { bark, shake, fetch: fetchB, play, pet: () => { pt = null; startPet(); setTimeout(endPet, 2200); } };
     initMotion(false);
     // gentle first hello
@@ -821,6 +840,7 @@
       if (k === 'haptics' && v) P.haptic('purr'); if (k === 'sound' && v) P.sound('bark', true);
     },
     'set-default-mode'(el) { S.set('displayMode', el.dataset.v); render({ keepScroll: true, noAnim: true }); },
+    'set-parent'(el) { S.set('parentTitle', el.dataset.v === 'parent' ? 'parent' : el.dataset.v); render({ keepScroll: true, noAnim: true }); },
     'set-theme'(el) { S.set('theme', el.dataset.v); applySettings(); render({ keepScroll: true, noAnim: true }); },
     'set-motion'(el) { S.set('motion', el.dataset.v); applySettings(); render({ keepScroll: true, noAnim: true }); },
     'set-icon'(el) { S.set('icon', el.dataset.v); applySettings(); render({ keepScroll: true, noAnim: true }); toast(`${P.BREEDS[el.dataset.v].name} is your new icon (shown in the browser tab here)`); },

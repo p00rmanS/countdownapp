@@ -225,9 +225,19 @@ func plainTitle(_ t: String) -> String {
 }
 
 /// what the dog says when tapped / petted / shaken / fetching
+/// what the dog calls the person: Mama / Papa (their choice in Settings > Profile), otherwise "hooman"
+enum Who {
+    static var name = "hooman"
+    static func of(_ title: String) -> String { title == "mama" ? "Mama" : title == "papa" ? "Papa" : "hooman" }
+}
+
 func dogLine(_ c: Countdown, _ k: Computed, kind: String = "tap") -> String {
+    let who = Who.name
     switch kind {
-    case "pet": return ["*happy sigh* 💛", "Best human. Ever.", "Mmm… more pets, please.", "*leans in*"].randomElement()!
+    case "pet": return ["*happy sigh* 💛", "Best \(who). Ever.", "Mmm… more pets, \(who).", "*leans in*"].randomElement()!
+    case "hungry": return ["\(who), my tummy is rumbling…", "\(who)… is it dinner time?", "I would very much like a snack."].randomElement()!
+    case "thirsty": return ["\(who), I'm so thirsty…", "My water bowl is looking empty…", "*pants* water, please?"].randomElement()!
+    case "drink": return ["Glug glug glug!", "Ahh, so refreshing!", "Thank you, \(who)! 💧"].randomElement()!
     case "sneeze": return ["Ah… ah… ACHOO!", "Achoo! Who shook the room?!"].randomElement()!
     case "fetch": return ["Got it! Throw again?", "Fetched! Good dog? GOOD DOG."].randomElement()!
     default: break
@@ -237,7 +247,7 @@ func dogLine(_ c: Countdown, _ k: Computed, kind: String = "tap") -> String {
     let lines: [String]
     switch k.stage {
     case .nap: lines = ["Zzz… \(sl)… zzz…", "*snore* five more minutes…", "Mmf. Wake me for \(t)."]
-    case .curious: lines = ["Is it \(t) yet? \(sl)!", "*head tilt* \(sl)?", "Ooh! You came to visit!"]
+    case .curious: lines = ["Is it \(t) yet? \(sl)!", "*head tilt* \(sl)?", "Ooh! \(who)! You came to visit!"]
     case .waiting: lines = ["I'm by the door! \(sl)!!", "Woof! \(k.daysCeil) days to go!", "Still waiting… tail says hi."]
     case .packing: lines = ["Packed! \(sl)!!", "Did you zip the suitcase? \(sl)!", "Almost time!! Almost time!!"]
     case .zoomies: lines = ["ZOOOOM! Almost here!!", "\(k.parts.h + (k.parts.d > 0 ? 24 : 0)) hours!! I can't sit still!!", "WOOF WOOF WOOF!"]

@@ -189,15 +189,22 @@
   P.describeDog = (c, k) => `${P.stageInfo(c, k).desc}. ${k.phase === 'past' ? P.spoken(k) : P.spoken(k) + ' left'}.`;
 
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  /** what the dog calls the person: Mama / Papa (their choice in Settings > Profile), otherwise "hooman" */
+  P.callName = () => ({ mama: 'Mama', papa: 'Papa' }[(P.store && P.store.state.settings.parentTitle) || ''] || 'hooman');
   P.dogLine = (c, k, kind = 'tap') => {
-    if (kind === 'pet') return pick(['*happy sigh* 💛', 'Best human. Ever.', 'Mmm… more pets, please.', '*leans in*']);
+    const who = P.callName();
+    if (kind === 'pet') return pick(['*happy sigh* 💛', `Best ${who}. Ever.`, `Mmm… more pets, ${who}.`, '*leans in*']);
+    if (kind === 'hungry') return pick([`${who}, my tummy is rumbling…`, `${who}… is it dinner time?`, 'I would very much like a snack.']);
+    if (kind === 'thirsty') return pick([`${who}, I'm so thirsty…`, 'My water bowl is looking empty…', '*pants* water, please?']);
+    if (kind === 'drink') return pick(['Glug glug glug!', 'Ahh, so refreshing!', `Thank you, ${who}! 💧`]);
+    if (kind === 'full') return pick(['Too full! …okay, one more bite.', `I love you, ${who}.`]);
     if (kind === 'sneeze') return pick(['Ah… ah… ACHOO!', 'Achoo! Who shook the room?!']);
     if (kind === 'fetch') return pick(['Got it! Throw again?', 'Fetched! Good dog? GOOD DOG.']);
     const n = k.sleeps, t = c.title.replace(/\s*[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}️]+\s*/gu, ' ').trim() || 'the big day';
     const sl = n === 1 ? '1 more sleep' : n + ' more sleeps';
     const L = {
       nap: [`Zzz… ${sl}… zzz…`, '*snore* five more minutes…', `Mmf. Wake me for ${t}.`],
-      curious: [`Is it ${t} yet? ${sl}!`, `*head tilt* ${sl}?`, 'Ooh! You came to visit!'],
+      curious: [`Is it ${t} yet? ${sl}!`, `*head tilt* ${sl}?`, `Ooh! ${who}! You came to visit!`],
       waiting: [`I'm by the door! ${sl}!!`, `Woof! ${k.daysCeil} days to go!`, 'Still waiting… tail says hi.'],
       packing: [`Packed! ${sl}!!`, `Did you zip the suitcase? ${sl}!`, 'Almost time!! Almost time!!'],
       zoomies: ['ZOOOOM! Almost here!!', `${k.parts.h + (k.parts.d ? 24 : 0)} hours!! I can't sit still!!`, 'WOOF WOOF WOOF!'],
@@ -275,6 +282,7 @@
     };
     if (o.destination && typeof o.destination === 'object') c.destination = { country: str(o.destination.country, 60), city: str(o.destination.city, 60), flag: str(o.destination.flag, 8) };
     if (o.person && typeof o.person === 'object') { c.person = { name: str(o.person.name, 40) }; if (Number.isFinite(o.person.birthYear)) c.person.birthYear = Math.trunc(o.person.birthYear); }
+    if (o.needs && Number.isFinite(o.needs.food) && Number.isFinite(o.needs.water) && Number.isFinite(o.needs.t)) c.needs = { food: Math.max(0, Math.min(100, o.needs.food)), water: Math.max(0, Math.min(100, o.needs.water)), t: o.needs.t };
     if (o.joy && Number.isFinite(o.joy.v) && Number.isFinite(o.joy.t)) c.joy = { v: Math.max(0, Math.min(100, o.joy.v)), t: o.joy.t };
     return c;
   };

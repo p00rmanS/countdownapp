@@ -232,6 +232,8 @@ fun SettingsScreen(vm: AppViewModel) {
                     if (s.profilePhoto.isNotEmpty()) Box(Modifier.padding(top = 10.dp)) { SmallButton("Remove photo", { vm.repo.deletePhoto(s.profilePhoto); vm.settings { it.copy(profilePhoto = "") } }, pc.surface) }
                 }
             }
+            Muted("What does your dog call you?", Modifier.padding(top = 14.dp), size = 14)
+            Seg(listOf("mama" to "Mama", "papa" to "Papa", "parent" to "Fur parent"), s.parentTitle.ifEmpty { "parent" }, { v -> vm.settings { it.copy(parentTitle = v) } }, label = "What your dog calls you")
             Muted("Stays on this device and in your backup. Sign-in with Google, so your profile follows you between phones, is planned.", Modifier.padding(top = 10.dp), size = 14)
         }
         Group("Look & feel")

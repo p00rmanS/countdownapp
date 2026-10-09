@@ -61,6 +61,7 @@ data class Settings(
     val notifications: Boolean = false,
     val profileName: String = "",
     val profilePhoto: String = "",        // file name in the photo folder
+    val parentTitle: String = "",         // what the dog calls the person: mama | papa | parent
 )
 
 data class AppData(
@@ -148,7 +149,7 @@ fun AppData.toJson(): JSONObject = JSONObject().apply {
     put("settings", JSONObject().apply {
         put("displayMode", settings.displayMode.key); put("haptics", settings.haptics); put("sound", settings.sound)
         put("motion", settings.reduceMotion); put("theme", settings.theme); put("notifications", settings.notifications)
-        put("profileName", settings.profileName); put("profilePhoto", settings.profilePhoto)
+        put("profileName", settings.profileName); put("profilePhoto", settings.profilePhoto); put("parentTitle", settings.parentTitle)
     })
 }
 
@@ -166,6 +167,7 @@ fun appDataFromJson(raw: JSONObject): AppData {
             sound = s?.optBoolean("sound") ?: false, reduceMotion = s?.optString("motion", "system") ?: "system",
             theme = s?.optString("theme", "system") ?: "system", notifications = s?.optBoolean("notifications") ?: false,
             profileName = (s?.optString("profileName", "") ?: "").take(30), profilePhoto = (s?.optString("profilePhoto", "") ?: "").takeIf { SAFE_PHOTO.matches(it) } ?: "",
+            parentTitle = (s?.optString("parentTitle", "") ?: "").takeIf { it in setOf("mama", "papa", "parent") } ?: "",
         ),
     )
 }
