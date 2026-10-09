@@ -109,6 +109,22 @@
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
 
+        <!-- launcher entry "scott": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
+        <activity-alias
+            android:name=".IconScott"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_scott"
+            android:roundIcon="@mipmap/ic_launcher_scott"
+            android:label="Pawcount">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
         <!-- launcher entry "mutt": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
         <activity-alias
             android:name=".IconMutt"

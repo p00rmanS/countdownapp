@@ -219,7 +219,7 @@
 
   /* ---------- samples ---------- */
   P.suggestedBreed = (type) => ({ intl_trip: 'shiba', vacation: 'golden', birthday: 'corgi', anniversary: 'dachshund', holiday: 'husky', custom: 'mutt' }[type] || 'golden');
-  P.BREED_BEST = { golden: ['vacation'], corgi: ['birthday'], shiba: ['intl_trip'], dachshund: ['anniversary'], husky: ['holiday'], mutt: ['custom'] };
+  P.BREED_BEST = { scott: [], golden: ['vacation'], corgi: ['birthday'], shiba: ['intl_trip'], dachshund: ['anniversary'], husky: ['holiday'], mutt: ['custom'] };
 
   P.makeSamples = (now = Date.now()) => {
     const tzL = P.localTz();

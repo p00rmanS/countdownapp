@@ -274,7 +274,7 @@ class BootReceiver : BroadcastReceiver() {
  * flipping them swaps the icon on the home screen without restarting the app.
  */
 object IconSwitcher {
-    val breeds = listOf("golden", "corgi", "shiba", "dachshund", "husky", "mutt")
+    val breeds = listOf("golden", "corgi", "shiba", "dachshund", "husky", "scott", "mutt")
     private fun alias(ctx: Context, breed: String) = android.content.ComponentName(ctx, "app.pawcount.Icon${breed.replaceFirstChar { it.uppercase() }}")
 
     fun current(ctx: Context): String {

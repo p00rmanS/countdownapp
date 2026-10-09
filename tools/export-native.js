@@ -101,9 +101,9 @@ function toGraph(svgText, opts = {}) {
   return g;
 }
 
-/* ---- dogs: 5 breeds + 4 mutt ear styles, in every stage ---- */
+/* ---- dogs: 6 breeds + 4 mutt ear styles, in every stage ---- */
 const variants = [];
-['golden', 'corgi', 'shiba', 'dachshund', 'husky'].forEach((b) => variants.push([b, { breed: b, name: '' }]));
+['golden', 'corgi', 'shiba', 'dachshund', 'husky', 'scott'].forEach((b) => variants.push([b, { breed: b, name: '' }]));
 ['floppy', 'pointy', 'tall', 'long'].forEach((e) => variants.push(['mutt-' + e, { breed: 'mutt', name: '', ears: e }]));
 const dogs = {};
 for (const [key, dog] of variants) {

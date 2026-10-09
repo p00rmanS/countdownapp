@@ -20,10 +20,11 @@
     shiba: { name: 'Miso', label: 'Shiba Inu', vibe: 'Cool, secretly thrilled', best: 'International travel', fur: '#DE8A45', dark: '#C0712F', light: '#FFF1DC', paw: '#FFF1DC', ears: 'pointy', face: 'shiba', tail: 'curl' },
     dachshund: { name: 'Noodle', label: 'Dachshund', vibe: 'Snuggly & patient', best: 'Anniversaries & date nights', fur: '#8A5236', dark: '#5E3622', light: '#C28A5E', paw: '#6E4129', ears: 'long', face: 'tan', tail: 'thin' },
     husky: { name: 'Blizzard', label: 'Husky', vibe: 'Loud, talks back', best: 'Ski trips & adventures', fur: '#6F7B90', dark: '#4A5568', light: '#F8F8F6', paw: '#F8F8F6', ears: 'pointy', face: 'mask', tail: 'bushy' },
+    scott: { name: 'Scott', label: 'Fluffy Black Pup', vibe: 'Sweet soul, fluffy chaos', best: 'Anything with Scott', fur: '#2A2630', dark: '#17141B', light: '#F4EEE4', paw: '#2A2630', ears: 'fluffy', face: 'scott', tail: 'plume' },
     mutt: { name: 'Lucky', label: 'Mutt', vibe: 'Your colours, your ears', best: 'Anything', fur: '#B98A62', dark: '#8A5F3F', light: '#F0DDC4', paw: '#F0DDC4', ears: 'floppy', face: 'plain', tail: 'normal' },
   };
   P.BREEDS = BREEDS;
-  P.BREED_ORDER = ['golden', 'corgi', 'shiba', 'dachshund', 'husky', 'mutt'];
+  P.BREED_ORDER = ['scott', 'golden', 'corgi', 'shiba', 'dachshund', 'husky', 'mutt'];
   P.MUTT_FURS = ['#B98A62', '#8A5F3F', '#E2A558', '#4A3B35', '#9A9A9A', '#E8D2B0', '#C46B3C'];
   P.EAR_TYPES = [['floppy', 'Floppy'], ['pointy', 'Pointy'], ['tall', 'Big'], ['long', 'Long']];
 
@@ -46,6 +47,7 @@
       floppy: `<path d="M80 66C54 58 34 84 40 124c4 20 26 24 36 6 8-14 12-38 4-64z" fill="${c.dark}"/>`,
       pointy: `<path d="M66 76 58 18Q96 24 110 62z" fill="${c.dark}"/><path d="M71 66 67 36Q86 40 97 60z" fill="${c.inner}"/>`,
       tall: `<path d="M62 80 40 4Q96 14 112 62z" fill="${c.dark}"/><path d="M67 68 55 28Q82 36 98 60z" fill="${c.inner}"/>`,
+      fluffy: `<path d="M82 64C54 50 26 74 30 112c-8 8-4 22 6 26-2 10 6 20 16 16 4 8 18 8 22-2 12-6 12-22 6-32 6-22 4-40 2-56z" fill="${c.dark}"/><path d="M44 120c4-14 6-26 14-38M56 140c2-14 4-26 10-40" stroke="${c.fur}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".55"/>`,
       long: `<path d="M78 66C44 56 24 100 30 156c4 28 32 28 38 2 6-30 18-62 10-92z" fill="${c.dark}"/>`,
     };
     const g = `<g class="ear ear-${side} t-${type}">${S[type] || S.floppy}</g>`;
@@ -62,12 +64,13 @@
   }
 
   function tail(c) {
-    const w = { normal: 16, curl: 18, stub: 0, thin: 9, bushy: 24 }[c.tail];
+    const w = { normal: 16, curl: 18, stub: 0, thin: 9, bushy: 24, plume: 22 }[c.tail];
     const path = {
       normal: 'M166 206C204 208 220 180 210 146',
       curl: 'M166 202C216 208 222 150 192 150C176 150 176 166 190 168',
       thin: 'M166 208C196 214 212 190 216 160',
       bushy: 'M164 204C208 214 228 176 206 136',
+      plume: 'M166 206C212 214 230 172 200 138',
     }[c.tail];
     if (c.tail === 'stub') return `<g class="tail"><ellipse cx="170" cy="204" rx="13" ry="10" fill="${c.fur}"/></g>`;
     const tip = c.tail === 'bushy' ? `<path d="${tailTip()}" stroke="${c.light}" stroke-width="10" fill="none" stroke-linecap="round" opacity=".9"/>` : '';
@@ -82,6 +85,9 @@
         return `<ellipse cx="84" cy="124" rx="27" ry="23" fill="${c.light}"/><ellipse cx="156" cy="124" rx="27" ry="23" fill="${c.light}"/><ellipse cx="120" cy="131" rx="28" ry="22" fill="${c.light}"/><circle cx="96" cy="81" r="5.5" fill="${c.light}"/><circle cx="144" cy="81" r="5.5" fill="${c.light}"/>`;
       case 'mask':
         return `<path d="M120 58C112 78 104 88 84 98 66 108 62 134 88 148c18 10 46 10 64 0 26-14 22-40 4-50-20-10-28-20-36-40z" fill="${c.light}"/><ellipse cx="98" cy="84" rx="8" ry="4.5" fill="${c.fur}"/><ellipse cx="142" cy="84" rx="8" ry="4.5" fill="${c.fur}"/>`;
+      case 'scott':
+        // charcoal muzzle + soft eye patches so the dark eyes read on black fur, a cream beard, and a few wispy brow hairs
+        return `<ellipse cx="120" cy="126" rx="33" ry="24" fill="#4B4452"/><ellipse cx="98" cy="100" rx="15" ry="14" fill="#3A3541"/><ellipse cx="142" cy="100" rx="15" ry="14" fill="#3A3541"/><path d="M100 134Q120 168 140 134Q130 146 120 147Q110 146 100 134z" fill="${c.light}"/><ellipse cx="120" cy="143" rx="11" ry="7" fill="${c.light}"/><path d="M92 70C96 56 104 52 112 54M128 54C136 52 144 56 148 70" stroke="${c.fur}" stroke-width="7" fill="none" stroke-linecap="round"/>`;
       case 'tan':
         return `<ellipse cx="120" cy="128" rx="34" ry="24" fill="${c.light}"/><ellipse cx="97" cy="81" rx="6" ry="4" fill="${c.light}"/><ellipse cx="143" cy="81" rx="6" ry="4" fill="${c.light}"/>`;
       default:
@@ -138,7 +144,7 @@
       <ellipse class="shadow" cx="120" cy="223" rx="66" ry="8" fill="#000" opacity=".15"/>
       ${tail(c)}
       <ellipse cx="76" cy="203" rx="27" ry="20" fill="${c.fur}"/><ellipse cx="164" cy="203" rx="27" ry="20" fill="${c.fur}"/>
-      <g class="torso"><ellipse cx="120" cy="178" rx="47" ry="49" fill="${c.fur}"/><ellipse cx="120" cy="184" rx="29" ry="37" fill="${c.light}"/></g>
+      <g class="torso"><ellipse cx="120" cy="178" rx="47" ry="49" fill="${c.fur}"/>${c.face === 'scott' ? `<path d="M120 146C100 150 94 166 100 178 108 188 132 188 140 178 146 166 140 150 120 146z" fill="${c.light}"/>` : `<ellipse cx="120" cy="184" rx="29" ry="37" fill="${c.light}"/>`}</g>
       <rect x="100" y="172" width="19" height="44" rx="9.5" fill="${c.fur}"/><rect x="121" y="172" width="19" height="44" rx="9.5" fill="${c.fur}"/>
       <ellipse cx="109.5" cy="215" rx="13" ry="8" fill="${c.paw}"/><ellipse cx="130.5" cy="215" rx="13" ry="8" fill="${c.paw}"/>
       <path d="M109 215v-4M130 215v-4" stroke="#000" stroke-opacity=".12" stroke-width="2" stroke-linecap="round"/>
@@ -172,6 +178,7 @@
     const c = palette(dog), memory = stage === 'memory';
     const earSvg = {
       floppy: `<path d="M98 150C128 148 134 188 112 206 100 198 94 176 98 150z" fill="${c.dark}"/>`,
+      fluffy: `<path d="M98 148C132 146 140 184 114 208 106 214 94 206 92 192 88 176 90 158 98 148z" fill="${c.dark}"/>`,
       long: `<path d="M98 152C132 150 138 192 108 214 94 200 90 176 98 152z" fill="${c.dark}"/>`,
       pointy: `<path d="M82 156 84 118Q108 128 114 160z" fill="${c.dark}"/><path d="M88 152 90 130Q102 136 106 152z" fill="${c.inner}"/>`,
       tall: `<path d="M78 158 78 108Q112 118 116 162z" fill="${c.dark}"/><path d="M85 152 86 124Q102 130 108 152z" fill="${c.inner}"/>`,
@@ -196,7 +203,7 @@
       <g class="nap-head">
         <circle cx="88" cy="184" r="37" fill="${c.fur}"/>
         ${faceBits}
-        <ellipse cx="58" cy="197" rx="25" ry="17" fill="${c.light}"/>
+        <ellipse cx="58" cy="197" rx="25" ry="17" fill="${c.face === 'scott' ? '#4B4452' : c.light}"/>${c.face === 'scott' ? `<ellipse cx="60" cy="209" rx="13" ry="6" fill="${c.light}"/>` : ''}
         <ellipse cx="37" cy="192" rx="7.5" ry="5.8" fill="${INK}"/><ellipse cx="35" cy="190" rx="2.6" ry="1.3" fill="#fff" opacity=".5"/>
         ${eye}
         <ellipse cx="94" cy="199" rx="8" ry="5" fill="#F6B7B0" opacity=".65"/>

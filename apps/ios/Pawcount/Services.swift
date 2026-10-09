@@ -272,7 +272,7 @@ enum Photos {
 /* ------------------------------ alternate app icons ------------------------------ */
 
 enum AppIcon {
-    static let breeds = ["golden", "corgi", "shiba", "dachshund", "husky", "mutt"]
+    static let breeds = ["golden", "corgi", "shiba", "dachshund", "husky", "scott", "mutt"]
     /// the dog on the home screen right now ("AppIcon" itself is the golden retriever)
     static var current: String { UIApplication.shared.alternateIconName.map { String($0.dropFirst("AppIcon-".count)) } ?? "golden" }
     static func set(_ breed: String, done: @escaping (Bool) -> Void) {

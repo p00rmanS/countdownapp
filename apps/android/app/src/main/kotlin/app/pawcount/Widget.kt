@@ -67,7 +67,7 @@ class PawWidget : AppWidgetProvider() {
             val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
             val cv = Canvas(bmp)
             fredoka = fonts.fredokaTypeface
-            val demo = c ?: Countdown("w", "Add a countdown", "custom", "2030-01-01T00:00", "UTC", false, false, System.currentTimeMillis(), Dog("golden", "Sunny"), "#E8A15C", DisplayMode.FULL)
+            val demo = c ?: Countdown("w", "Add a countdown", "custom", "2030-01-01T00:00", "UTC", false, false, System.currentTimeMillis(), Dog("scott", "Scott"), "#E8A15C", DisplayMode.FULL)
             val kk = k ?: compute(demo.copy(createdAt = System.currentTimeMillis() - DAY))
             val stage = if (c == null) Stage.NAP else kk.stage
             val accent = parseHex(demo.accent)
