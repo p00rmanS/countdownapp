@@ -101,6 +101,10 @@ class MainActivity : ComponentActivity() {
         if (uri.host == "import") {
             val id = vm.importShared(uri.toString())
             if (id != null) { vm.say("Added to your countdowns 🐾"); vm.stack.clear(); vm.stack.add(Route.Home); vm.push(Route.Detail(id)) } else vm.say("That link isn’t a Pawcount countdown")
+        } else if (uri.host == "new") {
+            vm.stack.clear(); vm.stack.add(Route.Home); vm.push(Route.Flow(null))
+        } else if (uri.host == "memories") {
+            vm.stack.clear(); vm.stack.add(Route.Memories)
         } else if (uri.host == "detail") {
             val id = uri.lastPathSegment
             if (id != null && vm.data.value.countdowns.any { it.id == id }) { vm.stack.clear(); vm.stack.add(Route.Home); vm.push(Route.Detail(id)) }

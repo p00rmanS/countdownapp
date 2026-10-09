@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- long-press the app icon: jump straight to a new countdown or to your memories -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut android:shortcutId="new" android:enabled="true" android:shortcutShortLabel="@string/shortcut_new" android:shortcutLongLabel="@string/shortcut_new_long">
+        <intent android:action="android.intent.action.VIEW" android:data="pawcount://new" android:targetPackage="app.pawcount.countdown" android:targetClass="app.pawcount.MainActivity" />
+    </shortcut>
+    <shortcut android:shortcutId="memories" android:enabled="true" android:shortcutShortLabel="@string/shortcut_memories" android:shortcutLongLabel="@string/shortcut_memories">
+        <intent android:action="android.intent.action.VIEW" android:data="pawcount://memories" android:targetPackage="app.pawcount.countdown" android:targetClass="app.pawcount.MainActivity" />
+    </shortcut>
+</shortcuts>

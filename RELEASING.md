@@ -35,6 +35,11 @@ cd apps/ios && xcodegen generate && open Pawcount.xcodeproj
 3. In App Store Connect: create the app (same bundle id), add screenshots (6.9" and 6.5" iPhone sizes), description, privacy policy URL,
    age rating, and the "Data Not Collected" privacy label. Test with TestFlight first, then *Submit for Review*.
 
+**Widget + shared data (one-time Apple setup).** The widget reads the app's data through an App Group.
+In *developer.apple.com → Identifiers* create the App Group `group.app.pawcount.countdown`, then enable *App Groups* for both
+`app.pawcount.countdown` and `app.pawcount.countdown.widget` (Xcode's *Signing & Capabilities* does this for you when the Team is set).
+Without it the app still works; the widget just shows the empty state.
+
 To see it without a Mac: open the latest GitHub Actions run → artifact **ios-screenshots** (every screen, rendered by an iPhone simulator).
 To try it on your phone with no store at all, use the web app and *Add to Home Screen*: https://p00rmans.github.io/countdownapp/
 

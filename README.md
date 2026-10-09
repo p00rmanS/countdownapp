@@ -21,6 +21,26 @@ Live web app: https://p00rmans.github.io/countdownapp/
   tests on each platform (time zones, daylight saving, stages, yearly repeats, backups).
 - **Data.** All three read and write the same backup JSON.
 
+## What it does
+Every countdown gets a dog whose mood follows how close the date is (napping → curious → waiting → packing → zoomies → party → memory).
+Tap it to bark, hold to pet, shake the phone to make it sneeze. On top of that:
+
+| | Android | iPhone | Web |
+|---|---|---|---|
+| Animated dogs, 6 event scenes, rolling numerals | ✅ | ✅ | ✅ |
+| Time-zone-true countdowns, yearly repeats | ✅ | ✅ | ✅ |
+| Reminders that fire with the app closed | ✅ | ✅ | in-app |
+| **Home-screen widget** (soonest countdown, dog in its mood) | ✅ | ✅ small / medium / lock screen | – |
+| **Alternate app icon** (pick your dog) | ✅ | ✅ | tab icon |
+| **Share picture card** (image for chats / stories) | ✅ | ✅ | – |
+| **Share with your person** (link adds the countdown to their app, any platform) | ✅ | ✅ | ✅ |
+| Live ticking countdown notification in the last 24 h | ✅ | – | – |
+| Long-press shortcuts / Siri | ✅ New · Memories | ✅ "How long until my next countdown" | – |
+| Memories with photos, backup export / import | ✅ | ✅ | ✅ |
+
+Sharing needs no account or server: a shared link *is* the countdown. Live two-way sync (seeing your partner's paw prints) would
+need a server and is not built.
+
 ## Run and test
 ```bash
 npm install

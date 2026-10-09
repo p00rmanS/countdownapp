@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">Pawcount</string>
     <string name="widget_description">Your soonest countdown, with the dog who can\'t wait.</string>
+    <string name="shortcut_new">New countdown</string>
+    <string name="shortcut_new_long">Start a new countdown</string>
+    <string name="shortcut_memories">Memories</string>
 </resources>

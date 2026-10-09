@@ -42,6 +42,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
 
         <!-- launcher entry "corgi": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
@@ -57,6 +58,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
 
         <!-- launcher entry "shiba": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
@@ -72,6 +74,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
 
         <!-- launcher entry "dachshund": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
@@ -87,6 +90,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
 
         <!-- launcher entry "husky": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
@@ -102,6 +106,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
 
         <!-- launcher entry "mutt": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
@@ -117,6 +122,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
 
         <receiver android:name=".PawWidget" android:exported="false" android:label="Pawcount">
