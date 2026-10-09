@@ -186,9 +186,10 @@
     const souvenir = memory
       ? `<g transform="rotate(-3 120 214)"><rect x="18" y="204" width="204" height="20" rx="7" fill="#fff"/><rect x="18" y="204" width="204" height="20" rx="7" fill="none" stroke="${o.accent}" stroke-width="3" stroke-dasharray="7 5"/><rect x="190" y="207" width="24" height="14" rx="3" fill="${o.accent}" opacity=".85"/></g>`
       : '';
+    const eyeInk = c.face === 'scott' ? '#E4DCEA' : INK; // dark lids vanish on black fur
     const eye = memory
-      ? `<path d="M72 181Q82 170 92 181" stroke="${INK}" stroke-width="4.2" fill="none" stroke-linecap="round"/>`
-      : `<path d="M72 179Q82 189 92 179" stroke="${INK}" stroke-width="4.2" fill="none" stroke-linecap="round"/>`;
+      ? `<path d="M72 181Q82 170 92 181" stroke="${eyeInk}" stroke-width="4.2" fill="none" stroke-linecap="round"/>`
+      : `<path d="M72 179Q82 189 92 179" stroke="${eyeInk}" stroke-width="4.2" fill="none" stroke-linecap="round"/>`;
     const faceBits = c.face === 'shiba' ? `<ellipse cx="70" cy="196" rx="22" ry="18" fill="${c.light}"/>` : c.face === 'mask' ? `<path d="M52 196C52 176 70 160 84 156c14 10 22 24 20 40 0 12-20 20-34 18-12-2-18-10-18-18z" fill="${c.light}"/>` : '';
     return `
       <ellipse class="shadow" cx="120" cy="224" rx="92" ry="8" fill="#000" opacity=".15"/>
@@ -199,12 +200,13 @@
         <path d="M72 176C106 158 164 158 202 186 172 176 112 172 72 176z" fill="${c.dark}" opacity=".35"/>
         <ellipse cx="178" cy="206" rx="27" ry="17" fill="${c.fur}" stroke="${c.dark}" stroke-opacity=".25" stroke-width="2"/>
       </g>
-      <ellipse cx="60" cy="217" rx="24" ry="9" fill="${c.paw}"/><ellipse cx="94" cy="219" rx="20" ry="8" fill="${c.paw}"/>
+      <ellipse cx="60" cy="217" rx="24" ry="9" fill="${c.paw}"/><ellipse cx="94" cy="219" rx="20" ry="8" fill="${c.paw}"/>${c.face === 'scott' ? `<ellipse cx="114" cy="212" rx="14" ry="9" fill="${c.light}"/>` : ''}
       <g class="nap-head">
         <circle cx="88" cy="184" r="37" fill="${c.fur}"/>
         ${faceBits}
         <ellipse cx="58" cy="197" rx="25" ry="17" fill="${c.face === 'scott' ? '#4B4452' : c.light}"/>${c.face === 'scott' ? `<ellipse cx="60" cy="209" rx="13" ry="6" fill="${c.light}"/>` : ''}
         <ellipse cx="37" cy="192" rx="7.5" ry="5.8" fill="${INK}"/><ellipse cx="35" cy="190" rx="2.6" ry="1.3" fill="#fff" opacity=".5"/>
+        ${c.face === 'scott' ? `<circle cx="70" cy="153" r="11" fill="${c.fur}"/><circle cx="86" cy="148" r="12" fill="${c.fur}"/><circle cx="103" cy="152" r="11" fill="${c.fur}"/><circle cx="55" cy="164" r="9" fill="${c.fur}"/>` : ''}
         ${eye}
         <ellipse cx="94" cy="199" rx="8" ry="5" fill="#F6B7B0" opacity=".65"/>
         <g class="ear ear-l t-${c.ears}">${earSvg}</g>
