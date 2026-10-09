@@ -139,7 +139,7 @@ extension Countdown: Codable {
 }
 
 /// photo files are named <uuid>.jpg; anything else (e.g. "../../x") could point outside the photo folder
-func isSafePhotoName(_ s: String) -> Bool { s.range(of: "^[A-Za-z0-9-]{1,64}\.jpg$", options: .regularExpression) != nil }
+func isSafePhotoName(_ s: String) -> Bool { s.range(of: "^[A-Za-z0-9-]{1,64}\\.jpg$", options: .regularExpression) != nil }
 
 struct Settings: Equatable {
     var displayMode: DisplayMode = .full
