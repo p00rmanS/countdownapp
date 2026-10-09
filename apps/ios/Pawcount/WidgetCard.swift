@@ -37,11 +37,17 @@ func bigCount(_ c: Countdown, _ k: Computed) -> String {
 /// the card: scene on top, title + count below. `wide` puts the text beside the picture (medium widget)
 struct WidgetCard: View {
     let c: Countdown?; let art: Art; var wide = false; var now = Date()
-    var body: some View {
+    /// the countdown to draw (a napping golden retriever when there is none) and its computed state
+    func resolve() -> (Countdown, Computed) {
         let demo = c ?? Countdown(id: "w", title: "Add a countdown", type: "custom", targetAt: "2030-01-01T00:00", timeZone: "UTC", allDay: false, yearly: false,
                                   createdAt: Date().addingTimeInterval(-DAY), dog: Dog(breed: "golden", name: "Sunny"), accent: "#E8A15C", displayMode: .full)
         var k = compute(demo, now: now)
         if c == nil { k.stage = .nap }
+        return (demo, k)
+    }
+
+    var body: some View {
+        let (demo, k) = resolve()
         let accent = Color(hex: demo.accent)
         let ink = Color(hex: "#3D2616")
         Group {
