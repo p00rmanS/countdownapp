@@ -14,9 +14,17 @@ struct SoonestCountdownIntent: AppIntent {
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let now = Date()
-        let soonest = SharedStore.load().countdowns.filter { !$0.archived }
-            .map { ($0, compute($0, now: now)) }.filter { $0.1.phase != .past }
-            .min { a, b in (a.1.phase == .today ? 0 : 1, a.1.target) < (b.1.phase == .today ? 0 : 1, b.1.target) }
+        // soonest first, with "today" ahead of everything (kept as small steps so the compiler stays fast)
+        var best: (Countdown, Computed)? = nil
+        for c in SharedStore.load().countdowns where !c.archived {
+            let k = compute(c, now: now)
+            if k.phase == .past { continue }
+            guard let cur = best else { best = (c, k); continue }
+            let curToday = cur.1.phase == .today, newToday = k.phase == .today
+            if newToday != curToday { if newToday { best = (c, k) }; continue }
+            if k.target < cur.1.target { best = (c, k) }
+        }
+        let soonest = best
         guard let (c, k) = soonest else { return .result(dialog: "You don't have any countdowns yet. Open Pawcount to start one.") }
         if k.phase == .today { return .result(dialog: "\(plainTitle(c.title)) is today! \(c.dog.name) is losing it.") }
         return .result(dialog: "\(plainTitle(c.title)) is in \(spoken(k)). \(stageSentence(c, k)).")

@@ -45,4 +45,4 @@ To try it on your phone with no store at all, use the web app and *Add to Home S
 
 ## Before the first public release
 - Replace the placeholder privacy policy / support URLs in the store consoles.
-- Alternate app icons per dog, widgets, Live Activities and partner sharing (v1.1+) are not built yet.
+- Not built yet: iPhone Live Activities / Dynamic Island, Apple Watch and Wear OS, live two-way partner sync (needs a server), custom dog from a photo.
