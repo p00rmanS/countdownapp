@@ -67,6 +67,16 @@ class LogicTest {
         assertEquals(days.size, days.toSet().size)
         assertTrue(plan.all { it.at > now })
     }
+    @Test fun hostileBackupIsCleaned() {
+        val o = org.json.JSONObject("""{"id":"../x","title":"t","type":"nope","targetAt":"2031-01-01T10:00","timeZone":"Mars/Base","accent":"zzz","dog":{"breed":"x","name":"n","colors":{"fur":"bad"},"ears":"bad"},"memoryPhotos":["../../databases/x","ok-1.jpg"]}""")
+        val c = countdownFromJson(o)
+        assertEquals("custom", c.type); assertEquals("#E8A15C", c.accent); assertEquals("mutt", c.dog.breed); assertEquals(null, c.dog.furColor)
+        assertEquals(listOf("ok-1.jpg"), c.photos); assertTrue(!c.id.contains("."))
+    }
+    @Test fun badDateIsRejected() {
+        val o = org.json.JSONObject("""{"id":"a","title":"t","type":"custom","targetAt":"tomorrow","dog":{"breed":"mutt","name":"n"}}""")
+        assertTrue(runCatching { countdownFromJson(o) }.isFailure)
+    }
     @Test fun backupRoundTrip() {
         val data = AppData(true, makeSamples(now))
         val back = appDataFromJson(data.toJson())

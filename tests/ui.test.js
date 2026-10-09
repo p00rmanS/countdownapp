@@ -99,6 +99,16 @@ test('empty Memories: Scott can be petted and played with', () => {
   A.ui.sceneApi.pet(); assert.ok(doc.querySelector('.dog.petting')); A.ui.sceneApi.play.tickle();
   A.S.state.countdowns = keep; go('#/');
 });
+test('hostile shared links are neutralised (no markup injection, no crash on unknown values)', () => {
+  const evil = { title: 'x', targetAt: '2031-01-01T10:00', type: 'nope', accent: 'red" onmouseover="alert(1)', displayMode: 'zzz', timeZone: 'Mars/Base', dog: { breed: 'x" onload="1', name: '<img src=x onerror=alert(1)>' }, notes: 'n', memoryPhotos: ['javascript:alert(1)'] };
+  const link = 'https://p00rmans.github.io/countdownapp/#/import/' + w.btoa(unescape(encodeURIComponent(JSON.stringify(evil)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const id = A.importShared(link); assert.ok(id); const c = A.S.get(id);
+  assert.strictEqual(c.type, 'custom'); assert.ok(/^#[0-9a-f]{6}$/i.test(c.accent)); assert.strictEqual(c.dog.breed, 'mutt'); assert.strictEqual(c.memoryPhotos.length, 0);
+  const h = go('#/c/' + id); for (const bad of ['onmouseover', 'onload="1']) assert.ok(!h.includes(bad), bad + ' leaked');
+  assert.strictEqual(doc.querySelectorAll('#view img[src="x"], #view [onerror], #view [onmouseover], #view [onload]').length, 0);
+  assert.strictEqual(A.importShared('#/import/' + w.btoa('{"title":"a"}')), null);
+  A.S.remove(id);
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

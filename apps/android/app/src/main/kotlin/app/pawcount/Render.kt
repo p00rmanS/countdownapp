@@ -37,7 +37,7 @@ class Palette(val fur: Int, val dark: Int, val light: Int, val paw: Int, val acc
 fun parseHex(s: String): Int {
     var h = s.removePrefix("#")
     if (h.length == 3) h = h.map { "$it$it" }.joinToString("")
-    return (0xFF000000L or h.toLong(16)).toInt()
+    return (0xFF000000L or (h.toLongOrNull(16) ?: 0xFF00FFL)).toInt()
 }
 
 fun mixColors(a: Int, b: Int, t: Float): Int {

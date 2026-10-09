@@ -3,6 +3,15 @@ import XCTest
 
 /* Unit tests for Logic.swift. They mirror tests/countdown.test.js and the Android LogicTest so all platforms agree. */
 final class LogicTests: XCTestCase {
+    func testHostileBackupIsCleaned() throws {
+        let json = #"{"id":"../x","title":"t","type":"nope","targetAt":"2031-01-01T10:00","timeZone":"Mars/Base","accent":"zzz","dog":{"breed":"x","name":"n","colors":{"fur":"bad"},"ears":"bad"},"memoryPhotos":["../../x","ok-1.jpg"]}"#
+        let c = try JSONDecoder().decode(Countdown.self, from: Data(json.utf8))
+        XCTAssertEqual(c.type, "custom"); XCTAssertEqual(c.accent, "#E8A15C"); XCTAssertEqual(c.dog.breed, "mutt"); XCTAssertNil(c.dog.furColor)
+        XCTAssertEqual(c.photos, ["ok-1.jpg"]); XCTAssertFalse(c.id.contains("."))
+        let bad = #"{"id":"a","title":"t","type":"custom","targetAt":"tomorrow","dog":{"breed":"mutt","name":"n"}}"#
+        XCTAssertThrowsError(try JSONDecoder().decode(Countdown.self, from: Data(bad.utf8)))
+    }
+
     let now = Date(timeIntervalSince1970: 1_906_545_600)      // 2030-06-01 12:00 UTC
 
     func utc(_ y: Int, _ m: Int, _ d: Int, _ h: Int = 0, _ mi: Int = 0) -> Date {

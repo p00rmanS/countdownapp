@@ -265,8 +265,10 @@ enum Photos {
         try? jpg.write(to: dir.appendingPathComponent(name))
         return name
     }
-    static func image(_ name: String) -> UIImage? { UIImage(contentsOfFile: dir.appendingPathComponent(name).path) }
-    static func delete(_ name: String) { try? FileManager.default.removeItem(at: dir.appendingPathComponent(name)) }
+    /// photo files are named <uuid>.jpg; anything else (e.g. "../../x") could point outside the photo folder
+    static func isSafeName(_ s: String) -> Bool { s.range(of: "^[A-Za-z0-9-]{1,64}\\.jpg$", options: .regularExpression) != nil }
+    static func image(_ name: String) -> UIImage? { isSafeName(name) ? UIImage(contentsOfFile: dir.appendingPathComponent(name).path) : nil }
+    static func delete(_ name: String) { if isSafeName(name) { try? FileManager.default.removeItem(at: dir.appendingPathComponent(name)) } }
 }
 
 /* ------------------------------ alternate app icons ------------------------------ */

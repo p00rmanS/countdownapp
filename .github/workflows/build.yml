@@ -2,6 +2,9 @@
 name: build
 on: [push, pull_request, workflow_dispatch]
 
+# the build only reads the repository
+permissions: { contents: read }
+
 jobs:
   web:
     runs-on: ubuntu-latest

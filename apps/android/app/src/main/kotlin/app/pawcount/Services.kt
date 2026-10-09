@@ -78,7 +78,7 @@ class Repo(private val ctx: Context) {
         name
     }.getOrNull()
 
-    fun photoFile(name: String) = File(photoDir, name)
+    fun photoFile(name: String) = File(photoDir, if (SAFE_PHOTO.matches(name)) name else "_invalid_")
     fun deletePhoto(name: String) { photoFile(name).delete() }
 }
 

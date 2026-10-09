@@ -135,9 +135,9 @@
       const j = raw.indexOf('d='); if (j >= 0) raw = raw.slice(j + 2);
       raw = raw.split(/[&#]/)[0];
       const o = JSON.parse(unb64url(raw));
-      if (!o.title || !o.targetAt || !o.dog) return null;
-      const c = { checklist: [], notes: '', ...o, id: P.uuid(), createdAt: new Date().toISOString(), archived: false, sample: false, memoryPhotos: [], notifications: P.defaultNotifications(o.type || 'custom') };
-      delete c.v; S.upsert(c); S.state.onboarded = true; S.save();
+      const c = P.cleanCountdown({ ...o, id: P.uuid(), createdAt: new Date().toISOString(), archived: false, sample: false, memoryPhotos: [], notifications: undefined });
+      if (!c) return null;
+      S.upsert(c); S.state.onboarded = true; S.save();
       return c.id;
     } catch (e) { return null; }
   }
@@ -430,7 +430,7 @@
     };
     if (d.type === 'intl_trip' && country) c.destination = { country: country[0], city: country[3], flag: country[1] };
     if (d.type === 'birthday' && (d.personName || d.birthYear)) c.person = { name: d.personName.trim(), birthYear: d.birthYear ? +d.birthYear : undefined };
-    const old = d.id && S.get(d.id); if (old) c.archived = old.archived;
+    const old = d.id && S.get(d.id); if (old) { c.archived = old.archived; if (old.joy) c.joy = old.joy; }
     return c;
   }
   function draftComp(forceStage) {

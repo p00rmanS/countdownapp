@@ -92,7 +92,35 @@ fun Countdown.toJson(): JSONObject = JSONObject().apply {
     put("archived", archived); put("memoryPhotos", JSONArray(photos)); put("sample", sample)
 }
 
-fun countdownFromJson(o: JSONObject): Countdown {
+/* ---------- untrusted data (shared links, backup files): only known-good shapes survive ---------- */
+private val TYPE_KEYS = setOf("intl_trip", "vacation", "birthday", "anniversary", "holiday", "custom")
+private val BREED_KEYS = setOf("scott", "golden", "corgi", "shiba", "dachshund", "husky", "mutt")
+private val EAR_KEYS = setOf("floppy", "pointy", "tall", "long")
+private val HEX6 = Regex("^#[0-9A-Fa-f]{6}$")
+private val WALL = Regex("^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2})?$")
+/** photo files are named <uuid>.jpg; anything else (e.g. "../../x") could point outside the photo folder */
+val SAFE_PHOTO = Regex("^[A-Za-z0-9-]{1,64}\\.jpg$")
+
+private fun Countdown.sanitized(): Countdown {
+    require(title.isNotBlank() && WALL.matches(targetAt)) { "not a countdown" }
+    runCatching { if (targetAt.length > 10) java.time.LocalDateTime.parse(targetAt) else java.time.LocalDate.parse(targetAt) }.getOrElse { throw IllegalArgumentException("bad date") }
+    val zone = runCatching { java.time.ZoneId.of(timeZone); timeZone }.getOrDefault(java.util.TimeZone.getDefault().id)
+    return copy(
+        id = id.filter { it.isLetterOrDigit() || it == '-' || it == '_' }.take(64).ifEmpty { newId() },
+        title = title.trim().take(80), type = if (type in TYPE_KEYS) type else "custom", timeZone = zone, notes = notes.take(2000),
+        accent = if (HEX6.matches(accent)) accent else "#E8A15C",
+        dog = dog.copy(breed = if (dog.breed in BREED_KEYS) dog.breed else "mutt", name = dog.name.trim().take(30).ifBlank { "Buddy" },
+            furColor = dog.furColor?.takeIf { HEX6.matches(it) }, ears = dog.ears?.takeIf { it in EAR_KEYS }),
+        checklist = checklist.take(100).map { it.copy(text = it.text.take(200)) }, reminders = reminders.take(12),
+        photos = photos.filter { SAFE_PHOTO.matches(it) }.take(6),
+        destination = destination?.let { it.copy(country = it.country.take(60), city = it.city?.take(60), flag = it.flag.take(8)) },
+        person = person?.let { it.copy(name = it.name.take(40)) },
+    )
+}
+
+fun countdownFromJson(o: JSONObject): Countdown = rawCountdownFromJson(o).sanitized()
+
+private fun rawCountdownFromJson(o: JSONObject): Countdown {
     val dogO = o.getJSONObject("dog")
     val created = o.optStr("createdAt")?.let { runCatching { java.time.Instant.parse(it).toEpochMilli() }.getOrNull() } ?: System.currentTimeMillis()
     val checks = o.optJSONArray("checklist") ?: JSONArray()
@@ -137,7 +165,7 @@ fun appDataFromJson(raw: JSONObject): AppData {
             displayMode = DisplayMode.of(s?.optStr("displayMode")), haptics = s?.optBoolean("haptics", true) ?: true,
             sound = s?.optBoolean("sound") ?: false, reduceMotion = s?.optString("motion", "system") ?: "system",
             theme = s?.optString("theme", "system") ?: "system", notifications = s?.optBoolean("notifications") ?: false,
-            profileName = s?.optString("profileName", "") ?: "", profilePhoto = s?.optString("profilePhoto", "") ?: "",
+            profileName = (s?.optString("profileName", "") ?: "").take(30), profilePhoto = (s?.optString("profilePhoto", "") ?: "").takeIf { SAFE_PHOTO.matches(it) } ?: "",
         ),
     )
 }

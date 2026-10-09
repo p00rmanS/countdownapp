@@ -95,6 +95,34 @@ extension Countdown: Codable {
         // web backups embed photos as data: URLs; only keep file names
         photos = (try c.decodeIfPresent([String].self, forKey: .memoryPhotos) ?? []).filter { !$0.hasPrefix("data:") && !$0.isEmpty }
         sample = try c.decodeIfPresent(Bool.self, forKey: .sample) ?? false
+        try sanitize()
+    }
+
+    /// untrusted data (shared links, backup files): only known-good shapes survive. Throws if it is not a usable countdown.
+    private mutating func sanitize() throws {
+        let types: Set<String> = ["intl_trip", "vacation", "birthday", "anniversary", "holiday", "custom"]
+        let breeds: Set<String> = ["scott", "golden", "corgi", "shiba", "dachshund", "husky", "mutt"]
+        let ears: Set<String> = ["floppy", "pointy", "tall", "long"]
+        let hex = try! NSRegularExpression(pattern: "^#[0-9A-Fa-f]{6}$")
+        let wall = try! NSRegularExpression(pattern: "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2})?$")
+        func ok(_ r: NSRegularExpression, _ s: String) -> Bool { r.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil }
+        title = String(title.trimmingCharacters(in: .whitespaces).prefix(80))
+        guard !title.isEmpty, ok(wall, targetAt) else { throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "not a countdown")) }
+        id = String(id.filter { $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" }.prefix(64))
+        if id.isEmpty { id = newId() }
+        if !types.contains(type) { type = "custom" }
+        if TimeZone(identifier: timeZone) == nil { timeZone = TimeZone.current.identifier }
+        if !ok(hex, accent) { accent = "#E8A15C" }
+        notes = String(notes.prefix(2000))
+        if !breeds.contains(dog.breed) { dog.breed = "mutt" }
+        dog.name = String(dog.name.trimmingCharacters(in: .whitespaces).prefix(30)); if dog.name.isEmpty { dog.name = "Buddy" }
+        if let f = dog.furColor, !ok(hex, f) { dog.furColor = nil }
+        if let e = dog.ears, !ears.contains(e) { dog.ears = nil }
+        checklist = Array(checklist.prefix(100)).map { var i = $0; i.text = String(i.text.prefix(200)); return i }
+        reminders = Array(reminders.prefix(12))
+        photos = Array(photos.filter { Photos.isSafeName($0) }.prefix(6))
+        if var d = destination { d.country = String(d.country.prefix(60)); d.city = d.city.map { String($0.prefix(60)) }; d.flag = String(d.flag.prefix(8)); destination = d }
+        if var p = person { p.name = String(p.name.prefix(40)); person = p }
     }
     func encode(to e: Encoder) throws {
         var c = e.container(keyedBy: K.self)
@@ -131,8 +159,9 @@ extension Settings: Codable {
         reduceMotion = try c.decodeIfPresent(String.self, forKey: .motion) ?? "system"
         theme = try c.decodeIfPresent(String.self, forKey: .theme) ?? "system"
         notifications = try c.decodeIfPresent(Bool.self, forKey: .notifications) ?? false
-        profileName = try c.decodeIfPresent(String.self, forKey: .profileName) ?? ""
-        profilePhoto = try c.decodeIfPresent(String.self, forKey: .profilePhoto) ?? ""
+        profileName = String((try c.decodeIfPresent(String.self, forKey: .profileName) ?? "").prefix(30))
+        let pp = try c.decodeIfPresent(String.self, forKey: .profilePhoto) ?? ""
+        profilePhoto = Photos.isSafeName(pp) ? pp : ""
     }
     func encode(to e: Encoder) throws {
         var c = e.container(keyedBy: K.self)

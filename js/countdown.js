@@ -246,4 +246,36 @@
     list.push(mkc({ key: 'lisbon', title: 'Lisbon 🇵🇹', type: 'intl_trip', tz: 'Europe/Lisbon', targetAt: wallIn(now - 30 * DAY, 'Europe/Lisbon', 11, 0), since: 100, dog: { breed: 'scott', name: 'Scott' }, destination: { country: 'Portugal', city: 'Lisbon', flag: '🇵🇹' }, mode: 'full', notes: 'Pastéis de nata at midnight. Worth it.' }));
     return list;
   };
+  /* ---------- untrusted data: shared links, backup files and storage all go through here ----------
+     Values end up inside HTML attributes and class names, so only known-good shapes are kept. */
+  const str = (v, max) => (typeof v === 'string' ? v.slice(0, max) : '');
+  const HEX = /^#[0-9a-fA-F]{6}$/;
+  const PHOTO = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+  P.PHOTO_RE = PHOTO;
+  /** returns a safe countdown, or null if it has no usable title / date */
+  P.cleanCountdown = (o) => {
+    if (!o || typeof o !== 'object' || Array.isArray(o)) return null;
+    const title = str(o.title, 80).trim(), targetAt = str(o.targetAt, 16);
+    if (!title || !/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/.test(targetAt)) return null;
+    const type = P.TYPES[o.type] ? o.type : 'custom';
+    const d = o.dog && typeof o.dog === 'object' ? o.dog : {};
+    const dog = { breed: P.BREEDS && P.BREEDS[d.breed] ? d.breed : 'mutt', name: str(d.name, 30).trim() || 'Buddy' };
+    if (d.colors && HEX.test(d.colors.fur || '')) dog.colors = { fur: d.colors.fur };
+    if (P.EAR_TYPES && P.EAR_TYPES.some((e) => e[0] === d.ears)) dog.ears = d.ears;
+    const c = {
+      id: str(o.id, 64).replace(/[^\w-]/g, '') || P.uuid(), title, type, targetAt,
+      timeZone: validTz(str(o.timeZone, 64) || P.localTz()), allDay: !!o.allDay, recurrence: o.recurrence === 'yearly' ? 'yearly' : 'none',
+      createdAt: Number.isFinite(Date.parse(o.createdAt)) ? new Date(o.createdAt).toISOString() : new Date().toISOString(),
+      dog, accent: HEX.test(o.accent || '') ? o.accent : P.TYPES[type].accent,
+      displayMode: ['full', 'days', 'sleeps', 'weeks'].includes(o.displayMode) ? o.displayMode : 'full',
+      notes: str(o.notes, 2000), archived: !!o.archived, sample: !!o.sample,
+      checklist: (Array.isArray(o.checklist) ? o.checklist : []).slice(0, 100).filter((i) => i && typeof i.text === 'string').map((i) => ({ id: str(i.id, 64).replace(/[^\w-]/g, '') || P.uuid(), text: str(i.text, 200), done: !!i.done })),
+      memoryPhotos: (Array.isArray(o.memoryPhotos) ? o.memoryPhotos : []).slice(0, 6).filter((u) => typeof u === 'string' && PHOTO.test(u)),
+      notifications: (Array.isArray(o.notifications) ? o.notifications : P.defaultNotifications(type)).slice(0, 12).filter((n) => n && Number.isFinite(n.offsetMinutes)).map((n) => ({ offsetMinutes: n.offsetMinutes, label: str(n.label, 60), enabled: !!n.enabled })),
+    };
+    if (o.destination && typeof o.destination === 'object') c.destination = { country: str(o.destination.country, 60), city: str(o.destination.city, 60), flag: str(o.destination.flag, 8) };
+    if (o.person && typeof o.person === 'object') { c.person = { name: str(o.person.name, 40) }; if (Number.isFinite(o.person.birthYear)) c.person.birthYear = Math.trunc(o.person.birthYear); }
+    if (o.joy && Number.isFinite(o.joy.v) && Number.isFinite(o.joy.t)) c.joy = { v: Math.max(0, Math.min(100, o.joy.v)), t: o.joy.t };
+    return c;
+  };
 })();

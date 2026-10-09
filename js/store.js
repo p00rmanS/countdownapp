@@ -15,6 +15,18 @@
     lastNotified: '',
     settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'scott', profileName: '', profilePhoto: '' },
   });
+  // settings come from storage / backups: keep only values of the right type
+  function sanitizeSettings(s) {
+    const b = defaults().settings, out = { ...b };
+    for (const k of Object.keys(b)) if (typeof s[k] === typeof b[k]) out[k] = s[k];
+    if (!['full', 'days', 'sleeps', 'weeks'].includes(out.displayMode)) out.displayMode = 'full';
+    if (!['system', 'light', 'dark'].includes(out.theme)) out.theme = 'system';
+    if (!['system', 'on', 'off'].includes(out.motion)) out.motion = 'system';
+    if (!/^[a-z]+$/.test(out.icon)) out.icon = 'scott';
+    out.profileName = out.profileName.slice(0, 30);
+    if (out.profilePhoto && !P.PHOTO_RE.test(out.profilePhoto) && !/^[\w.-]{1,80}$/.test(out.profilePhoto)) out.profilePhoto = '';
+    return out;
+  }
   let state = defaults();
   const subs = [];
   let memoryOnly = false;
@@ -25,7 +37,7 @@
       if (raw) {
         const d = JSON.parse(raw);
         const base = defaults();
-        state = { ...base, ...d, settings: { ...base.settings, ...(d.settings || {}) } };
+        state = { ...base, ...d, countdowns: Array.isArray(d.countdowns) ? d.countdowns.map(P.cleanCountdown).filter(Boolean) : [], settings: sanitizeSettings({ ...base.settings, ...(d.settings || {}) }) };
       }
     } catch (e) { memoryOnly = true; }
   }
@@ -61,7 +73,7 @@
       const d = j.data || j;
       if (!Array.isArray(d.countdowns)) throw new Error('Not a Pawcount backup');
       const base = defaults();
-      state = { ...base, ...d, settings: { ...base.settings, ...(d.settings || {}) } };
+      state = { ...base, ...d, countdowns: d.countdowns.map(P.cleanCountdown).filter(Boolean), settings: sanitizeSettings({ ...base.settings, ...(d.settings || {}) }) };
       return this.commit();
     },
   };
