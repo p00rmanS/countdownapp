@@ -118,6 +118,30 @@
   const chip = (txt, cls = '') => `<span class="chip ${cls}">${txt}</span>`;
   const stageChip = (c, k) => { const i = P.stageInfo(c, k); return chip(`<span aria-hidden="true">${i.emoji}</span> ${i.label}`, 'stage'); };
 
+  /* =============================== SHARING ===============================
+     A shared countdown is just its data, base64url-encoded in a link:  https://.../#/import/<code>
+     Opening the link adds a copy to the other person's app (web, Android or iPhone - same format). No server. */
+  const SHARE_WEB = 'https://p00rmans.github.io/countdownapp/';
+  const b64url = (str) => btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const unb64url = (b) => decodeURIComponent(escape(atob(b.replace(/-/g, '+').replace(/_/g, '/'))));
+  function shareLink(c) {
+    const o = { ...c }; ['id', 'createdAt', 'archived', 'memoryPhotos', 'sample', 'notifications'].forEach((k) => delete o[k]); o.v = 1;
+    return SHARE_WEB + '#/import/' + b64url(JSON.stringify(o));
+  }
+  /** returns the new countdown's id, or null if the text isn't a shared countdown */
+  function importShared(text) {
+    try {
+      let raw = String(text).trim(); const i = raw.lastIndexOf('/import/'); if (i >= 0) raw = raw.slice(i + 8);
+      const j = raw.indexOf('d='); if (j >= 0) raw = raw.slice(j + 2);
+      raw = raw.split(/[&#]/)[0];
+      const o = JSON.parse(unb64url(raw));
+      if (!o.title || !o.targetAt || !o.dog) return null;
+      const c = { checklist: [], notes: '', ...o, id: P.uuid(), createdAt: new Date().toISOString(), archived: false, sample: false, memoryPhotos: [], notifications: P.defaultNotifications(o.type || 'custom') };
+      delete c.v; S.upsert(c); S.state.onboarded = true; S.save();
+      return c.id;
+    } catch (e) { return null; }
+  }
+
   /* =============================== HOME =============================== */
   function greeting() { const h = new Date().getHours(); return h < 5 ? 'Late night, huh?' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
 
@@ -520,6 +544,11 @@
     let html = '', tab = '', title = 'Pawcount';
     ui.onFetch = null; ui.sceneApi = null;
     switch (r.name) {
+      case 'import': {
+        const id = importShared(location.hash.slice('#/import/'.length));
+        toast(id ? 'Added to your countdowns 🐾' : 'That link isn’t a Pawcount countdown');
+        location.replace(id ? '#/c/' + id : '#/'); return;
+      }
       case 'welcome': html = viewWelcome(); title = 'Welcome'; break;
       case 'memories': html = viewMemories(); tab = 'memories'; title = 'Memories'; break;
       case 'settings': html = viewSettings(); title = 'Settings'; break;
@@ -709,8 +738,17 @@
       const c = S.get(route().id); if (!c) return;
       openSheet(`<h2 class="sheet-t">${esc(c.title)}</h2><div class="sheet-list">
         <a class="sheet-item" href="#/edit/${c.id}" data-action="close-sheet">${icon('edit')}<span>Edit countdown</span></a>
+        <button class="sheet-item" data-action="share">${icon('upload')}<span>Share with your person</span></button>
         <button class="sheet-item" data-action="${c.archived ? 'unarchive' : 'archive'}">${icon('archive')}<span>${c.archived ? 'Move back to Home' : 'Archive to Memories'}</span></button>
         <button class="sheet-item danger" data-action="delete-ask">${icon('trash')}<span>Delete…</span></button></div>`, 'Countdown options');
+    },
+    share() {
+      const c = S.get(route().id); if (!c) return;
+      const url = shareLink(c), text = `${c.dog.name} is counting down to ${c.title}!`;
+      closeSheet();
+      if (navigator.share) navigator.share({ title: 'Pawcount', text, url }).catch(() => {});
+      else if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => toast('Link copied — send it to your person 💛'), () => prompt('Copy this link', url));
+      else prompt('Copy this link', url);
     },
     archive() { const c = S.get(route().id); c.archived = true; S.commit(); closeSheet(); toast('Archived to Memories'); location.hash = '#/memories'; },
     unarchive() { const c = S.get(route().id); c.archived = false; S.commit(); closeSheet(); toast('Back on Home'); render({ keepScroll: true, noAnim: true }); },
@@ -885,5 +923,5 @@
   setInterval(tick, 1000);
   setTimeout(() => { if (!['welcome', 'new', 'edit'].includes(route().name) && route().name !== 'c') checkMilestones(); }, 1200);
   if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !P.native.isNative) navigator.serviceWorker.register('sw.js').catch(() => {});
-  window.Pawcount = { S, P, ui, render };
+  window.Pawcount = { S, P, ui, render, shareLink, importShared };
 })();

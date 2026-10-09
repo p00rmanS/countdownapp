@@ -52,13 +52,15 @@ struct WidgetCard: View {
         let ink = Color(hex: "#3D2616")
         Group {
             if wide {
-                HStack(spacing: 0) {
-                    StillScene(c: demo, k: k, art: art).frame(maxWidth: .infinity).clipped().layoutPriority(0.9)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(demo.title).font(PawFont.display(17)).foregroundColor(ink).lineLimit(2).minimumScaleFactor(0.7)
-                        Text(c == nil ? "Tap to start" : bigCount(demo, k)).font(PawFont.display(30, 700)).foregroundColor(accent.luminanceIsHigh ? ink : accent).minimumScaleFactor(0.5).lineLimit(1)
-                        if c != nil { Text(stageLabel(demo, k)).font(PawFont.body(12, 800)).foregroundColor(Color(hex: "#765039")) }
-                    }.padding(12).frame(maxWidth: .infinity, alignment: .leading)
+                GeometryReader { g in
+                    HStack(spacing: 0) {
+                        StillScene(c: demo, k: k, art: art).frame(width: g.size.width * 0.46, height: g.size.height).clipped()
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(demo.title).font(PawFont.display(17)).foregroundColor(ink).lineLimit(2).minimumScaleFactor(0.7)
+                            Text(c == nil ? "Tap to start" : bigCount(demo, k)).font(PawFont.display(30, 700)).foregroundColor(accent.luminanceIsHigh ? ink : accent).minimumScaleFactor(0.5).lineLimit(1)
+                            if c != nil { Text(stageLabel(demo, k)).font(PawFont.body(12, 800)).foregroundColor(Color(hex: "#765039")) }
+                        }.padding(12).frame(width: g.size.width * 0.54, height: g.size.height, alignment: .leading)
+                    }
                 }
             } else {
                 VStack(spacing: 0) {

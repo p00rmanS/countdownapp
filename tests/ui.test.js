@@ -64,6 +64,14 @@ test('reminder plan: at most one per day, in the future', () => {
   const plan = A.P.native.plan(); const days = plan.map((n) => new w.Date(n.at).toDateString());
   assert.strictEqual(new Set(days).size, days.length); assert.ok(plan.every((n) => n.at > Date.now()));
 });
+test('a shared link adds a copy of the countdown', () => {
+  const c = A.S.get('sample-japan'); const before = A.S.state.countdowns.length;
+  const link = A.shareLink(c); assert.ok(link.includes('#/import/'));
+  const id = A.importShared(link);
+  assert.ok(id && id !== c.id); assert.strictEqual(A.S.state.countdowns.length, before + 1);
+  const copy = A.S.get(id); assert.strictEqual(copy.title, c.title); assert.strictEqual(copy.timeZone, c.timeZone); assert.strictEqual(copy.dog.breed, c.dog.breed);
+  assert.strictEqual(A.importShared('https://example.com/nothing'), null);
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);
