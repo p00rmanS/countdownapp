@@ -82,6 +82,14 @@ test('profile: name shows in the greeting, photo replaces the dog avatar, both s
   assert.strictEqual(A.S.state.settings.profileName, 'Mia'); assert.strictEqual(A.S.state.settings.profilePhoto, 'data:image/jpeg;base64,AAAA');
   A.S.set('profilePhoto', ''); A.S.set('profileName', '');
 });
+test('play tray: treat, feed, ball and tickle raise the joy meter', () => {
+  go('#/c/sample-bali'); const c = A.S.get('sample-bali'); delete c.joy;
+  assert.strictEqual(doc.querySelectorAll('[data-play]').length, 4);
+  A.ui.sceneApi.play.tickle(); assert.ok(c.joy.v > 20 && doc.querySelector('.dog.tickle'));
+  const v = c.joy.v; A.ui.sceneApi.play.feed(); assert.ok(c.joy.v > v && doc.querySelector('.bowl'));
+  A.ui.sceneApi.play.ball(); A.ui.sceneApi.play.treat();
+  assert.ok(doc.querySelector('[data-joy-text]').textContent.includes(c.dog.name));
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

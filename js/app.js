@@ -218,6 +218,15 @@
           <button class="glass-btn" data-action="menu" aria-label="More options for ${esc(c.title)}">${icon('more')}</button></div>
         ${P.sceneHTML(c, k, { size: 'detail', interactive: true })}
         <p class="scene-hint" aria-hidden="true">Tap to bark · Hold to pet · Shake</p>
+        <div class="play-tray" role="group" aria-label="Play with ${esc(c.dog.name)}">
+          <div class="joy" data-joy role="status" aria-live="polite"><span class="joy-h" aria-hidden="true">♥</span><span class="joy-bar"><i data-joy-fill></i></span><span class="joy-t" data-joy-text></span></div>
+          <div class="play-btns">
+            <button class="play-btn" data-play="treat"><span aria-hidden="true">🦴</span>Treat</button>
+            <button class="play-btn" data-play="feed"><span aria-hidden="true">🍖</span>Feed</button>
+            <button class="play-btn" data-play="ball"><span aria-hidden="true">🎾</span>Ball</button>
+            <button class="play-btn" data-play="tickle"><span aria-hidden="true">🤗</span>Tickle</button>
+          </div>
+        </div>
       </div>
       <div class="detail-sheet">
         <div class="chip-row center">${chip(`<span aria-hidden="true">${tp.emoji}</span> ${tp.short}`, 'ghost')}${c.destination ? chip(`<span aria-hidden="true">${c.destination.flag}</span> ${esc(c.destination.city || c.destination.country)}`, 'ghost') : ''}${facts.map((f) => chip(f, 'ghost')).join('')}</div>
@@ -634,7 +643,25 @@
       setTimeout(() => { say(P.dogLine(c, K(), 'fetch')); P.haptic('soft'); }, 900);
       setTimeout(() => { scene.classList.remove('fetching'); ball.remove(); }, 1900);
     };
-    ui.sceneApi = { bark, shake, fetch: fetchB, pet: () => { pt = null; startPet(); setTimeout(endPet, 2200); } };
+    /* ---- play: treat / feed / ball / tickle, and a joy meter that fades while you are away ---- */
+    const joyNow = () => { const j = c.joy; return j ? Math.max(0, j.v - ((Date.now() - j.t) / 3600000) * 6) : 20; };
+    const joyLabel = (v) => (v < 25 ? 'Sleepy' : v < 55 ? 'Content' : v < 85 ? 'Happy' : 'Over the moon');
+    const showJoy = () => { const v = Math.round(joyNow()), f = $('[data-joy-fill]', root), t = $('[data-joy-text]', root); if (f) f.style.width = v + '%'; if (t) t.textContent = `${c.dog.name} is ${joyLabel(v).toLowerCase()}`; };
+    const addJoy = (n) => {
+      const before = joyNow(); c.joy = { v: Math.min(100, before + n), t: Date.now() }; S.save(); showJoy();
+      if (before < 100 && c.joy.v >= 100) { P.confetti({ count: 70, power: 0.8 }); P.haptic('success'); say(`${c.dog.name} loves you! 💛`, 2600); }
+    };
+    const drop = (cls, emoji, ms) => { const el = document.createElement('i'); el.className = cls; el.textContent = emoji; fx2.appendChild(el); setTimeout(() => el.remove(), ms); return el; };
+    const play = {
+      treat() { used(); drop('treat-drop', '🦴', 1000); setTimeout(() => { flash('munch', 1100); P.hearts(fx2, 2); say(k0(['Nom nom! 🦴', 'Best human ever!', 'More? 👀'])); P.haptic('tick'); P.sound('chime'); addJoy(8); }, 750); },
+      feed() { used(); const b = drop('bowl', '🥣', 2600); flash('munch', 2300); say('Yum yum yum…', 2400); P.haptic('purr'); addJoy(10); },
+      ball() { fetchB(); addJoy(6); },
+      tickle() { used(); flash('tickle', 1600); P.hearts(fx2, 5); say(k0(['Hehehe!!', 'That tickles! 😆', 'Again, again!']), 2000); P.haptic('purr'); addJoy(8); },
+    };
+    const k0 = (a) => a[Math.floor(Math.random() * a.length)];
+    $$('[data-play]', root).forEach((b) => b.addEventListener('click', () => play[b.dataset.play]()));
+    showJoy();
+    ui.sceneApi = { bark, shake, fetch: fetchB, play, pet: () => { pt = null; startPet(); setTimeout(endPet, 2200); } };
     initMotion(false);
     // gentle first hello
     if (root === view && route().name === 'c') {

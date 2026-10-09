@@ -170,7 +170,7 @@ kbd { font-family: var(--display); font-size: 12px; padding: 1px 7px; border-rad
 .bubble { position: absolute; z-index: 5; top: max(18%, calc(var(--safe-top) + 92px)); left: 50%; max-width: 78%; transform: translate(-50%, 10px) scale(.7); opacity: 0; background: #fff; color: #3D2616; padding: 9px 16px; border-radius: 20px; font-family: var(--display); font-weight: 600; font-size: 17px; text-align: center; box-shadow: 0 8px 22px rgba(0, 0, 0, .2); transition: transform .35s var(--spring), opacity .2s; pointer-events: none; }
 .bubble::after { content: ''; position: absolute; left: 50%; bottom: -7px; width: 16px; height: 16px; background: #fff; transform: translateX(-50%) rotate(45deg); border-radius: 3px; }
 .bubble.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
-.scene-hint { position: absolute; z-index: 4; left: 50%; bottom: 52px; transform: translateX(-50%); background: rgba(31, 36, 51, .66); color: #fff; font-size: 12.5px; font-weight: 800; padding: 6px 14px; border-radius: 999px; white-space: nowrap; transition: opacity .6s; backdrop-filter: blur(6px); pointer-events: none; }
+.scene-hint { position: absolute; z-index: 4; left: 50%; bottom: 128px; transform: translateX(-50%); background: rgba(31, 36, 51, .66); color: #fff; font-size: 12.5px; font-weight: 800; padding: 6px 14px; border-radius: 999px; white-space: nowrap; transition: opacity .6s; backdrop-filter: blur(6px); pointer-events: none; }
 .scene-hint.gone { opacity: 0; }
 
 /* stage atmospheres */
@@ -491,3 +491,22 @@ button, a, .dog-hit { -webkit-touch-callout: none; }
 .w-cta { position: sticky; bottom: 0; margin: 0 -22px; padding: 14px 22px 4px; background: linear-gradient(transparent, var(--bg) 28%); z-index: 3; }
 /* keeps the status-bar icons readable when the scene is bright */
 .detail-scene::before { content: ''; position: absolute; z-index: 5; top: 0; left: 0; right: 0; height: calc(var(--safe-top) + 46px); background: linear-gradient(rgba(20, 12, 8, .32), transparent); pointer-events: none; }
+
+/* ---- play tray: treat / feed / ball / tickle + joy meter ---- */
+.play-tray { position: absolute; z-index: 6; left: 14px; right: 14px; bottom: 62px; display: grid; gap: 8px; }
+.joy { display: flex; align-items: center; gap: 8px; justify-self: center; background: rgba(31, 36, 51, .62); color: #fff; padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 800; backdrop-filter: blur(6px); }
+.joy-h { color: #FF7DAA; } .joy-bar { width: 84px; height: 7px; border-radius: 99px; background: rgba(255, 255, 255, .28); overflow: hidden; } .joy-bar i { display: block; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, #FFD35C, #FF7DAA); transition: width .6s var(--spring); }
+.play-btns { display: flex; justify-content: center; gap: 8px; }
+.play-btn { flex: 1; max-width: 86px; min-height: 52px; display: grid; place-items: center; gap: 0; padding: 6px 4px; border-radius: 18px; background: rgba(255, 255, 255, .92); color: #3D2616; font-family: var(--display); font-weight: 600; font-size: 12.5px; box-shadow: 0 6px 16px rgba(0, 0, 0, .18); transition: transform .15s var(--spring); }
+.play-btn span { font-size: 22px; line-height: 1; } .play-btn:active { transform: scale(.92); }
+.treat-drop, .bowl { position: absolute; left: 50%; font-style: normal; pointer-events: none; }
+.treat-drop { top: 6%; font-size: 34px; animation: treatDrop .8s cubic-bezier(.5, 0, 1, .6) forwards; }
+.bowl { bottom: 4%; font-size: 40px; margin-left: -70px; animation: bowlIn .35s var(--spring) both; }
+.dog.munch .head { animation: munch .32s ease-in-out infinite !important; } .dog.munch .mouth-open { display: inline; } .dog.munch .mouth-closed { display: none; }
+.dog.tickle { animation: tickle .22s ease-in-out infinite; } .dog.tickle .eye { display: none; } .dog.tickle .eye-shut { display: inline; } .dog.tickle .mouth-open { display: inline; } .dog.tickle .mouth-closed { display: none; } .dog.tickle .blush { opacity: .9; }
+@keyframes treatDrop { 0% { transform: translate(-50%, -30px) rotate(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(-50%, 190px) rotate(300deg); opacity: 0; } }
+@keyframes bowlIn { from { transform: translateY(30px) scale(.5); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes munch { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(5px) rotate(-3deg); } }
+@keyframes tickle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg) translateY(-2px); } }
+.play-tray { bottom: 38px; left: 10px; right: 10px; gap: 6px; } .play-btns { gap: 6px; } .play-btn { min-width: 0; min-height: 46px; max-width: none; font-size: 12px; border-radius: 16px; } .play-btn span { font-size: 20px; }
+.scene.sz-detail .dog-wrap { height: 54%; bottom: 31%; } .scene-hint { bottom: 150px; }
