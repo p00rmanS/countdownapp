@@ -24,3 +24,6 @@ apps/ios/build/
 apps/ios/shots/
 apps/ios/test.log
 apps/ios/Pawcount/Info.plist
+apps/ios/Pawcount/Pawcount.entitlements
+apps/ios/PawcountWidget/Info.plist
+apps/ios/PawcountWidget/PawcountWidget.entitlements

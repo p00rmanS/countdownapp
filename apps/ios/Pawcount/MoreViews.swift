@@ -171,6 +171,9 @@ struct SettingsView: View {
     @Environment(\.paw) var pc
     @State var confirmReset = false
     @State var importing = false
+    @State var showImport = false
+    @State var importText = ""
+    @State var icon = AppIcon.current
 
     var body: some View {
         let s = store.settings
@@ -203,11 +206,38 @@ struct SettingsView: View {
                     }
                 }
 
+                group("App icon")
+                Panel {
+                    Muted("Pick the dog that lives on your home screen.", 14).padding(.bottom, 12)
+                    let rows = stride(from: 0, to: store.art.meta.breedOrder.count, by: 3).map { Array(store.art.meta.breedOrder[$0..<min($0 + 3, store.art.meta.breedOrder.count)]) }
+                    VStack(spacing: 10) {
+                        ForEach(rows, id: \.self) { row in
+                            HStack(spacing: 10) {
+                                ForEach(row, id: \.self) { b in
+                                    let on = icon == b, br = store.art.meta.breeds[b]!
+                                    Button {
+                                        AppIcon.set(b) { ok in
+                                            if ok { icon = b; Haptics.play(store.settings.haptics, "tick"); store.say("\(br.name) is your new icon 🐾") } else { store.say("This device can’t change its icon") }
+                                        }
+                                    } label: {
+                                        VStack(spacing: 2) {
+                                            DogIcon(dog: Dog(breed: b, name: "", furColor: b == "mutt" ? "#B98A62" : nil, ears: b == "mutt" ? "floppy" : nil)).frame(width: 62, height: 62)
+                                            Text(br.name).font(PawFont.body(13, 800)).foregroundColor(on ? pc.ink : pc.ink2)
+                                        }.padding(.vertical, 10).frame(maxWidth: .infinity)
+                                        .overlay(RoundedRectangle(cornerRadius: 20).stroke(on ? pc.kibble : .clear, lineWidth: 2.5))
+                                    }.buttonStyle(.plain).accessibilityAddTraits(on ? [.isSelected] : [])
+                                }
+                            }
+                        }
+                    }
+                }
+
                 group("Your data")
                 Panel(flush: true) {
                     Muted("Everything stays on this phone. No account, no tracking, no ads.", 14).padding(.vertical, 14)
                     if let url = store.exportJSON() { ShareLink(item: url) { linkRow("download", "Export backup") } }
                     link("upload", "Import backup") { importing = true }
+                    link("heart", "Add a shared countdown") { showImport = true }
                     link("paw", "Load sample adventures") { store.loadSamples(); store.say("Seven sample adventures added 🐾") }
                     if store.data.countdowns.contains(where: { $0.sample }) { link("trash", "Remove sample adventures") { store.update { $0.countdowns.removeAll { $0.sample } }; store.say("Samples removed") } }
                     link("trash", "Erase everything", danger: true) { confirmReset = true }
@@ -225,6 +255,18 @@ struct SettingsView: View {
                 let ok = url.startAccessingSecurityScopedResource(); defer { if ok { url.stopAccessingSecurityScopedResource() } }
                 if let d = try? Data(contentsOf: url), store.importJSON(d) { store.say("Backup restored 🐾") } else { store.say("That file isn’t a Pawcount backup") }
             }
+        }
+        .sheet(isPresented: $showImport) {
+            VStack(spacing: 10) {
+                H("Add a shared countdown", 22, align: .center)
+                Muted("Paste the link your person sent you.", 15, align: .center)
+                Field(label: "", text: $importText, placeholder: "https://…", maxLen: 6000)
+                PrimaryButton("Add countdown", enabled: !importText.isEmpty) {
+                    if let id = store.importShared(importText) { showImport = false; importText = ""; store.say("Added to your countdowns 🐾"); store.stack = [.home, .detail(id)] }
+                    else { store.say("That doesn’t look like a Pawcount link") }
+                }.padding(.top, 8)
+                Spacer(minLength: 0)
+            }.padding(20).background(pc.bg.ignoresSafeArea()).presentationDetents([.height(340)])
         }
         .sheet(isPresented: $confirmReset) {
             VStack(spacing: 10) {

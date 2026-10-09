@@ -3,6 +3,7 @@ import UIKit
 import AVFoundation
 import CoreMotion
 import UserNotifications
+import WidgetKit
 
 /*
  Services.swift - everything that touches the phone rather than the screen:
@@ -36,9 +37,8 @@ final class AppStore: ObservableObject {
     private var toastTask: Task<Void, Never>?
 
     init() {
-        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        file = docs.appendingPathComponent("pawcount.json")
-        let loaded = (try? Data(contentsOf: file)).flatMap { try? JSONDecoder().decode(AppData.self, from: $0) } ?? AppData()
+        file = SharedStore.fileURL            // shared with the widget (App Group) when the app is signed for it
+        let loaded = SharedStore.load()
         data = loaded
         stack = [loaded.onboarded || !loaded.countdowns.isEmpty ? .home : .welcome]
         PawFont.registerNames()
@@ -85,11 +85,29 @@ final class AppStore: ObservableObject {
         var d = data; f(&d); data = d
         if let enc = try? JSONEncoder().encode(d) { try? enc.write(to: file, options: .atomic) }
         Reminders.reschedule(d)
+        WidgetCenter.shared.reloadAllTimelines()     // keep home-screen widgets in step with what was just saved
     }
     func upsert(_ c: Countdown) { update { d in if let i = d.countdowns.firstIndex(where: { $0.id == c.id }) { d.countdowns[i] = c } else { d.countdowns.append(c) } } }
     func remove(_ id: String) { update { $0.countdowns.removeAll { $0.id == id } } }
     func setSettings(_ f: (inout Settings) -> Void) { update { f(&$0.settings) } }
     func loadSamples() { update { $0.onboarded = true; $0.countdowns = $0.countdowns.filter { !$0.sample } + makeSamples() } }
+    /// pawcount://import?d=...  (a shared countdown)  or  pawcount://detail/<id>  (from a widget)
+    func handle(url: URL) {
+        guard url.scheme == "pawcount" else { return }
+        if url.host == "import" {
+            if let c = Share.parse(url.absoluteString) { upsert(c); update { $0.onboarded = true }; stack = [.home, .detail(c.id)]; say("Added to your countdowns 🐾") }
+            else { say("That link isn’t a Pawcount countdown") }
+        } else if url.host == "detail" {
+            let id = url.lastPathComponent
+            if countdown(id) != nil { stack = [.home, .detail(id)] }
+        }
+    }
+    /// adds a countdown from pasted text; returns its id or nil
+    func importShared(_ text: String) -> String? {
+        guard let c = Share.parse(text) else { return nil }
+        upsert(c); update { $0.onboarded = true }
+        return c.id
+    }
     func countdown(_ id: String) -> Countdown? { data.countdowns.first { $0.id == id } }
 
     func exportJSON() -> URL? {
@@ -249,4 +267,16 @@ enum Photos {
     }
     static func image(_ name: String) -> UIImage? { UIImage(contentsOfFile: dir.appendingPathComponent(name).path) }
     static func delete(_ name: String) { try? FileManager.default.removeItem(at: dir.appendingPathComponent(name)) }
+}
+
+/* ------------------------------ alternate app icons ------------------------------ */
+
+enum AppIcon {
+    static let breeds = ["golden", "corgi", "shiba", "dachshund", "husky", "mutt"]
+    /// the dog on the home screen right now ("AppIcon" itself is the golden retriever)
+    static var current: String { UIApplication.shared.alternateIconName.map { String($0.dropFirst("AppIcon-".count)) } ?? "golden" }
+    static func set(_ breed: String, done: @escaping (Bool) -> Void) {
+        guard UIApplication.shared.supportsAlternateIcons else { done(false); return }
+        UIApplication.shared.setAlternateIconName(breed == "golden" ? nil : "AppIcon-\(breed)") { err in DispatchQueue.main.async { done(err == nil) } }
+    }
 }

@@ -13,6 +13,7 @@ struct DetailView: View {
     @StateObject var ctrl = SceneController()
     @State var menu = false
     @State var confirmDelete = false
+    @State var sharing = false
     @State var shake = ShakeDetector()
 
     var body: some View {
@@ -134,13 +135,15 @@ struct DetailView: View {
             VStack(spacing: 0) {
                 H(c.title, 22, align: .center).padding(.bottom, 12)
                 SheetItem(icon: "edit", text: "Edit countdown") { menu = false; store.push(.flow(c.id)) }
+                SheetItem(icon: "heart", text: "Share…") { menu = false; DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { sharing = true } }
                 SheetItem(icon: "archive", text: c.archived ? "Move back to Home" : "Archive to Memories") {
                     menu = false; var n = c; n.archived.toggle(); store.upsert(n); store.say(n.archived ? "Archived to Memories" : "Back on Home"); if n.archived { store.tab(.memories) }
                 }
                 SheetItem(icon: "trash", text: "Delete…", danger: true) { menu = false; DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { confirmDelete = true } }
                 Spacer(minLength: 0)
-            }.padding(20).background(pc.bg.ignoresSafeArea()).presentationDetents([.height(320)])
+            }.padding(20).background(pc.bg.ignoresSafeArea()).presentationDetents([.height(400)])
         }
+        .sheet(isPresented: $sharing) { ShareSheet(c: c).presentationDetents([.large]).environment(\.paw, pc) }
         .sheet(isPresented: $confirmDelete) {
             VStack(spacing: 10) {
                 H("Delete “\(c.title)”?", 22, align: .center)

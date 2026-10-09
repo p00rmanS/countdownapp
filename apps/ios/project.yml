@@ -23,6 +23,13 @@ targets:
         buildPhase: resources
       - path: ../../native/fonts
         buildPhase: resources
+    dependencies:
+      - target: PawcountWidget          # embeds the home-screen widget in the app
+    entitlements:
+      path: Pawcount/Pawcount.entitlements
+      properties:
+        # lets the app and the widget read the same data file
+        com.apple.security.application-groups: [group.app.pawcount.countdown]
     info:
       path: Pawcount/Info.plist
       properties:
@@ -32,6 +39,10 @@ targets:
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        # pawcount://import?d=...  opens a countdown somebody shared
+        CFBundleURLTypes:
+          - CFBundleURLName: app.pawcount.countdown
+            CFBundleURLSchemes: [pawcount]
         UIAppFonts:
           - Fredoka-Medium.ttf
           - Fredoka-SemiBold.ttf
@@ -44,6 +55,45 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.pawcount.countdown
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # the other five dogs, selectable in Settings > App icon
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: "AppIcon-corgi AppIcon-shiba AppIcon-dachshund AppIcon-husky AppIcon-mutt"
+  PawcountWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PawcountWidget
+      # only the files the widget needs from the app: data model, logic, the drawing engine and the card
+      - path: Pawcount/Model.swift
+      - path: Pawcount/Logic.swift
+      - path: Pawcount/Art.swift
+      - path: Pawcount/Render.swift
+      - path: Pawcount/Theme.swift
+      - path: Pawcount/Shared.swift
+      - path: Pawcount/WidgetCard.swift
+      - path: ../../native/assets
+        buildPhase: resources
+      - path: ../../native/fonts
+        buildPhase: resources
+    entitlements:
+      path: PawcountWidget/PawcountWidget.entitlements
+      properties:
+        com.apple.security.application-groups: [group.app.pawcount.countdown]
+    info:
+      path: PawcountWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Pawcount
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        UIAppFonts:
+          - Fredoka-Medium.ttf
+          - Fredoka-SemiBold.ttf
+          - Fredoka-Bold.ttf
+          - Nunito-Regular.ttf
+          - Nunito-Bold.ttf
+          - Nunito-ExtraBold.ttf
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pawcount.countdown.widget
   PawcountTests:
     type: bundle.unit-test
     platform: iOS
@@ -59,6 +109,7 @@ schemes:
     build:
       targets:
         Pawcount: all
+        PawcountWidget: all
         PawcountTests: [test]
     test:
       targets: [PawcountTests]

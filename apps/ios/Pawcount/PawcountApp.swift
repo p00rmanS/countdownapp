@@ -60,6 +60,7 @@ struct RootView: View {
         .animation(.easeInOut(duration: 0.28), value: route)
         .environment(\.paw, pc)
         .environment(\.pawReduceMotion, store.reduceMotion)
+        .onOpenURL { store.handle(url: $0) }
         .preferredColorScheme(theme == "dark" ? .dark : (theme == "light" ? .light : nil))
     }
 }
