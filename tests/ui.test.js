@@ -117,6 +117,15 @@ test('needs: water and food fill up, and the dog calls you Mama or Papa', () => 
   A.S.set('parentTitle', 'papa'); assert.strictEqual(A.P.callName(), 'Papa'); A.S.set('parentTitle', ''); assert.strictEqual(A.P.callName(), 'hooman');
   assert.ok(go('#/settings').includes('data-action="set-parent"'));
 });
+test('Scott has lots of lines for every kind of play, and none say "best human"', () => {
+  const c = A.S.get('sample-bali'), k = A.P.compute(c); A.S.set('parentTitle', 'papa');
+  for (const kind of ['treat', 'feed', 'drink', 'ball', 'tickle', 'pet', 'love']) {
+    assert.ok(A.P.LINES[kind].length >= 12, kind);
+    for (let i = 0; i < 40; i++) { const l = A.P.dogLine(c, k, kind); assert.ok(!/best human/i.test(l) && !l.includes('{who}'), l); }
+  }
+  assert.ok(A.P.LINES.love.some((l) => /I love you/.test(l)) && /Papa/.test(A.P.LINES.love.map((l) => l.replace('{who}', A.P.callName())).join(' ')));
+  A.S.set('parentTitle', '');
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

@@ -123,7 +123,7 @@ for (const type of P.TYPE_ORDER) {
 /* ---- meta: the data tables ---- */
 const meta = {
   breeds: P.BREEDS, breedOrder: P.BREED_ORDER, breedBest: P.BREED_BEST, muttFurs: P.MUTT_FURS, earTypes: P.EAR_TYPES,
-  types: P.TYPES, typeOrder: P.TYPE_ORDER, accents: P.ACCENTS, countries: P.COUNTRIES, stages: P.STAGES, milestones: P.MILESTONES,
+  lines: P.LINES, types: P.TYPES, typeOrder: P.TYPE_ORDER, accents: P.ACCENTS, countries: P.COUNTRIES, stages: P.STAGES, milestones: P.MILESTONES,
 };
 const dir = path.join(root, 'native/assets');
 fs.mkdirSync(dir, { recursive: true });

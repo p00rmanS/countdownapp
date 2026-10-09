@@ -228,16 +228,17 @@ func plainTitle(_ t: String) -> String {
 /// what the dog calls the person: Mama / Papa (their choice in Settings > Profile), otherwise "hooman"
 enum Who {
     static var name = "hooman"
-    static func of(_ title: String) -> String { title == "mama" ? "Mama" : title == "papa" ? "Papa" : "hooman" }
+    static func of(_ title: String, _ profileName: String = "") -> String {
+        title == "mama" ? "Mama" : title == "papa" ? "Papa" : (profileName.trimmingCharacters(in: .whitespaces).isEmpty ? "hooman" : profileName.trimmingCharacters(in: .whitespaces))
+    }
 }
 
 func dogLine(_ c: Countdown, _ k: Computed, kind: String = "tap") -> String {
     let who = Who.name
+    if let pool = Lines.pools[kind == "fetch" ? "ball" : kind], let line = pool.randomElement() { return line.replacingOccurrences(of: "{who}", with: who) }
     switch kind {
-    case "pet": return ["*happy sigh* 💛", "Best \(who). Ever.", "Mmm… more pets, \(who).", "*leans in*"].randomElement()!
     case "hungry": return ["\(who), my tummy is rumbling…", "\(who)… is it dinner time?", "I would very much like a snack."].randomElement()!
     case "thirsty": return ["\(who), I'm so thirsty…", "My water bowl is looking empty…", "*pants* water, please?"].randomElement()!
-    case "drink": return ["Glug glug glug!", "Ahh, so refreshing!", "Thank you, \(who)! 💧"].randomElement()!
     case "sneeze": return ["Ah… ah… ACHOO!", "Achoo! Who shook the room?!"].randomElement()!
     case "fetch": return ["Got it! Throw again?", "Fetched! Good dog? GOOD DOG."].randomElement()!
     default: break

@@ -114,7 +114,13 @@ class Breed(val key: String, val name: String, val label: String, val vibe: Stri
 class TypeInfo(val key: String, val label: String, val short: String, val emoji: String, val icon: String, val accent: String, val hint: String, val placeholder: String, val repeats: Boolean)
 class Country(val name: String, val flag: String, val tz: String, val city: String)
 
+/** what the dog says for each kind of play ({who} = Mama / Papa / your name); loaded from meta.json so every platform shares one list */
+object Lines { @Volatile var pools: Map<String, List<String>> = emptyMap() }
+
 class Meta(j: JSONObject) {
+    init {
+        j.optJSONObject("lines")?.let { l -> Lines.pools = l.keys().asSequence().associateWith { k -> l.getJSONArray(k).let { a -> (0 until a.length()).map { a.getString(it) } } } }
+    }
     val breedOrder: List<String> = j.getJSONArray("breedOrder").let { a -> (0 until a.length()).map { a.getString(it) } }
     val breeds: Map<String, Breed> = j.getJSONObject("breeds").let { b ->
         b.keys().asSequence().associateWith { k -> b.getJSONObject(k).let { o ->

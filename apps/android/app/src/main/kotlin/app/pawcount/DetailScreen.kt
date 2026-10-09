@@ -94,7 +94,7 @@ fun DetailScreen(vm: AppViewModel, id: String) {
     LaunchedEffect(id) { delay(600); say(when (k.stage) { Stage.NAP -> "Zzz…"; Stage.TODAY -> "IT'S TODAY!!! 🎉"; Stage.ZOOMIES -> "ZOOM!"; Stage.MEMORY -> "Remember this? 💛"; else -> "Woof!" }) }
 
     // play: treat / feed / ball / tickle, and a joy meter that fades while you are away
-    Who.name = Who.of(settings.parentTitle)
+    Who.name = Who.of(settings.parentTitle, settings.profileName)
     var joy by remember(id) { mutableStateOf(Joy.now(ctx, id)) }
     var needs by remember(id) { mutableStateOf(Joy.needs(ctx, id)) }
     LaunchedEffect(id) {
@@ -105,16 +105,16 @@ fun DetailScreen(vm: AppViewModel, id: String) {
     val scope = rememberCoroutineScope()
     fun play(what: String) {
         ctrl.hint = false; ctrl.wake(scope)
-        val lines = when (what) { "Treat" -> listOf("Nom nom! 🦴", "Best human ever!", "More? 👀"); "Feed" -> listOf("Yum yum yum…"); "Tickle" -> listOf("Hehehe!!", "That tickles! 😆", "Again, again!"); "Water" -> listOf("Glug glug glug!", "Ahh, so refreshing!", "Thank you, ${Who.name}! 💧"); else -> emptyList() }
+        val kind = when (what) { "Treat" -> "treat"; "Feed" -> "feed"; "Water" -> "drink"; "Tickle" -> "tickle"; else -> "ball" }
         when (what) {
             "Ball" -> { ctrl.fetchAt = ctrl.clock; Haptics.play(ctx, settings.haptics, "soft"); ctrl.bubble = dogLine(c, compute(c), "fetch") }
-            "Tickle" -> { ctrl.reactions.start("petting", ctrl.clock); ctrl.bubble = lines.random(); Haptics.play(ctx, settings.haptics, "purr"); scope.launch { delay(1600); ctrl.reactions.stop("petting") } }
-            else -> { ctrl.bubble = lines.random(); Haptics.play(ctx, settings.haptics, if (what == "Treat") "tick" else "purr"); Sounds.play(settings.sound, "chime")
+            "Tickle" -> { ctrl.reactions.start("petting", ctrl.clock); ctrl.bubble = dogLine(c, compute(c), kind); Haptics.play(ctx, settings.haptics, "purr"); scope.launch { delay(1600); ctrl.reactions.stop("petting") } }
+            else -> { ctrl.bubble = dogLine(c, compute(c), kind); Haptics.play(ctx, settings.haptics, if (what == "Treat") "tick" else "purr"); Sounds.play(settings.sound, "chime")
                 needs = when (what) { "Feed" -> Joy.fill(ctx, id, 55f, 0f); "Water" -> Joy.fill(ctx, id, 0f, 60f); else -> Joy.fill(ctx, id, 8f, 0f) }
                 scope.launch { repeat(if (what == "Feed" || what == "Water") 5 else 2) { ctrl.reactions.start("bark", ctrl.clock); delay(500) } } }
         }
         val before = joy; joy = Joy.add(ctx, id, when (what) { "Feed" -> 10f; "Ball" -> 6f; else -> 8f })
-        if (before < 100f && joy >= 100f) { vm.confetti(); ctrl.bubble = "${c.dog.name} loves you! 💛"; Haptics.play(ctx, settings.haptics, "success") }
+        if (before < 100f && joy >= 100f) { vm.confetti(); ctrl.bubble = dogLine(c, compute(c), "love"); Haptics.play(ctx, settings.haptics, "success") }
     }
 
     // shake the phone -> sneeze

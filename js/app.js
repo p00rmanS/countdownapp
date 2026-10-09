@@ -664,7 +664,7 @@
     const showJoy = () => { const v = Math.round(joyNow()), f = $('[data-joy-fill]', root), t = $('[data-joy-text]', root); if (f) f.style.width = v + '%'; if (t) t.textContent = `${c.dog.name} is ${joyLabel(v).toLowerCase()}`; };
     const addJoy = (n) => {
       const before = joyNow(); c.joy = { v: Math.min(100, before + n), t: Date.now() }; S.save(); showJoy();
-      if (before < 100 && c.joy.v >= 100) { P.confetti({ count: 70, power: 0.8 }); P.haptic('success'); say(`${c.dog.name} loves you! 💛`, 2600); }
+      if (before < 100 && c.joy.v >= 100) { P.confetti({ count: 70, power: 0.8 }); P.haptic('success'); say(P.dogLine(c, K(), 'love'), 3000); }
     };
     const drop = (cls, emoji, ms) => { const el = document.createElement('i'); el.className = cls; el.innerHTML = icon(emoji); fx2.appendChild(el); setTimeout(() => el.remove(), ms); return el; };
     /* hunger and thirst: they run down while you are away (food ~5 points an hour, water ~8) and Feed / Water fill them */
@@ -674,10 +674,10 @@
     const nudge = () => { const n = needNow(); if (n.water < 30) say(P.dogLine(c, K(), 'thirsty'), 3200); else if (n.food < 30) say(P.dogLine(c, K(), 'hungry'), 3200); };
     const play = {
       drink() { used(); drop('bowl', 'drop', 2400); flash('munch', 2000); say(P.dogLine(c, K(), 'drink'), 2400); P.haptic('purr'); fill(0, 60); addJoy(6); },
-      treat() { used(); drop('treat-drop', 'bone', 1000); setTimeout(() => { fill(8, 0); flash('munch', 1100); P.hearts(fx2, 2); say(k0(['Nom nom!', 'Best human ever!', 'More? 👀'])); P.haptic('tick'); P.sound('chime'); addJoy(8); }, 750); },
-      feed() { used(); const b = drop('bowl', 'bowl', 2600); flash('munch', 2300); say('Yum yum yum…', 2400); P.haptic('purr'); fill(55, 0); addJoy(10); },
+      treat() { used(); drop('treat-drop', 'bone', 1000); setTimeout(() => { fill(8, 0); flash('munch', 1100); P.hearts(fx2, 2); say(P.dogLine(c, K(), 'treat')); P.haptic('tick'); P.sound('chime'); addJoy(8); }, 750); },
+      feed() { used(); const b = drop('bowl', 'bowl', 2600); flash('munch', 2300); say(P.dogLine(c, K(), 'feed'), 2800); P.haptic('purr'); fill(55, 0); addJoy(10); },
       ball() { fetchB(); addJoy(6); },
-      tickle() { used(); flash('tickle', 1600); P.hearts(fx2, 5); say(k0(['Hehehe!!', 'That tickles! 😆', 'Again, again!']), 2000); P.haptic('purr'); addJoy(8); },
+      tickle() { used(); flash('tickle', 1600); P.hearts(fx2, 5); say(P.dogLine(c, K(), 'tickle'), 2400); P.haptic('purr'); addJoy(8); },
     };
     const k0 = (a) => a[Math.floor(Math.random() * a.length)];
     $$('[data-play]', root).forEach((b) => b.addEventListener('click', () => play[b.dataset.play]()));

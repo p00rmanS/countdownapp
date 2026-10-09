@@ -230,6 +230,9 @@ struct Breed { let key, name, label, vibe, best, fur, dark, light, paw, ears: St
 struct TypeInfo { let key, label, short, emoji, icon, accent, hint, placeholder: String; let repeats: Bool }
 struct Country { let name, flag, tz, city: String }
 
+/// what the dog says for each kind of play ({who} = Mama / Papa / your name); loaded from meta.json so every platform shares one list
+enum Lines { static var pools: [String: [String]] = [:] }
+
 final class Meta {
     let breedOrder: [String]
     let breeds: [String: Breed]
@@ -243,6 +246,7 @@ final class Meta {
     let milestones = [100, 50, 30, 10, 7, 1]
 
     init(_ j: [String: Any]) {
+        Lines.pools = (j["lines"] as? [String: [String]]) ?? [:]
         breedOrder = j["breedOrder"] as? [String] ?? []
         var b: [String: Breed] = [:]
         for (k, v) in (j["breeds"] as? [String: [String: Any]] ?? [:]) {

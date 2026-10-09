@@ -25,17 +25,17 @@ struct DetailView: View {
         switch what {
         case "Ball": ctrl.fetchAt = ctrl.clock; Haptics.play(s.haptics, "soft"); ctrl.bubble = dogLine(c, compute(c), kind: "fetch")
         case "Tickle":
-            ctrl.reactions.start("petting", ctrl.clock); ctrl.bubble = ["Hehehe!!", "That tickles! 😆", "Again, again!"].randomElement(); Haptics.play(s.haptics, "purr")
+            ctrl.reactions.start("petting", ctrl.clock); ctrl.bubble = dogLine(c, compute(c), kind: "tickle"); Haptics.play(s.haptics, "purr")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { ctrl.reactions.stop("petting") }
         default:
-            ctrl.bubble = (what == "Feed" ? ["Yum yum yum…"] : what == "Water" ? ["Glug glug glug!", "Ahh, so refreshing!", "Thank you, \(Who.name)! 💧"] : ["Nom nom! 🦴", "Best \(Who.name) ever!", "More? 👀"]).randomElement()
+            ctrl.bubble = dogLine(c, compute(c), kind: what == "Feed" ? "feed" : what == "Water" ? "drink" : "treat")
             Haptics.play(s.haptics, what == "Treat" ? "tick" : "purr"); Sounds.play(s.sound, "chime")
             needs = what == "Feed" ? Joy.fill(id, food: 55, water: 0) : what == "Water" ? Joy.fill(id, food: 0, water: 60) : Joy.fill(id, food: 8, water: 0)
             for n in 0..<(what == "Feed" || what == "Water" ? 5 : 2) { DispatchQueue.main.asyncAfter(deadline: .now() + Double(n) * 0.5) { ctrl.reactions.start("bark", ctrl.clock) } }
         }
         let before = joy
         joy = Joy.add(id, what == "Feed" ? 10 : what == "Ball" ? 6 : 8)
-        if before < 100 && joy >= 100 { store.confetti(); ctrl.bubble = "\(c.dog.name) loves you! 💛"; Haptics.play(s.haptics, "success") }
+        if before < 100 && joy >= 100 { store.confetti(); ctrl.bubble = dogLine(c, compute(c), kind: "love"); Haptics.play(s.haptics, "success") }
     }
 
     var body: some View {
@@ -147,7 +147,7 @@ struct DetailView: View {
             .onAppear { milestone(c, k) }
         }
         .onAppear {
-            joy = Joy.now(id); needs = Joy.needs(id); Who.name = Who.of(store.settings.parentTitle)
+            joy = Joy.now(id); needs = Joy.needs(id); Who.name = Who.of(store.settings.parentTitle, store.settings.profileName)
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.6) {
                 let n = Joy.needs(id), cc = store.countdown(id) ?? c
                 if n.water < 30 { ctrl.bubble = dogLine(cc, compute(cc), kind: "thirsty") } else if n.food < 30 { ctrl.bubble = dogLine(cc, compute(cc), kind: "hungry") }

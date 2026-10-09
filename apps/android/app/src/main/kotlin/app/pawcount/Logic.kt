@@ -183,16 +183,15 @@ fun plainTitle(t: String) = t.replace(Regex("[\\x{1F000}-\\x{1FFFF}\\x{2600}-\\x
 
 /** what the dog says when tapped / petted / shaken / fetching */
 /** what the dog calls the person: Mama / Papa (their choice in Settings > Profile), otherwise "hooman" */
-object Who { @Volatile var name = "hooman"; fun of(title: String) = when (title) { "mama" -> "Mama"; "papa" -> "Papa"; else -> "hooman" } }
+object Who { @Volatile var name = "hooman"; fun of(title: String, profileName: String = "") = when (title) { "mama" -> "Mama"; "papa" -> "Papa"; else -> profileName.trim().ifEmpty { "hooman" } } }
 
 fun dogLine(c: Countdown, k: Computed, kind: String = "tap", rnd: java.util.Random = java.util.Random()): String {
     fun <T> pick(a: List<T>) = a[rnd.nextInt(a.size)]
     val who = Who.name
+    Lines.pools[if (kind == "fetch") "ball" else kind]?.let { pool -> return pick(pool).replace("{who}", who) }
     when (kind) {
-        "pet" -> return pick(listOf("*happy sigh* 💛", "Best $who. Ever.", "Mmm… more pets, $who.", "*leans in*"))
         "hungry" -> return pick(listOf("$who, my tummy is rumbling…", "$who… is it dinner time?", "I would very much like a snack."))
         "thirsty" -> return pick(listOf("$who, I'm so thirsty…", "My water bowl is looking empty…", "*pants* water, please?"))
-        "drink" -> return pick(listOf("Glug glug glug!", "Ahh, so refreshing!", "Thank you, $who! 💧"))
         "sneeze" -> return pick(listOf("Ah… ah… ACHOO!", "Achoo! Who shook the room?!"))
         "fetch" -> return pick(listOf("Got it! Throw again?", "Fetched! Good dog? GOOD DOG."))
     }

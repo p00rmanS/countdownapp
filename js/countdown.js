@@ -189,17 +189,144 @@
   P.describeDog = (c, k) => `${P.stageInfo(c, k).desc}. ${k.phase === 'past' ? P.spoken(k) : P.spoken(k) + ' left'}.`;
 
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  /** what Scott says for each kind of play. {who} becomes Mama / Papa / your name. Shared with the Android and iPhone apps through native/assets/meta.json */
+  P.LINES = {
+  "pet": [
+    "*happy sigh*",
+    "Mmm… more pets, {who}.",
+    "I love you, {who}.",
+    "*leans in*",
+    "Don't stop. Ever.",
+    "You have the softest hands.",
+    "My heart is so full.",
+    "I could stay here forever.",
+    "Pets are better than treats. (Almost.)",
+    "*melts into a puddle*",
+    "You make me feel so safe, {who}.",
+    "Right behind the ears, please.",
+    "Thank you for being mine.",
+    "Home is wherever you are.",
+    "*slow tail wag*",
+    "I'm your biggest fan, {who}.",
+    "Ahhh… yes. Right there.",
+    "You always know how to make my day."
+  ],
+  "treat": [
+    "Nom nom nom!",
+    "Is that a treat?! For ME?",
+    "Crunch crunch… more?",
+    "{who}, you're my favourite person.",
+    "I love you, {who}!",
+    "Wait, I wasn't done smelling it… okay, now.",
+    "*tail goes helicopter*",
+    "Treats are my love language.",
+    "One more? I'll be so good.",
+    "Tastes like happiness.",
+    "I'd do a trick for this. Watch! …I forgot the trick.",
+    "Mmm. Chef’s kiss.",
+    "You always know what I need.",
+    "I saved a spot in my heart for you, {who}.",
+    "Gulp. Did I even chew?",
+    "Fastest treat ever eaten. Record broken.",
+    "Thank you, thank you, THANK YOU!"
+  ],
+  "feed": [
+    "Yum yum yum…",
+    "Dinner time! Best time!",
+    "*happy crunching noises*",
+    "I love you, {who}!",
+    "My bowl runneth over!",
+    "Food! Glorious food!",
+    "Is this the best kibble ever? I think so.",
+    "I waited so patiently. Did you see?",
+    "Thank you for feeding me, {who}.",
+    "Nom. Nom. Nom. Nom.",
+    "I'm going to lick the bowl clean.",
+    "You're the reason I wag, {who}.",
+    "*spins in a circle before eating*",
+    "A full tummy, a happy heart.",
+    "Eating with my whole body!",
+    "Seconds? Just asking.",
+    "Best. Meal. Ever."
+  ],
+  "drink": [
+    "Glug glug glug!",
+    "Ahh, so refreshing!",
+    "Thank you, {who}!",
+    "Splish splash, my chin's all wet.",
+    "*lap lap lap*",
+    "Cold water. You spoil me.",
+    "I love you, {who}!",
+    "Dripping everywhere. Worth it.",
+    "Hydration station!",
+    "My favourite fountain is you.",
+    "Slurp! Pardon the mess.",
+    "I was so thirsty… you saved me.",
+    "Water makes everything better.",
+    "*drinks, then dribbles on your foot*",
+    "Aah. Now I can zoom again."
+  ],
+  "ball": [
+    "Got it! Throw again?",
+    "Fetch is my favourite!",
+    "I caught it! Did you see?!",
+    "Again again again!",
+    "*brings the ball back, drops it on your foot*",
+    "I love playing with you, {who}!",
+    "Ball! Ball! BALL!",
+    "Throw it farther, I dare you.",
+    "I'm the fastest dog in the world.",
+    "You throw, I fetch. Perfect team.",
+    "It's mine now. …Okay, you can have it.",
+    "Best game ever, {who}.",
+    "*zoom zoom zoom*",
+    "Let's never stop.",
+    "I'd chase this ball to the moon.",
+    "Did I do good? I did good."
+  ],
+  "tickle": [
+    "Hehehe!!",
+    "That tickles!",
+    "Again, again!",
+    "*wiggles all over*",
+    "Not the belly! …okay, the belly.",
+    "I love you, {who}!",
+    "My leg is kicking all by itself!",
+    "Stop! …Don't stop!",
+    "{who}, you found my spot!",
+    "*happy snort*",
+    "Giggle giggle woof!",
+    "I'm a wiggly worm!",
+    "A little to the left… yes!",
+    "This is my favourite part of the day.",
+    "Ahh, right there, {who}.",
+    "You're the best at this."
+  ],
+  "love": [
+    "I love you, {who}!",
+    "I love you so much, {who}!",
+    "You're my whole world.",
+    "Best day ever, because of you.",
+    "I love you more than treats. Almost.",
+    "{who}, you are my favourite person.",
+    "I love you to the moon and back.",
+    "Every day with you is the best day.",
+    "You + me forever, {who}.",
+    "My tail has not stopped wagging since you got here.",
+    "Thank you for choosing me.",
+    "I'm the luckiest dog in the world."
+  ]
+};
   /** what the dog calls the person: Mama / Papa (their choice in Settings > Profile), otherwise "hooman" */
-  P.callName = () => ({ mama: 'Mama', papa: 'Papa' }[(P.store && P.store.state.settings.parentTitle) || ''] || 'hooman');
+  P.callName = () => { const st = (P.store && P.store.state.settings) || {}; return { mama: 'Mama', papa: 'Papa' }[st.parentTitle || ''] || (st.profileName || '').trim() || 'hooman'; };
   P.dogLine = (c, k, kind = 'tap') => {
     const who = P.callName();
-    if (kind === 'pet') return pick(['*happy sigh* 💛', `Best ${who}. Ever.`, `Mmm… more pets, ${who}.`, '*leans in*']);
+    const pool = P.LINES[kind === 'fetch' ? 'ball' : kind];
+    if (pool) return pick(pool).replace(/\{who\}/g, who);
     if (kind === 'hungry') return pick([`${who}, my tummy is rumbling…`, `${who}… is it dinner time?`, 'I would very much like a snack.']);
     if (kind === 'thirsty') return pick([`${who}, I'm so thirsty…`, 'My water bowl is looking empty…', '*pants* water, please?']);
-    if (kind === 'drink') return pick(['Glug glug glug!', 'Ahh, so refreshing!', `Thank you, ${who}! 💧`]);
     if (kind === 'full') return pick(['Too full! …okay, one more bite.', `I love you, ${who}.`]);
     if (kind === 'sneeze') return pick(['Ah… ah… ACHOO!', 'Achoo! Who shook the room?!']);
-    if (kind === 'fetch') return pick(['Got it! Throw again?', 'Fetched! Good dog? GOOD DOG.']);
     const n = k.sleeps, t = c.title.replace(/\s*[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}️]+\s*/gu, ' ').trim() || 'the big day';
     const sl = n === 1 ? '1 more sleep' : n + ' more sleeps';
     const L = {
