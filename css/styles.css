@@ -518,3 +518,9 @@ button, a, .dog-hit { -webkit-touch-callout: none; }
 .mood .i { width: 16px; height: 16px; margin-right: 4px; vertical-align: -3px; }
 .play-btn .i { width: 22px; height: 22px; color: #3D2616; } .play-btn > span { display: none; }
 .treat-drop .i, .bowl .i { width: 40px; height: 40px; color: #fff; stroke-width: 2.2; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .35)); }
+.top-actions { display: flex; align-items: center; gap: 10px; flex: none; }
+.play-tray.static { position: static; margin: 0 0 14px; }
+.empty-scene.mem-play .scene { height: 300px; aspect-ratio: auto; }
+.empty-scene.mem-play .scene-hint { display: none; }
+.empty-scene.mem-play { position: relative; height: 320px; width: 100%; } .empty-scene.mem-play .scene { position: absolute; inset: 0; height: 100%; }
+.empty .play-tray.static { width: 100%; max-width: 360px; }

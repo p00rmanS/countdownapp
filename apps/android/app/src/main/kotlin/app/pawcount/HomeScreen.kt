@@ -65,7 +65,9 @@ fun HomeScreen(vm: AppViewModel) {
                     H(greeting() + data.settings.profileName.let { if (it.isBlank()) "" else ", $it" }, 32)
                     if (items.isNotEmpty()) Muted(if (items.size == 1) "1 adventure on the way" else "${items.size} adventures on the way", size = 16)
                 }
-                Box(Modifier.clickable(role = Role.Button, onClickLabel = "Profile and settings") { vm.push(Route.Settings) }.semantics { contentDescription = "Profile and settings" }) { Avatar(vm, 46.dp) }
+                Box(Modifier.clickable(role = Role.Button, onClickLabel = "Your profile") { vm.push(Route.Settings) }.semantics { contentDescription = "Your profile" }) { Avatar(vm, 46.dp) }
+                Box(Modifier.width(10.dp))
+                IconButton("sliders", "Settings", { vm.push(Route.Settings) })
             }
             Box(Modifier.padding(top = 18.dp))
             if (hero == null) {

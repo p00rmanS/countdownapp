@@ -153,7 +153,14 @@ fun MemoriesScreen(vm: AppViewModel) {
             }
             if (items.isEmpty()) {
                 Column(Modifier.fillMaxWidth().padding(top = 28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    DogOnly(vm, Dog("scott", "Scott"), Stage.MEMORY, Modifier.fillMaxWidth(0.7f))
+                    // Scott is not just a picture: tap to bark, hold to pet
+                    val demo = remember { Countdown("demo", "Memories", "custom", "2020-01-01T00:00", "UTC", false, false, System.currentTimeMillis(), Dog("scott", "Scott"), "#EE8FA0", DisplayMode.FULL) }
+                    val ctrl = remember { SceneController() }
+                    LaunchedEffect(ctrl.bubble) { if (ctrl.bubble != null) { kotlinx.coroutines.delay(2400); ctrl.bubble = null } }
+                    Box(Modifier.fillMaxWidth().height(300.dp).clip(RoundedCornerShape(28.dp))) {
+                        SceneView(demo, compute(demo, now), vm.art, vm.fonts, SceneSize.DETAIL, stage = Stage.MEMORY, controller = ctrl, interactive = true, reduceMotion = LocalReduceMotion.current,
+                            onBark = { ctrl.bubble = dogLine(demo, compute(demo), "tap") }, onPetStart = { ctrl.bubble = dogLine(demo, compute(demo), "pet") })
+                    }
                     H("No memories yet", 26, align = TextAlign.Center)
                     Muted("When a countdown ends, it lands here as a keepsake — with your photos and a very proud dog.", Modifier.padding(top = 8.dp), 16, TextAlign.Center)
                 }

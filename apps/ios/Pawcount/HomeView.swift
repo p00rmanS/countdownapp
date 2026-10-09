@@ -37,7 +37,8 @@ struct HomeView: View {
                             if !items.isEmpty { Muted(items.count == 1 ? "1 adventure on the way" : "\(items.count) adventures on the way", 16) }
                         }
                         Spacer()
-                        Button { store.push(.settings) } label: { Avatar(size: 46) }.buttonStyle(.plain).accessibilityLabel("Profile and settings")
+                        Button { store.push(.settings) } label: { Avatar(size: 46) }.buttonStyle(.plain).accessibilityLabel("Your profile")
+                        IconButton(icon: "sliders", label: "Settings") { store.push(.settings) }
                     }
                     .padding(.bottom, 18)
                     if let hero = items.first {

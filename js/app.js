@@ -171,7 +171,7 @@
     }
     return `<section class="screen home">
       <header class="topbar"><div><p class="eyebrow">${esc(date)}</p><h1 class="h-title">${greeting()}${S.state.settings.profileName ? ', ' + esc(S.state.settings.profileName) : ''}</h1>${items.length ? `<p class="sub">${items.length === 1 ? '1 adventure' : items.length + ' adventures'} on the way</p>` : ''}</div>
-        <a class="icon-btn avatar-btn" href="#/settings" aria-label="Profile and settings">${avatar(40)}</a></header>
+        <div class="top-actions"><a class="icon-btn avatar-btn" href="#/settings" aria-label="Your profile">${avatar(40)}</a><a class="icon-btn" href="#/settings" aria-label="Settings">${icon('sliders')}</a></div></header>
       ${body}
       ${items.length ? `<p class="foot-hint">Pull down to throw the ball 🎾</p>` : ''}
     </section>`;
@@ -218,15 +218,7 @@
           <button class="glass-btn" data-action="menu" aria-label="More options for ${esc(c.title)}">${icon('more')}</button></div>
         ${P.sceneHTML(c, k, { size: 'detail', interactive: true })}
         <p class="scene-hint" aria-hidden="true">Tap to bark · Hold to pet · Shake</p>
-        <div class="play-tray" role="group" aria-label="Play with ${esc(c.dog.name)}">
-          <div class="joy" data-joy role="status" aria-live="polite"><span class="joy-h" aria-hidden="true">♥</span><span class="joy-bar"><i data-joy-fill></i></span><span class="joy-t" data-joy-text></span></div>
-          <div class="play-btns">
-            <button class="play-btn" data-play="treat">${icon('bone')}Treat</button>
-            <button class="play-btn" data-play="feed">${icon('bowl')}Feed</button>
-            <button class="play-btn" data-play="ball">${icon('ball')}Ball</button>
-            <button class="play-btn" data-play="tickle">${icon('smile')}Tickle</button>
-          </div>
-        </div>
+        ${playTray(c)}
       </div>
       <div class="detail-sheet">
         <div class="chip-row center">${chip(`${icon(tp.icon)} ${tp.short}`, 'ghost')}${c.destination ? chip(`<span aria-hidden="true">${c.destination.flag}</span> ${esc(c.destination.city || c.destination.country)}`, 'ghost') : ''}${facts.map((f) => chip(f, 'ghost')).join('')}</div>
@@ -263,6 +255,16 @@
       <input type="file" accept="image/*" multiple hidden data-photo-input data-id="${c.id}"></div>`;
   }
 
+  const playTray = (c) => `<div class="play-tray" role="group" aria-label="Play with ${esc(c.dog.name)}">
+      <div class="joy" data-joy role="status" aria-live="polite"><span class="joy-h" aria-hidden="true">♥</span><span class="joy-bar"><i data-joy-fill></i></span><span class="joy-t" data-joy-text></span></div>
+      <div class="play-btns">
+        <button class="play-btn" data-play="treat">${icon('bone')}Treat</button>
+        <button class="play-btn" data-play="feed">${icon('bowl')}Feed</button>
+        <button class="play-btn" data-play="ball">${icon('ball')}Ball</button>
+        <button class="play-btn" data-play="tickle">${icon('smile')}Tickle</button>
+      </div>
+        </div>`;
+
   /* =============================== MEMORIES =============================== */
   function viewMemories() {
     const now = Date.now();
@@ -277,7 +279,8 @@
             <div class="pol-img">${ph ? `<img src="${ph}" alt="">` : P.sceneHTML(c, k, { size: 'card', stage: 'memory' })}</div>
             <p class="pol-t">${esc(c.title)}</p><p class="pol-d muted small">${icon(tp.icon, 'inline')} ${esc(P.fmtInstant(k.target, k.tz, { allDay: true, noYear: false }))}${c.archived ? ' · archived' : ''}</p></a>`;
         }).join('')}</div>`
-        : `<div class="empty"><div class="empty-scene">${P.sceneHTML({ id: 'x', type: 'custom', dog: { breed: 'scott', name: 'Scott' }, accent: '#EE8FA0', title: '', displayMode: 'full' }, {}, { stage: 'memory', size: 'hero' })}</div><h2>No memories yet</h2><p class="muted">When a countdown ends, it lands here as a keepsake — with your photos and a very proud dog.</p></div>`}
+        : (() => { const demo = ui.demo = { ...P.makeSamples().find((x) => x.key === 'lisbon' || x.id === 'sample-lisbon'), id: 'demo-memory', title: 'Memories', dog: { breed: 'scott', name: 'Scott' }, accent: '#EE8FA0', joy: { v: 40, t: Date.now() } }; const k = P.compute(demo);
+          return `<div class="empty"><div class="empty-scene mem-play">${P.sceneHTML(demo, k, { size: 'detail', interactive: true, stage: 'memory' })}</div>${playTray(demo).replace('class="play-tray"', 'class="play-tray static"')}<h2>No memories yet</h2><p class="muted">When a countdown ends, it lands here as a keepsake — with your photos and a very proud dog. Until then, Scott is happy to be petted.</p></div>`; })()}
     </section>`;
   }
 
@@ -608,7 +611,7 @@
   /* =============================== SCENE INTERACTIONS =============================== */
   function bindScene(root) {
     const scene = $('.scene[data-cid]', root); if (!scene) return;
-    const c = S.get(scene.dataset.cid); if (!c) return;
+    const c = S.get(scene.dataset.cid) || (ui.demo && ui.demo.id === scene.dataset.cid ? ui.demo : null); if (!c) return;
     const hit = $('[data-dog]', scene), svg = $('.dog', scene), bubble = $('.bubble', scene), fx2 = $('.scene-fx2', scene), hint = $('.scene-hint', root);
     let hold, loop, petting = false, pt = null, sayT;
     const K = () => P.compute(c);

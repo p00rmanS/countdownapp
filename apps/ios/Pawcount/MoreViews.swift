@@ -110,6 +110,7 @@ struct WelcomeView: View {
 struct MemoriesView: View {
     @EnvironmentObject var store: AppStore
     @Environment(\.paw) var pc
+    @StateObject var memCtrl = SceneController()
     var body: some View {
         Ticker { now in
             let items = store.data.countdowns.map { ($0, compute($0, now: now)) }.filter { $0.1.phase == .past || $0.0.archived }.sorted { $0.1.target > $1.1.target }
@@ -120,7 +121,12 @@ struct MemoriesView: View {
                     HStack { VStack(alignment: .leading, spacing: 2) { Eyebrow("Keepsakes"); H("Memories", 32) }; Spacer(); IconButton(icon: "sliders", label: "Settings") { store.push(.settings) } }
                     if items.isEmpty {
                         VStack(spacing: 8) {
-                            DogOnly(dog: Dog(breed: "scott", name: "Scott"), stage: .memory).frame(maxWidth: 260).padding(.top, 28)
+                            // Scott is not just a picture: tap to bark, hold to pet
+                            let demo = Countdown(id: "demo", title: "Memories", type: "custom", targetAt: "2020-01-01T00:00", timeZone: "UTC", allDay: false, yearly: false,
+                                                 createdAt: Date().addingTimeInterval(-DAY), dog: Dog(breed: "scott", name: "Scott"), accent: "#EE8FA0", displayMode: .full)
+                            SceneView(c: demo, k: compute(demo, now: now), art: store.art, size: .detail, stage: .memory, controller: memCtrl, reduceMotion: store.reduceMotion, interactive: true,
+                                      onBark: { memCtrl.bubble = dogLine(demo, compute(demo), kind: "tap") }, onPetStart: { memCtrl.bubble = dogLine(demo, compute(demo), kind: "pet") })
+                                .frame(height: 300).clipShape(RoundedRectangle(cornerRadius: 28)).padding(.top, 20)
                             H("No memories yet", 26, align: .center)
                             Muted("When a countdown ends, it lands here as a keepsake — with your photos and a very proud dog.", 16, align: .center)
                         }.frame(maxWidth: .infinity)

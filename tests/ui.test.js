@@ -93,6 +93,12 @@ test('play tray: treat, feed, ball and tickle raise the joy meter', () => {
 test('profile photo from a phone backup (a file name, not an image) falls back to the dog', () => {
   A.S.set('profilePhoto', 'abc123.jpg'); assert.ok(!go('#/').includes('<img class="avatar"')); A.S.set('profilePhoto', '');
 });
+test('empty Memories: Scott can be petted and played with', () => {
+  const keep = A.S.state.countdowns; A.S.state.countdowns = [];
+  const h = go('#/memories'); assert.ok(h.includes('No memories yet') && doc.querySelector('[data-dog]') && doc.querySelectorAll('[data-play]').length === 4);
+  A.ui.sceneApi.pet(); assert.ok(doc.querySelector('.dog.petting')); A.ui.sceneApi.play.tickle();
+  A.S.state.countdowns = keep; go('#/');
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);
