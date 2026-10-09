@@ -120,7 +120,7 @@ extension Countdown: Codable {
         if let e = dog.ears, !ears.contains(e) { dog.ears = nil }
         checklist = Array(checklist.prefix(100)).map { var i = $0; i.text = String(i.text.prefix(200)); return i }
         reminders = Array(reminders.prefix(12))
-        photos = Array(photos.filter { Photos.isSafeName($0) }.prefix(6))
+        photos = Array(photos.filter { isSafePhotoName($0) }.prefix(6))
         if var d = destination { d.country = String(d.country.prefix(60)); d.city = d.city.map { String($0.prefix(60)) }; d.flag = String(d.flag.prefix(8)); destination = d }
         if var p = person { p.name = String(p.name.prefix(40)); person = p }
     }
@@ -137,6 +137,9 @@ extension Countdown: Codable {
         try c.encode(photos, forKey: .memoryPhotos); try c.encode(sample, forKey: .sample)
     }
 }
+
+/// photo files are named <uuid>.jpg; anything else (e.g. "../../x") could point outside the photo folder
+func isSafePhotoName(_ s: String) -> Bool { s.range(of: "^[A-Za-z0-9-]{1,64}\.jpg$", options: .regularExpression) != nil }
 
 struct Settings: Equatable {
     var displayMode: DisplayMode = .full
@@ -161,7 +164,7 @@ extension Settings: Codable {
         notifications = try c.decodeIfPresent(Bool.self, forKey: .notifications) ?? false
         profileName = String((try c.decodeIfPresent(String.self, forKey: .profileName) ?? "").prefix(30))
         let pp = try c.decodeIfPresent(String.self, forKey: .profilePhoto) ?? ""
-        profilePhoto = Photos.isSafeName(pp) ? pp : ""
+        profilePhoto = isSafePhotoName(pp) ? pp : ""
     }
     func encode(to e: Encoder) throws {
         var c = e.container(keyedBy: K.self)
