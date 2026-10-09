@@ -41,6 +41,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /*
  * DetailScreen.kt - one countdown full screen: the interactive scene (tap = bark, hold = pet, shake = sneeze),
@@ -89,6 +91,22 @@ fun DetailScreen(vm: AppViewModel, id: String) {
     fun say(text: String) { ctrl.bubble = text }
     LaunchedEffect(ctrl.bubble) { if (ctrl.bubble != null) { delay(2400); ctrl.bubble = null } }
     LaunchedEffect(id) { delay(600); say(when (k.stage) { Stage.NAP -> "Zzz…"; Stage.TODAY -> "IT'S TODAY!!! 🎉"; Stage.ZOOMIES -> "ZOOM!"; Stage.MEMORY -> "Remember this? 💛"; else -> "Woof!" }) }
+
+    // play: treat / feed / ball / tickle, and a joy meter that fades while you are away
+    var joy by remember(id) { mutableStateOf(Joy.now(ctx, id)) }
+    val scope = rememberCoroutineScope()
+    fun play(what: String) {
+        ctrl.hint = false
+        val lines = when (what) { "Treat" -> listOf("Nom nom! 🦴", "Best human ever!", "More? 👀"); "Feed" -> listOf("Yum yum yum…"); "Tickle" -> listOf("Hehehe!!", "That tickles! 😆", "Again, again!"); else -> emptyList() }
+        when (what) {
+            "Ball" -> { ctrl.fetchAt = ctrl.clock; Haptics.play(ctx, settings.haptics, "soft"); ctrl.bubble = dogLine(c, compute(c), "fetch") }
+            "Tickle" -> { ctrl.reactions.start("petting", ctrl.clock); ctrl.bubble = lines.random(); Haptics.play(ctx, settings.haptics, "purr"); scope.launch { delay(1600); ctrl.reactions.stop("petting") } }
+            else -> { ctrl.bubble = lines.random(); Haptics.play(ctx, settings.haptics, if (what == "Feed") "purr" else "tick"); Sounds.play(settings.sound, "chime")
+                scope.launch { repeat(if (what == "Feed") 5 else 2) { ctrl.reactions.start("bark", ctrl.clock); delay(500) } } }
+        }
+        val before = joy; joy = Joy.add(ctx, id, when (what) { "Feed" -> 10f; "Ball" -> 6f; else -> 8f })
+        if (before < 100f && joy >= 100f) { vm.confetti(); ctrl.bubble = "${c.dog.name} loves you! 💛"; Haptics.play(ctx, settings.haptics, "success") }
+    }
 
     // shake the phone -> sneeze
     DisposableEffect(id) {
@@ -125,11 +143,16 @@ fun DetailScreen(vm: AppViewModel, id: String) {
                     }
                     IconButton("more", "More options for ${c.title}", { menu = true }, glass = true)
                 }
-                Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 50.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.align(Alignment.BottomCenter).padding(bottom = 44.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     if (ctrl.hint) Text("Tap to bark · Hold to pet · Shake", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
-                    Text("🎾 Fetch", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).clickable(role = Role.Button) {
-                        ctrl.hint = false; ctrl.fetchAt = ctrl.clock; Haptics.play(ctx, settings.haptics, "soft"); ctrl.bubble = dogLine(c, compute(c), "fetch")
-                    }.padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
+                    Text("♥  ${c.dog.name} is ${Joy.label(joy)}", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
+                    Row(Modifier.padding(horizontal = 10.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        listOf("🦴" to "Treat", "🍖" to "Feed", "🎾" to "Ball", "🤗" to "Tickle").forEach { (emoji, label) ->
+                            Column(Modifier.weight(1f).shadow(4.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(Color(0xEBFFFFFF)).clickable(role = Role.Button, onClickLabel = "$label ${c.dog.name}") { play(label) }.padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(emoji, style = T.body(20)); Text(label, style = T.body(12, FontWeight.ExtraBold).copy(color = Color(0xFF3D2616)))
+                            }
+                        }
+                    }
                 }
             }
 
@@ -327,4 +350,20 @@ fun DogIcon(art: Art, dog: Dog, modifier: Modifier = Modifier, bg: Color = Color
             cv.nativeCanvas.restore()
         }
     }
+}
+
+/** How happy each dog is (0-100). Goes up with treats and play, and fades by about 6 points an hour. Kept per countdown on this device only. */
+object Joy {
+    private fun prefs(ctx: android.content.Context) = ctx.getSharedPreferences("joy", android.content.Context.MODE_PRIVATE)
+    fun now(ctx: android.content.Context, id: String): Float {
+        val raw = prefs(ctx).getString(id, null) ?: return 20f
+        val (v, t) = raw.split("|").let { it[0].toFloat() to it[1].toLong() }
+        return maxOf(0f, v - (System.currentTimeMillis() - t) / 3_600_000f * 6f)
+    }
+    fun add(ctx: android.content.Context, id: String, n: Float): Float {
+        val v = minOf(100f, now(ctx, id) + n)
+        prefs(ctx).edit().putString(id, "$v|${System.currentTimeMillis()}").apply()
+        return v
+    }
+    fun label(v: Float) = when { v < 25f -> "sleepy"; v < 55f -> "content"; v < 85f -> "happy"; else -> "over the moon" }
 }

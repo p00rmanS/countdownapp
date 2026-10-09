@@ -15,6 +15,26 @@ struct DetailView: View {
     @State var confirmDelete = false
     @State var sharing = false
     @State var shake = ShakeDetector()
+    @State var joy: Double = 20
+
+    /// treat / feed / ball / tickle: the dog reacts and gets happier (the meter fades while you are away)
+    func play(_ what: String, _ c: Countdown) {
+        let s = store.settings
+        ctrl.hint = false
+        switch what {
+        case "Ball": ctrl.fetchAt = ctrl.clock; Haptics.play(s.haptics, "soft"); ctrl.bubble = dogLine(c, compute(c), kind: "fetch")
+        case "Tickle":
+            ctrl.reactions.start("petting", ctrl.clock); ctrl.bubble = ["Hehehe!!", "That tickles! 😆", "Again, again!"].randomElement(); Haptics.play(s.haptics, "purr")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { ctrl.reactions.stop("petting") }
+        default:
+            ctrl.bubble = (what == "Feed" ? ["Yum yum yum…"] : ["Nom nom! 🦴", "Best human ever!", "More? 👀"]).randomElement()
+            Haptics.play(s.haptics, what == "Feed" ? "purr" : "tick"); Sounds.play(s.sound, "chime")
+            for n in 0..<(what == "Feed" ? 5 : 2) { DispatchQueue.main.asyncAfter(deadline: .now() + Double(n) * 0.5) { ctrl.reactions.start("bark", ctrl.clock) } }
+        }
+        let before = joy
+        joy = Joy.add(id, what == "Feed" ? 10 : what == "Ball" ? 6 : 8)
+        if before < 100 && joy >= 100 { store.confetti(); ctrl.bubble = "\(c.dog.name) loves you! 💛"; Haptics.play(s.haptics, "success") }
+    }
 
     var body: some View {
         if let c = store.countdown(id) {
@@ -51,12 +71,18 @@ struct DetailView: View {
                                 IconButton(icon: "more", label: "More options for \(c.title)", glass: true) { menu = true }
                             }.padding(.horizontal, 16).padding(.top, geo.safeAreaInsets.top + 6)
                             VStack { Spacer()
-                                HStack(spacing: 8) {
+                                VStack(spacing: 6) {
                                     if ctrl.hint { Text("Tap to bark · Hold to pet · Shake").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66))) }
-                                    Button {
-                                        ctrl.hint = false; ctrl.fetchAt = ctrl.clock; Haptics.play(s.haptics, "soft"); ctrl.bubble = dogLine(c, compute(c), kind: "fetch")
-                                    } label: { Text("🎾 Fetch").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66))) }.buttonStyle(.plain)
-                                }.padding(.bottom, 50)
+                                    Text("♥  \(c.dog.name) is \(Joy.label(joy))").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66)))
+                                    HStack(spacing: 6) {
+                                        ForEach([("🦴", "Treat"), ("🍖", "Feed"), ("🎾", "Ball"), ("🤗", "Tickle")], id: \.1) { item in
+                                            Button { play(item.1, c) } label: {
+                                                VStack(spacing: 0) { Text(item.0).font(.system(size: 20)); Text(item.1).font(PawFont.body(12, 800)).foregroundColor(Color(hex: "#3D2616")) }
+                                                    .frame(maxWidth: .infinity).padding(.vertical, 6).background(RoundedRectangle(cornerRadius: 16).fill(Color.white.opacity(0.92)))
+                                            }.buttonStyle(.plain).accessibilityLabel("\(item.1) \(c.dog.name)")
+                                        }
+                                    }.padding(.horizontal, 10)
+                                }.padding(.bottom, 44)
                             }.frame(height: sceneH + geo.safeAreaInsets.top)
                         }
                         // ---- sheet with the numbers ----
@@ -119,6 +145,7 @@ struct DetailView: View {
             .onAppear { milestone(c, k) }
         }
         .onAppear {
+            joy = Joy.now(id)
             shake.onShake = {
                 let cc = store.countdown(id) ?? c
                 ctrl.hint = false; ctrl.reactions.start("sneeze", ctrl.clock); ctrl.shakenAt = ctrl.clock
@@ -329,4 +356,20 @@ struct DogIcon: View {
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .accessibilityHidden(true)
     }
+}
+
+/// How happy each dog is (0-100). Goes up with treats and play, and fades by about 6 points an hour. Kept per countdown on this device only.
+enum Joy {
+    static func now(_ id: String) -> Double {
+        guard let raw = UserDefaults.standard.string(forKey: "joy." + id) else { return 20 }
+        let p = raw.split(separator: "|")
+        guard p.count == 2, let v = Double(p[0]), let t = Double(p[1]) else { return 20 }
+        return max(0, v - (Date().timeIntervalSince1970 - t) / 3600 * 6)
+    }
+    @discardableResult static func add(_ id: String, _ n: Double) -> Double {
+        let v = min(100, now(id) + n)
+        UserDefaults.standard.set("\(v)|\(Date().timeIntervalSince1970)", forKey: "joy." + id)
+        return v
+    }
+    static func label(_ v: Double) -> String { v < 25 ? "sleepy" : v < 55 ? "content" : v < 85 ? "happy" : "over the moon" }
 }
