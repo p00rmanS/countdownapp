@@ -111,12 +111,12 @@
     const pct = Math.round(k.progress * 100);
     const label = k.phase === 'upcoming' ? `Day ${k.daysIn} of ${k.daysTotal}` : k.phase === 'today' ? 'Today is the day!' : 'Made it!';
     return `<div class="leash ${cls}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Countdown progress">
-      <div class="leash-row"><div class="leash-track"><div class="leash-fill" style="width:${pct}%"></div><span class="leash-paw" style="left:${pct}%">${icon('paw')}</span></div><span class="leash-end" aria-hidden="true">${P.TYPES[c.type].emoji}</span></div>
+      <div class="leash-row"><div class="leash-track"><div class="leash-fill" style="width:${pct}%"></div><span class="leash-paw" style="left:${pct}%">${icon('paw')}</span></div><span class="leash-end" aria-hidden="true">${icon(P.TYPES[c.type].icon)}</span></div>
       <div class="leash-cap"><span>${label}</span><span>${pct}%</span></div></div>`;
   }
 
   const chip = (txt, cls = '') => `<span class="chip ${cls}">${txt}</span>`;
-  const stageChip = (c, k) => { const i = P.stageInfo(c, k); return chip(`<span aria-hidden="true">${i.emoji}</span> ${i.label}`, 'stage'); };
+  const stageChip = (c, k) => { const i = P.stageInfo(c, k); return chip(`${icon(i.icon)} ${i.label}`, 'stage'); };
 
   /* =============================== SHARING ===============================
      A shared countdown is just its data, base64url-encoded in a link:  https://.../#/import/<code>
@@ -182,7 +182,7 @@
     return `<a class="hero-card" href="#/c/${c.id}" style="${styleVars(c)}" aria-label="${esc(c.title)}. ${esc(P.spoken(k))} left. ${esc(P.describeDog(c, k))}">
       ${P.sceneHTML(c, k, { size: 'hero' })}
       <div class="hero-body">
-        <div class="chip-row">${stageChip(c, k)}${chip(`<span aria-hidden="true">${tp.emoji}</span> ${tp.short}`, 'ghost')}</div>
+        <div class="chip-row">${stageChip(c, k)}${chip(`${icon(tp.icon)} ${tp.short}`, 'ghost')}</div>
         <h2 class="hero-title">${esc(c.title)}</h2>
         <p class="muted small">${k.phase === 'today' ? 'Happening today' : esc(w.dest)}</p>
         ${numeralsHTML(c, k, 'sz-hero')}
@@ -194,7 +194,7 @@
     return `<a class="card" href="#/c/${c.id}" style="${styleVars(c)}" aria-label="${esc(c.title)}. ${esc(shortCount(c, k))}. ${esc(P.stageInfo(c, k).desc)}">
       ${P.sceneHTML(c, k, { size: 'card' })}
       <div class="card-body"><h3>${esc(c.title)}</h3><p class="card-count" data-short="${c.id}">${esc(shortCount(c, k))}</p>
-      <div class="chip-row">${chip(`<span aria-hidden="true">${P.STAGES[k.stage].emoji}</span> ${P.stageInfo(c, k).label}`, 'tiny stage')}</div></div></a>`;
+      <div class="chip-row">${chip(`${icon(P.STAGES[k.stage].icon)} ${P.stageInfo(c, k).label}`, 'tiny stage')}</div></div></a>`;
   }
 
   /* =============================== DETAIL =============================== */
@@ -214,22 +214,22 @@
     return `<section class="detail" style="${styleVars(c)}">
       <div class="detail-scene">
         <div class="detail-bar"><button class="glass-btn" data-action="back" aria-label="Back">${icon('back')}</button>
-          <span class="glass-pill"><span aria-hidden="true">${info.emoji}</span> ${esc(info.label)}</span>
+          <span class="glass-pill">${icon(info.icon)} ${esc(info.label)}</span>
           <button class="glass-btn" data-action="menu" aria-label="More options for ${esc(c.title)}">${icon('more')}</button></div>
         ${P.sceneHTML(c, k, { size: 'detail', interactive: true })}
         <p class="scene-hint" aria-hidden="true">Tap to bark · Hold to pet · Shake</p>
         <div class="play-tray" role="group" aria-label="Play with ${esc(c.dog.name)}">
           <div class="joy" data-joy role="status" aria-live="polite"><span class="joy-h" aria-hidden="true">♥</span><span class="joy-bar"><i data-joy-fill></i></span><span class="joy-t" data-joy-text></span></div>
           <div class="play-btns">
-            <button class="play-btn" data-play="treat"><span aria-hidden="true">🦴</span>Treat</button>
-            <button class="play-btn" data-play="feed"><span aria-hidden="true">🍖</span>Feed</button>
-            <button class="play-btn" data-play="ball"><span aria-hidden="true">🎾</span>Ball</button>
-            <button class="play-btn" data-play="tickle"><span aria-hidden="true">🤗</span>Tickle</button>
+            <button class="play-btn" data-play="treat">${icon('bone')}Treat</button>
+            <button class="play-btn" data-play="feed">${icon('bowl')}Feed</button>
+            <button class="play-btn" data-play="ball">${icon('ball')}Ball</button>
+            <button class="play-btn" data-play="tickle">${icon('smile')}Tickle</button>
           </div>
         </div>
       </div>
       <div class="detail-sheet">
-        <div class="chip-row center">${chip(`<span aria-hidden="true">${tp.emoji}</span> ${tp.short}`, 'ghost')}${c.destination ? chip(`<span aria-hidden="true">${c.destination.flag}</span> ${esc(c.destination.city || c.destination.country)}`, 'ghost') : ''}${facts.map((f) => chip(f, 'ghost')).join('')}</div>
+        <div class="chip-row center">${chip(`${icon(tp.icon)} ${tp.short}`, 'ghost')}${c.destination ? chip(`<span aria-hidden="true">${c.destination.flag}</span> ${esc(c.destination.city || c.destination.country)}`, 'ghost') : ''}${facts.map((f) => chip(f, 'ghost')).join('')}</div>
         <h1 class="detail-title">${esc(c.title)}</h1>
         <p class="when">${past ? esc(w.dest) : k.phase === 'today' ? 'Happening today' : esc(w.dest)}${w.local && !past ? `<br><span class="muted small">${esc(w.local)} your time</span>` : ''}</p>
         ${past ? `<div class="numerals words sz-detail"><span class="big-words">${P.plural(k.daysSince, 'day')} ago 💛</span></div>` : numeralsHTML(c, k, 'sz-detail')}
@@ -275,7 +275,7 @@
           const tp = P.TYPES[c.type], ph = (c.memoryPhotos || [])[0];
           return `<a class="polaroid-card" href="#/c/${c.id}" style="${styleVars(c)};--tilt:${i % 2 ? 1.6 : -1.6}deg" aria-label="${esc(c.title)}, ${esc(P.fmtInstant(k.target, k.tz, { allDay: true }))}">
             <div class="pol-img">${ph ? `<img src="${ph}" alt="">` : P.sceneHTML(c, k, { size: 'card', stage: 'memory' })}</div>
-            <p class="pol-t">${esc(c.title)}</p><p class="pol-d muted small">${tp.emoji} ${esc(P.fmtInstant(k.target, k.tz, { allDay: true, noYear: false }))}${c.archived ? ' · archived' : ''}</p></a>`;
+            <p class="pol-t">${esc(c.title)}</p><p class="pol-d muted small">${icon(tp.icon, 'inline')} ${esc(P.fmtInstant(k.target, k.tz, { allDay: true, noYear: false }))}${c.archived ? ' · archived' : ''}</p></a>`;
         }).join('')}</div>`
         : `<div class="empty"><div class="empty-scene">${P.sceneHTML({ id: 'x', type: 'custom', dog: { breed: 'scott', name: 'Scott' }, accent: '#EE8FA0', title: '', displayMode: 'full' }, {}, { stage: 'memory', size: 'hero' })}</div><h2>No memories yet</h2><p class="muted">When a countdown ends, it lands here as a keepsake — with your photos and a very proud dog.</p></div>`}
     </section>`;
@@ -473,7 +473,7 @@
     const d = ui.draft, step = ui.step;
     if (step === 0) {
       const tp = P.TYPES[d.type];
-      return `<div class="type-grid" role="radiogroup" aria-label="Event type">${P.TYPE_ORDER.map((t) => { const x = P.TYPES[t]; return `<button class="type-card ${d.type === t ? 'on' : ''}" role="radio" aria-checked="${d.type === t}" data-action="type-pick" data-v="${t}" style="--ta:${x.accent}"><span class="te" aria-hidden="true">${x.emoji}</span><b>${x.label}</b><span class="small muted">${x.hint}</span>${d.type === t ? `<span class="tick">${icon('check')}</span>` : ''}</button>`; }).join('')}</div>
+      return `<div class="type-grid" role="radiogroup" aria-label="Event type">${P.TYPE_ORDER.map((t) => { const x = P.TYPES[t]; return `<button class="type-card ${d.type === t ? 'on' : ''}" role="radio" aria-checked="${d.type === t}" data-action="type-pick" data-v="${t}" style="--ta:${x.accent}"><span class="te" aria-hidden="true">${icon(x.icon)}</span><b>${x.label}</b><span class="small muted">${x.hint}</span>${d.type === t ? `<span class="tick">${icon('check')}</span>` : ''}</button>`; }).join('')}</div>
         <label class="field"><span>Name it</span><input data-bind="title" value="${esc(d.title)}" placeholder="${esc(tp.ph)}" maxlength="48" autocomplete="off" enterkeyhint="next"></label>
         ${d.type === 'intl_trip' ? `<label class="field"><span>Destination country</span><select data-bind="country"><option value="">Choose a country…</option>${P.COUNTRIES.map((x) => `<option value="${esc(x[0])}" ${d.country === x[0] ? 'selected' : ''}>${x[1]} ${esc(x[0])}</option>`).join('')}</select><small>We'll set the time zone for you.</small></label>` : ''}
         ${d.type === 'birthday' ? `<div class="field-row"><label class="field"><span>Whose birthday?</span><input data-bind="personName" value="${esc(d.personName)}" placeholder="Mia" maxlength="30" autocomplete="off"></label><label class="field narrow"><span>Birth year</span><input data-bind="birthYear" value="${esc(d.birthYear)}" inputmode="numeric" placeholder="1996" maxlength="4"></label></div>` : ''}`;
@@ -491,7 +491,7 @@
     if (step === 2) {
       const mut = d.breed === 'mutt';
       return `<div class="dog-preview" id="dog-preview">${previewScene()}</div>
-        <div class="mood-row" role="radiogroup" aria-label="Preview mood">${['nap', 'curious', 'waiting', 'packing', 'zoomies', 'today'].map((s) => `<button class="mood ${ui.preview === s ? 'on' : ''}" role="radio" aria-checked="${ui.preview === s}" data-action="mood" data-v="${s}"><span aria-hidden="true">${P.STAGES[s].emoji}</span>${P.STAGES[s].label.replace("It's today!", 'Party')}</button>`).join('')}</div>
+        <div class="mood-row" role="radiogroup" aria-label="Preview mood">${['nap', 'curious', 'waiting', 'packing', 'zoomies', 'today'].map((s) => `<button class="mood ${ui.preview === s ? 'on' : ''}" role="radio" aria-checked="${ui.preview === s}" data-action="mood" data-v="${s}">${icon(P.STAGES[s].icon)}${P.STAGES[s].label.replace("It's today!", 'Party')}</button>`).join('')}</div>
         <div class="breed-scroll" role="radiogroup" aria-label="Dog breed">${P.BREED_ORDER.map((b) => { const B = P.BREEDS[b], sug = P.BREED_BEST[b].includes(d.type); return `<button class="breed ${d.breed === b ? 'on' : ''}" role="radio" aria-checked="${d.breed === b}" data-action="breed-pick" data-v="${b}"><span class="b-ic">${P.dogIconSVG(b)}</span><b>${esc(B.name)}</b><span class="small">${esc(B.label)}</span><span class="small muted">${esc(B.vibe)}</span>${sug ? '<span class="sug">Great match</span>' : ''}</button>`; }).join('')}</div>
         <label class="field"><span>Dog's name</span><input data-bind="dogName" value="${esc(d.dogName)}" maxlength="18" autocomplete="off"></label>
         ${mut ? `<div class="panel"><h2 class="panel-h">Customize ${esc(d.dogName || 'Lucky')}</h2><p class="muted small">Coat colour</p><div class="swatches" role="radiogroup" aria-label="Coat colour">${P.MUTT_FURS.map((f) => `<button class="swatch ${d.fur === f ? 'on' : ''}" role="radio" aria-checked="${d.fur === f}" style="--s:${f}" data-action="fur-pick" data-v="${f}" aria-label="Coat ${f}">${d.fur === f ? icon('check') : ''}</button>`).join('')}</div><p class="muted small">Ears</p>${seg('ear-pick', P.EAR_TYPES, d.ears, 'aria-label="Ear style"')}</div>` : ''}`;
@@ -651,10 +651,10 @@
       const before = joyNow(); c.joy = { v: Math.min(100, before + n), t: Date.now() }; S.save(); showJoy();
       if (before < 100 && c.joy.v >= 100) { P.confetti({ count: 70, power: 0.8 }); P.haptic('success'); say(`${c.dog.name} loves you! 💛`, 2600); }
     };
-    const drop = (cls, emoji, ms) => { const el = document.createElement('i'); el.className = cls; el.textContent = emoji; fx2.appendChild(el); setTimeout(() => el.remove(), ms); return el; };
+    const drop = (cls, emoji, ms) => { const el = document.createElement('i'); el.className = cls; el.innerHTML = icon(emoji); fx2.appendChild(el); setTimeout(() => el.remove(), ms); return el; };
     const play = {
-      treat() { used(); drop('treat-drop', '🦴', 1000); setTimeout(() => { flash('munch', 1100); P.hearts(fx2, 2); say(k0(['Nom nom! 🦴', 'Best human ever!', 'More? 👀'])); P.haptic('tick'); P.sound('chime'); addJoy(8); }, 750); },
-      feed() { used(); const b = drop('bowl', '🥣', 2600); flash('munch', 2300); say('Yum yum yum…', 2400); P.haptic('purr'); addJoy(10); },
+      treat() { used(); drop('treat-drop', 'bone', 1000); setTimeout(() => { flash('munch', 1100); P.hearts(fx2, 2); say(k0(['Nom nom!', 'Best human ever!', 'More? 👀'])); P.haptic('tick'); P.sound('chime'); addJoy(8); }, 750); },
+      feed() { used(); const b = drop('bowl', 'bowl', 2600); flash('munch', 2300); say('Yum yum yum…', 2400); P.haptic('purr'); addJoy(10); },
       ball() { fetchB(); addJoy(6); },
       tickle() { used(); flash('tickle', 1600); P.hearts(fx2, 5); say(k0(['Hehehe!!', 'That tickles! 😆', 'Again, again!']), 2000); P.haptic('purr'); addJoy(8); },
     };

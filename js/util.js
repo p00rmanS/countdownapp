@@ -16,6 +16,7 @@
 
   const ICONS = {
     home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/>',
+    heart: '<path d="M12 20s-7.5-4.6-7.5-10.3A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.3C19.5 15.4 12 20 12 20z"/>',
     album: '<path d="M12 20s-7.5-4.6-7.5-10.3A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.3C19.5 15.4 12 20 12 20z"/>',
     sliders: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
@@ -35,6 +36,23 @@
     chevron: '<path d="m9 5 7 7-7 7"/>',
     globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c3 3.2 3 13.8 0 17M12 3.5c-3 3.2-3 13.8 0 17"/>',
     clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    plane: '<path d="M21 15.5v-1.8L13.5 9V4.5a1.5 1.5 0 0 0-3 0V9L3 13.7v1.8l7.5-2.2v4.2L8.5 19v1.5l3.5-1 3.5 1V19l-2-1.5v-4.2z"/>',
+    beach: '<path d="M7 14a5 5 0 0 1 10 0M3 14h18M4 18c1.5-1.2 2.5-1.2 4 0s2.5 1.2 4 0 2.5-1.2 4 0 2.5 1.2 4 0M12 5v1.5M5.6 7.6l1 1M18.4 7.6l-1 1"/>',
+    cake: '<path d="M4 20h16M5 20v-6h14v6M5 16.5c2 1.5 3 1.5 5 0s3-1.5 5 0 2 1 4 0M12 14v-3M12 9.5c-1-1 0-2.4 0-3 1 .8 1.2 2 0 3z"/>',
+    rings: '<path d="M4 14a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M10 14a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M10 4.5h4l1.2 1.7L12 9.4 8.8 6.2z"/>',
+    snow: '<path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5 4.2 16.5M9.5 4.5 12 6.5l2.5-2M9.5 19.5 12 17.5l2.5 2"/>',
+    star: '<path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9l-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/>',
+    moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
+    eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12zM9 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>',
+    hourglass: '<path d="M7 3.5h10M7 20.5h10M8 3.5c0 4 4 4.5 4 8.5s-4 4.5-4 8.5M16 3.5c0 4-4 4.5-4 8.5s4 4.5 4 8.5"/>',
+    suitcase: '<path d="M5 8h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 20H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 8zM9 8V5.5h6V8M3.5 13h17"/>',
+    bolt: '<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>',
+    sparkles: '<path d="M11 3c.6 4.5 2.5 6.4 7 7-4.5.6-6.4 2.5-7 7-.6-4.5-2.5-6.4-7-7 4.5-.6 6.4-2.5 7-7zM19 3v3M17.5 4.5h3"/>',
+    bone: '<path d="M7 12h10M3 9.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M3 14.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 9.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 14.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>',
+    bowl: '<path d="M3.5 11h17a8.5 8.5 0 0 1-17 0zM9 21h6M8 8.5l1 1.5M12 6l.5 2.5M16 8.5l-1 1.5"/>',
+    ball: '<path d="M3.5 12a8.5 8.5 0 1 0 17.0 0a8.5 8.5 0 1 0 -17.0 0M5 7.5c4 1 6 5 5.5 9M19 7.5c-4 1-6 5-5.5 9"/>',
+    smile: '<path d="M3.5 12a8.5 8.5 0 1 0 17.0 0a8.5 8.5 0 1 0 -17.0 0M8 14c1.2 2 2.5 3 4 3s2.8-1 4-3M9 9.5v.5M15 9.5v.5"/>',
+    ticket: '<path d="M3.5 8.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v1.5a2 2 0 0 0 0 4v1.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V14a2 2 0 0 0 0-4zM14 6.5v11"/>',
     repeat: '<path d="M4 11V9a3 3 0 0 1 3-3h11l-3-3M20 13v2a3 3 0 0 1-3 3H6l3 3"/>',
   };
   P.icon = (name, cls = '') =>
@@ -43,12 +61,12 @@
       : `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 
   P.TYPES = {
-    intl_trip: { label: 'International trip', short: 'Trip abroad', emoji: '✈️', accent: '#5DADE8', hint: 'Time zones, flags & packing', ph: 'Japan', repeat: false },
-    vacation: { label: 'Vacation', short: 'Vacation', emoji: '🏝️', accent: '#3FBFA8', hint: 'Sun, sand & a packing list', ph: 'Bali getaway', repeat: false },
-    birthday: { label: 'Birthday', short: 'Birthday', emoji: '🎂', accent: '#FF7DAA', hint: 'Repeats every year', ph: "Mia's birthday", repeat: true },
-    anniversary: { label: 'Anniversary', short: 'Anniversary', emoji: '💍', accent: '#EE8FA0', hint: 'Together for X days', ph: 'Our anniversary', repeat: true },
-    holiday: { label: 'Holiday', short: 'Holiday', emoji: '🎄', accent: '#3E9C6C', hint: 'Cozy seasonal scene', ph: 'Christmas Eve', repeat: true },
-    custom: { label: 'Custom', short: 'Custom', emoji: '⭐', accent: '#E8A15C', hint: 'Anything you are excited about', ph: 'Concert night', repeat: false },
+    intl_trip: { label: 'International trip', short: 'Trip abroad', emoji: '✈️', icon: 'plane', accent: '#5DADE8', hint: 'Time zones, flags & packing', ph: 'Japan', repeat: false },
+    vacation: { label: 'Vacation', short: 'Vacation', emoji: '🏝️', icon: 'beach', accent: '#3FBFA8', hint: 'Sun, sand & a packing list', ph: 'Bali getaway', repeat: false },
+    birthday: { label: 'Birthday', short: 'Birthday', emoji: '🎂', icon: 'cake', accent: '#FF7DAA', hint: 'Repeats every year', ph: "Mia's birthday", repeat: true },
+    anniversary: { label: 'Anniversary', short: 'Anniversary', emoji: '💍', icon: 'rings', accent: '#EE8FA0', hint: 'Together for X days', ph: 'Our anniversary', repeat: true },
+    holiday: { label: 'Holiday', short: 'Holiday', emoji: '🎄', icon: 'snow', accent: '#3E9C6C', hint: 'Cozy seasonal scene', ph: 'Christmas Eve', repeat: true },
+    custom: { label: 'Custom', short: 'Custom', emoji: '⭐', icon: 'star', accent: '#E8A15C', hint: 'Anything you are excited about', ph: 'Concert night', repeat: false },
   };
   P.TYPE_ORDER = ['intl_trip', 'vacation', 'birthday', 'anniversary', 'holiday', 'custom'];
 

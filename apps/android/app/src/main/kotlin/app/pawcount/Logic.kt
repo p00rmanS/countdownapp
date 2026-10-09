@@ -31,10 +31,10 @@ const val DAY = 86_400_000L
 const val HOUR = 3_600_000L
 const val MIN = 60_000L
 
-enum class Stage(val key: String, val label: String, val emoji: String) {
-    NAP("nap", "Napping", "😴"), CURIOUS("curious", "Curious", "👀"), WAITING("waiting", "Waiting", "🐕"),
-    PACKING("packing", "Packing", "🎒"), ZOOMIES("zoomies", "Zoomies", "⚡"), TODAY("today", "It's today!", "🎉"),
-    MEMORY("memory", "Memory", "💛");
+enum class Stage(val key: String, val label: String, val emoji: String, val icon: String) {
+    NAP("nap", "Napping", "😴", "moon"), CURIOUS("curious", "Curious", "👀", "eye"), WAITING("waiting", "Waiting", "🐕", "hourglass"),
+    PACKING("packing", "Packing", "🎒", "suitcase"), ZOOMIES("zoomies", "Zoomies", "⚡", "bolt"), TODAY("today", "It's today!", "🎉", "sparkles"),
+    MEMORY("memory", "Memory", "💛", "heart");
 }
 
 enum class Phase { UPCOMING, TODAY, PAST }

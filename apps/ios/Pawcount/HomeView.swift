@@ -105,8 +105,8 @@ private struct HeroCard: View {
                 SceneView(c: c, k: k, art: store.art, size: .hero, reduceMotion: store.reduceMotion)
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: 6) {
-                        Chip(text: "\(k.stage.emoji) \(stageLabel(c, k))", filled: accent, textColor: accent.onColor)
-                        Chip(text: "\(type.emoji) \(type.short)")
+                        Chip(text: stageLabel(c, k), filled: accent, textColor: accent.onColor, icon: k.stage.icon)
+                        Chip(text: type.short, icon: type.icon)
                     }
                     H(c.title, 28).padding(.top, 10)
                     Muted(k.phase == .today ? "Happening today" : w.0, 14)
@@ -136,7 +136,7 @@ private struct GridCard: View {
                 VStack(alignment: .leading, spacing: 3) {
                     H(c.title, 17).lineLimit(1)
                     H(shortCount(c, k), 22).padding(.bottom, 4)
-                    Chip(text: "\(k.stage.emoji) \(stageLabel(c, k))", filled: accent, textColor: accent.onColor, small: true)
+                    Chip(text: stageLabel(c, k), filled: accent, textColor: accent.onColor, small: true, icon: k.stage.icon)
                 }.padding(.horizontal, 13).padding(.top, 11).padding(.bottom, 14).frame(maxWidth: .infinity, alignment: .leading)
             }
             .background(pc.surface)

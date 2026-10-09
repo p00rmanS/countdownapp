@@ -71,7 +71,7 @@
         <rect width="400" height="300" fill="url(#${u}s)"/>
         <circle cx="70" cy="80" r="46" fill="#fff" opacity=".4"/><circle cx="340" cy="60" r="30" fill="#fff" opacity=".45"/><circle cx="300" cy="150" r="56" fill="${a}" opacity=".18"/>
         ${cloud(110, 46, 0.9, 0.7)}
-        <text class="prop emoji-float" x="300" y="110" font-size="62" text-anchor="middle">🎟️</text>
+        <g class="prop emoji-float"><g transform="translate(262 72) scale(2.6)"><path d="M3.5 8.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v1.5a2 2 0 0 0 0 4v1.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V14a2 2 0 0 0 0-4z" fill="#fff" opacity=".92"/><path d="M14 6.5v11" stroke="${a}" stroke-width="1.2" stroke-dasharray="1.6 1.6" fill="none"/><path d="m8.6 9.2.8 1.7 1.8.2-1.3 1.2.4 1.8-1.7-.9-1.7.9.4-1.8-1.3-1.2 1.8-.2z" fill="${a}"/></g></g>
         <path d="M0 232C120 218 280 246 400 226V300H0z" fill="${deep}" opacity=".35"/><rect y="238" width="400" height="62" fill="${P.mix(a, '#8A5A3B', 0.15)}" opacity=".5"/>`;
       }
     }

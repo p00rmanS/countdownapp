@@ -156,13 +156,13 @@
 
   /* ---------- dog personality ---------- */
   P.STAGES = {
-    nap: { label: 'Napping', emoji: '😴' },
-    curious: { label: 'Curious', emoji: '👀' },
-    waiting: { label: 'Waiting', emoji: '🐕' },
-    packing: { label: 'Packing', emoji: '🎒' },
-    zoomies: { label: 'Zoomies', emoji: '⚡' },
-    today: { label: "It's today!", emoji: '🎉' },
-    memory: { label: 'Memory', emoji: '💛' },
+    nap: { label: 'Napping', emoji: '😴', icon: 'moon' },
+    curious: { label: 'Curious', emoji: '👀', icon: 'eye' },
+    waiting: { label: 'Waiting', emoji: '🐕', icon: 'hourglass' },
+    packing: { label: 'Packing', emoji: '🎒', icon: 'suitcase' },
+    zoomies: { label: 'Zoomies', emoji: '⚡', icon: 'bolt' },
+    today: { label: "It's today!", emoji: '🎉', icon: 'sparkles' },
+    memory: { label: 'Memory', emoji: '💛', icon: 'heart' },
   };
   const PACK = {
     intl_trip: ['Packing', 'dragging a suitcase and clutching a passport'],

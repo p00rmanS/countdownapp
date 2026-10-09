@@ -510,3 +510,11 @@ button, a, .dog-hit { -webkit-touch-callout: none; }
 @keyframes tickle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg) translateY(-2px); } }
 .play-tray { bottom: 38px; left: 10px; right: 10px; gap: 6px; } .play-btns { gap: 6px; } .play-btn { min-width: 0; min-height: 46px; max-width: none; font-size: 12px; border-radius: 16px; } .play-btn span { font-size: 20px; }
 .scene.sz-detail .dog-wrap { height: 54%; bottom: 31%; } .scene-hint { bottom: 150px; }
+/* line icons replace the old emoji */
+.chip .i, .glass-pill .i { width: 16px; height: 16px; stroke-width: 2.2; } .chip.tiny .i { width: 14px; height: 14px; }
+.leash-end { display: grid; place-items: center; } .leash-end .i { width: 26px; height: 26px; color: var(--accent, var(--ink-2)); }
+.pol-d .i.inline { width: 14px; height: 14px; vertical-align: -2px; }
+.te { display: grid; place-items: center; } .te .i { width: 30px; height: 30px; color: var(--ta, var(--ink)); }
+.mood .i { width: 16px; height: 16px; margin-right: 4px; vertical-align: -3px; }
+.play-btn .i { width: 22px; height: 22px; color: #3D2616; } .play-btn > span { display: none; }
+.treat-drop .i, .bowl .i { width: 40px; height: 40px; color: #fff; stroke-width: 2.2; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .35)); }

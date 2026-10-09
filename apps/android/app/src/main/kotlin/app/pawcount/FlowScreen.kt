@@ -175,7 +175,7 @@ fun FlowScreen(vm: AppViewModel, editId: String?) {
                             val info = meta.types.getValue(t); val on = d.type == t; val ta = accentColor(info.accent)
                             Column(Modifier.weight(1f).heightIn(min = 108.dp).shadow(3.dp, RoundedCornerShape(22.dp)).clip(RoundedCornerShape(22.dp)).background(if (on) mixColor(pc.surface, ta, 0.14f) else pc.surface)
                                 .border(3.dp, if (on) ta else Color.Transparent, RoundedCornerShape(22.dp)).clickable(role = Role.RadioButton) { d = d.withType(meta, t) }.padding(14.dp)) {
-                                Text(info.emoji, style = T.body(30)); H(info.label, 17); Muted(info.hint, size = 13)
+                                Icon(info.icon, ta, 30.dp); H(info.label, 17); Muted(info.hint, size = 13)
                             } } } }
                     }
                     Field("Name it", d.title, { d = d.copy(title = it, titleAuto = false) }, placeholder = meta.types.getValue(d.type).placeholder, accent = accent, maxLen = 48)
@@ -217,8 +217,11 @@ fun FlowScreen(vm: AppViewModel, editId: String?) {
                     LazyRow(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         items(listOf(Stage.NAP, Stage.CURIOUS, Stage.WAITING, Stage.PACKING, Stage.ZOOMIES, Stage.TODAY)) { s ->
                             val on = preview == s
-                            Text("${s.emoji} ${if (s == Stage.TODAY) "Party" else s.label}", Modifier.heightIn(min = 38.dp).clip(RoundedCornerShape(50)).background(if (on) accent else pc.surface).clickable(role = Role.RadioButton) { preview = s }.padding(horizontal = 13.dp, vertical = 9.dp),
-                                style = T.body(13.5.toInt(), FontWeight.ExtraBold).copy(color = if (on) onAccent(accent) else pc.ink2))
+                            Row(Modifier.heightIn(min = 38.dp).clip(RoundedCornerShape(50)).background(if (on) accent else pc.surface).clickable(role = Role.RadioButton) { preview = s }.padding(horizontal = 13.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
+                                val tint = if (on) onAccent(accent) else pc.ink2
+                                Icon(s.icon, tint, 16.dp); Box(Modifier.width(5.dp))
+                                Text(if (s == Stage.TODAY) "Party" else s.label, style = T.body(13.5.toInt(), FontWeight.ExtraBold).copy(color = tint))
+                            }
                         }
                     }
                     LazyRow(Modifier.padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {

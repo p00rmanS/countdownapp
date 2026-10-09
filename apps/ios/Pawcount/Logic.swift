@@ -24,6 +24,12 @@ enum Stage: String, CaseIterable {
         case .zoomies: return "Zoomies"; case .today: return "It's today!"; case .memory: return "Memory"
         }
     }
+    var icon: String {
+        switch self {
+        case .nap: return "moon"; case .curious: return "eye"; case .waiting: return "hourglass"; case .packing: return "suitcase"
+        case .zoomies: return "bolt"; case .today: return "sparkles"; case .memory: return "heart"
+        }
+    }
     var emoji: String {
         switch self {
         case .nap: return "😴"; case .curious: return "👀"; case .waiting: return "🐕"; case .packing: return "🎒"

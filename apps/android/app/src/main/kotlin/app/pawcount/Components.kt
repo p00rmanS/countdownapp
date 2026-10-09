@@ -79,7 +79,24 @@ private val ICONS: Map<String, String> = mapOf(
     "camera" to "M4 8h3l1.8-2.6h6.4L17 8h3v11H4z ${circle(12f, 13.2f, 3.5f)}",
     "archive" to "M4 6h16v4H4zM6 10v10h12V10M10 14h4", "download" to "M12 4v11m0 0-4-4m4 4 4-4M5 20h14", "upload" to "M12 16V5m0 0L8 9m4-4 4 4M5 20h14",
     "chevron" to "m9 5 7 7-7 7", "globe" to "${circle(12f, 12f, 8.5f)} M3.5 12h17M12 3.5c3 3.2 3 13.8 0 17M12 3.5c-3 3.2-3 13.8 0 17",
-    "clock" to "${circle(12f, 12f, 8.5f)} M12 7.5V12l3 2", "repeat" to "M4 11V9a3 3 0 0 1 3-3h11l-3-3M20 13v2a3 3 0 0 1-3 3H6l3 3",
+    "clock" to "${circle(12f, 12f, 8.5f)} M12 7.5V12l3 2",
+    "plane" to "M21 15.5v-1.8L13.5 9V4.5a1.5 1.5 0 0 0-3 0V9L3 13.7v1.8l7.5-2.2v4.2L8.5 19v1.5l3.5-1 3.5 1V19l-2-1.5v-4.2z",
+    "beach" to "M7 14a5 5 0 0 1 10 0M3 14h18M4 18c1.5-1.2 2.5-1.2 4 0s2.5 1.2 4 0 2.5-1.2 4 0 2.5 1.2 4 0M12 5v1.5M5.6 7.6l1 1M18.4 7.6l-1 1",
+    "cake" to "M4 20h16M5 20v-6h14v6M5 16.5c2 1.5 3 1.5 5 0s3-1.5 5 0 2 1 4 0M12 14v-3M12 9.5c-1-1 0-2.4 0-3 1 .8 1.2 2 0 3z",
+    "rings" to "M4 14a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M10 14a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M10 4.5h4l1.2 1.7L12 9.4 8.8 6.2z",
+    "snow" to "M12 3v18M4.2 7.5l15.6 9M19.8 7.5 4.2 16.5M9.5 4.5 12 6.5l2.5-2M9.5 19.5 12 17.5l2.5 2",
+    "star" to "m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9l-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z",
+    "moon" to "M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z",
+    "eye" to "M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12zM9 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0",
+    "hourglass" to "M7 3.5h10M7 20.5h10M8 3.5c0 4 4 4.5 4 8.5s-4 4.5-4 8.5M16 3.5c0 4-4 4.5-4 8.5s4 4.5 4 8.5",
+    "suitcase" to "M5 8h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 20H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 8zM9 8V5.5h6V8M3.5 13h17",
+    "bolt" to "M13 3 5 13.5h6L10 21l8-10.5h-6z",
+    "sparkles" to "M11 3c.6 4.5 2.5 6.4 7 7-4.5.6-6.4 2.5-7 7-.6-4.5-2.5-6.4-7-7 4.5-.6 6.4-2.5 7-7zM19 3v3M17.5 4.5h3",
+    "bone" to "M7 12h10M3 9.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M3 14.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 9.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 14.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+    "bowl" to "M3.5 11h17a8.5 8.5 0 0 1-17 0zM9 21h6M8 8.5l1 1.5M12 6l.5 2.5M16 8.5l-1 1.5",
+    "ball" to "M3.5 12a8.5 8.5 0 1 0 17.0 0a8.5 8.5 0 1 0 -17.0 0M5 7.5c4 1 6 5 5.5 9M19 7.5c-4 1-6 5-5.5 9",
+    "smile" to "M3.5 12a8.5 8.5 0 1 0 17.0 0a8.5 8.5 0 1 0 -17.0 0M8 14c1.2 2 2.5 3 4 3s2.8-1 4-3M9 9.5v.5M15 9.5v.5",
+    "ticket" to "M3.5 8.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v1.5a2 2 0 0 0 0 4v1.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V14a2 2 0 0 0 0-4zM14 6.5v11", "repeat" to "M4 11V9a3 3 0 0 1 3-3h11l-3-3M20 13v2a3 3 0 0 1-3 3H6l3 3",
 )
 private const val PAW = "M4 10.4a2.2 2.9 0 1 0 4.4 0a2.2 2.9 0 1 0 -4.4 0M8 6.4a2.2 3 0 1 0 4.4 0a2.2 3 0 1 0 -4.4 0M12.6 6.4a2.2 3 0 1 0 4.4 0a2.2 3 0 1 0 -4.4 0M16.6 10.4a2.2 2.9 0 1 0 4.4 0a2.2 2.9 0 1 0 -4.4 0M12.5 11.2c3.2 0 6 3.6 6 6.2 0 2-1.8 2.7-3.2 2.4-1.2-.3-1.9-.7-2.8-.7s-1.6.4-2.8.7c-1.4.3-3.2-.4-3.2-2.4 0-2.6 2.8-6.2 6-6.2z"
 private val parsed = HashMap<String, android.graphics.Path>()
@@ -177,12 +194,15 @@ fun IconButton(icon: String, label: String, onClick: () -> Unit, modifier: Modif
 }
 
 @Composable
-fun Chip(text: String, modifier: Modifier = Modifier, filled: Color? = null, textColor: Color? = null, small: Boolean = false) {
+fun Chip(text: String, modifier: Modifier = Modifier, filled: Color? = null, textColor: Color? = null, small: Boolean = false, icon: String? = null) {
     val c = LocalPaw.current
     val shape = RoundedCornerShape(50)
     val m = if (filled != null) Modifier.background(filled, shape) else Modifier.border(1.5.dp, c.line, shape)
-    Text(text, modifier.then(m).padding(horizontal = if (small) 9.dp else 11.dp, vertical = if (small) 2.dp else 4.dp),
-        style = T.body(if (small) 12 else 13, FontWeight.ExtraBold).copy(color = textColor ?: if (filled != null) c.ink else c.ink2), maxLines = 1)
+    val tint = textColor ?: if (filled != null) c.ink else c.ink2
+    Row(modifier.then(m).padding(horizontal = if (small) 9.dp else 11.dp, vertical = if (small) 2.dp else 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (icon != null) { Icon(icon, tint, if (small) 13.dp else 15.dp); Box(Modifier.width(5.dp)) }
+        Text(text, style = T.body(if (small) 12 else 13, FontWeight.ExtraBold).copy(color = tint), maxLines = 1)
+    }
 }
 
 /* ------------------------------ controls ------------------------------ */

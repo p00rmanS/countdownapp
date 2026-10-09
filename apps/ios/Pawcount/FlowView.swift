@@ -174,7 +174,7 @@ struct FlowView: View {
                             let info = meta.types[t]!, on = d.type == t, ta = Color(hex: info.accent)
                             Button { d.setType(meta, t); Haptics.play(store.settings.haptics, "tick") } label: {
                                 VStack(alignment: .leading, spacing: 1) {
-                                    Text(info.emoji).font(.system(size: 30)); H(info.label, 17); Muted(info.hint, 13)
+                                    PawIcon(name: info.icon, color: ta, size: 30); H(info.label, 17); Muted(info.hint, 13)
                                 }.padding(14).frame(maxWidth: .infinity, minHeight: 108, alignment: .topLeading)
                                 .background(RoundedRectangle(cornerRadius: 22).fill(on ? pc.surface.mixed(ta, 0.14) : pc.surface).shadow(color: .black.opacity(0.08), radius: 4, y: 1))
                                 .overlay(RoundedRectangle(cornerRadius: 22).stroke(on ? ta : .clear, lineWidth: 3))
@@ -240,7 +240,7 @@ struct FlowView: View {
                     ForEach([Stage.nap, .curious, .waiting, .packing, .zoomies, .today], id: \.self) { s in
                         let on = preview == s
                         Button { preview = s } label: {
-                            Text("\(s.emoji) \(s == .today ? "Party" : s.label)").font(PawFont.body(13.5, 800)).foregroundColor(on ? accent.onColor : pc.ink2)
+                            HStack(spacing: 5) { PawIcon(name: s.icon, color: on ? accent.onColor : pc.ink2, size: 16); Text(s == .today ? "Party" : s.label) }.font(PawFont.body(13.5, 800)).foregroundColor(on ? accent.onColor : pc.ink2)
                                 .padding(.horizontal, 13).frame(minHeight: 38).background(Capsule().fill(on ? accent : pc.surface))
                         }.buttonStyle(.plain).accessibilityAddTraits(on ? [.isSelected] : [])
                     }

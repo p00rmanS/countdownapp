@@ -227,7 +227,7 @@ enum SVGPath {
 /* ---------------- data tables (native/assets/meta.json) ---------------- */
 
 struct Breed { let key, name, label, vibe, best, fur, dark, light, paw, ears: String }
-struct TypeInfo { let key, label, short, emoji, accent, hint, placeholder: String; let repeats: Bool }
+struct TypeInfo { let key, label, short, emoji, icon, accent, hint, placeholder: String; let repeats: Bool }
 struct Country { let name, flag, tz, city: String }
 
 final class Meta {
@@ -254,7 +254,7 @@ final class Meta {
         var t: [String: TypeInfo] = [:]
         for (k, v) in (j["types"] as? [String: [String: Any]] ?? [:]) {
             func s(_ n: String) -> String { v[n] as? String ?? "" }
-            t[k] = TypeInfo(key: k, label: s("label"), short: s("short"), emoji: s("emoji"), accent: s("accent"), hint: s("hint"), placeholder: s("ph"), repeats: v["repeat"] as? Bool ?? false)
+            t[k] = TypeInfo(key: k, label: s("label"), short: s("short"), emoji: s("emoji"), icon: (v["icon"] as? String) ?? "star", accent: s("accent"), hint: s("hint"), placeholder: s("ph"), repeats: v["repeat"] as? Bool ?? false)
         }
         types = t
         accents = (j["accents"] as? [[String: String]] ?? []).map { ($0["v"] ?? "#E8A15C", $0["n"] ?? "") }

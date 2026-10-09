@@ -111,7 +111,7 @@ fun parseNode(j: JSONObject): Node {
 class Breed(val key: String, val name: String, val label: String, val vibe: String, val best: String,
             val fur: String, val dark: String, val light: String, val paw: String, val ears: String)
 
-class TypeInfo(val key: String, val label: String, val short: String, val emoji: String, val accent: String, val hint: String, val placeholder: String, val repeats: Boolean)
+class TypeInfo(val key: String, val label: String, val short: String, val emoji: String, val icon: String, val accent: String, val hint: String, val placeholder: String, val repeats: Boolean)
 class Country(val name: String, val flag: String, val tz: String, val city: String)
 
 class Meta(j: JSONObject) {
@@ -123,7 +123,7 @@ class Meta(j: JSONObject) {
     val typeOrder: List<String> = j.getJSONArray("typeOrder").let { a -> (0 until a.length()).map { a.getString(it) } }
     val types: Map<String, TypeInfo> = j.getJSONObject("types").let { t ->
         t.keys().asSequence().associateWith { k -> t.getJSONObject(k).let { o ->
-            TypeInfo(k, o.getString("label"), o.getString("short"), o.getString("emoji"), o.getString("accent"), o.getString("hint"), o.getString("ph"), o.getBoolean("repeat")) } }
+            TypeInfo(k, o.getString("label"), o.getString("short"), o.getString("emoji"), o.optString("icon", "star"), o.getString("accent"), o.getString("hint"), o.getString("ph"), o.getBoolean("repeat")) } }
     }
     val accents: List<Pair<String, String>> = j.getJSONArray("accents").let { a -> (0 until a.length()).map { a.getJSONObject(it).let { o -> o.getString("v") to o.getString("n") } } }
     val countries: List<Country> = j.getJSONArray("countries").let { a -> (0 until a.length()).map { a.getJSONArray(it).let { c -> Country(c.getString(0), c.getString(1), c.getString(2), c.getString(3)) } } }

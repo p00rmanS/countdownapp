@@ -65,7 +65,7 @@ struct DetailView: View {
                             HStack {
                                 IconButton(icon: "back", label: "Back", glass: true) { store.pop() }
                                 Spacer()
-                                Text("\(k.stage.emoji) \(stageLabel(c, k))").font(PawFont.body(14, 800)).foregroundColor(Color(hex: "#3D2616"))
+                                HStack(spacing: 6) { PawIcon(name: k.stage.icon, color: Color(hex: "#3D2616"), size: 16); Text(stageLabel(c, k)).font(PawFont.body(14, 800)).foregroundColor(Color(hex: "#3D2616")) }
                                     .padding(.horizontal, 14).padding(.vertical, 8).background(Capsule().fill(Color.white.opacity(0.78)).shadow(color: .black.opacity(0.12), radius: 4, y: 2))
                                 Spacer()
                                 IconButton(icon: "more", label: "More options for \(c.title)", glass: true) { menu = true }
@@ -75,9 +75,9 @@ struct DetailView: View {
                                     if ctrl.hint { Text("Tap to bark · Hold to pet · Shake").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66))) }
                                     Text("♥  \(c.dog.name) is \(Joy.label(joy))").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66)))
                                     HStack(spacing: 6) {
-                                        ForEach([("🦴", "Treat"), ("🍖", "Feed"), ("🎾", "Ball"), ("🤗", "Tickle")], id: \.1) { item in
+                                        ForEach([("bone", "Treat"), ("bowl", "Feed"), ("ball", "Ball"), ("smile", "Tickle")], id: \.1) { item in
                                             Button { play(item.1, c) } label: {
-                                                VStack(spacing: 0) { Text(item.0).font(.system(size: 20)); Text(item.1).font(PawFont.body(12, 800)).foregroundColor(Color(hex: "#3D2616")) }
+                                                VStack(spacing: 0) { PawIcon(name: item.0, color: Color(hex: "#3D2616"), size: 22); Text(item.1).font(PawFont.body(12, 800)).foregroundColor(Color(hex: "#3D2616")) }
                                                     .frame(maxWidth: .infinity).padding(.vertical, 6).background(RoundedRectangle(cornerRadius: 16).fill(Color.white.opacity(0.92)))
                                             }.buttonStyle(.plain).accessibilityLabel("\(item.1) \(c.dog.name)")
                                         }
@@ -88,7 +88,7 @@ struct DetailView: View {
                         // ---- sheet with the numbers ----
                         VStack(spacing: 0) {
                             FlowLayout(spacing: 6) {
-                                Chip(text: "\(type.emoji) \(type.short)")
+                                Chip(text: type.short, icon: type.icon)
                                 if let d = c.destination { Chip(text: "\(d.flag) \(d.city ?? d.country)") }
                                 if c.type == "birthday", let a = k.age { Chip(text: "\(c.person?.name.isEmpty == false ? c.person!.name : "They") turn\(c.person?.name.isEmpty == false ? "s" : "") \(a)") }
                                 if c.type == "anniversary", let t = k.together { Chip(text: "Together for \(t.formatted()) days") }

@@ -121,8 +121,8 @@ private fun HeroCard(vm: AppViewModel, c: Countdown, k: Computed, reduce: Boolea
         SceneView(c, k, vm.art, vm.fonts, SceneSize.HERO, reduceMotion = reduce)
         Column(Modifier.padding(start = 18.dp, end = 18.dp, top = 16.dp, bottom = 18.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Chip("${k.stage.emoji} ${stageLabel(c, k)}", filled = accent, textColor = onAccent(accent))
-                Chip("${type.emoji} ${type.short}")
+                Chip(stageLabel(c, k), filled = accent, textColor = onAccent(accent), icon = k.stage.icon)
+                Chip(type.short, icon = type.icon)
             }
             H(c.title, 28, Modifier.padding(top = 10.dp))
             Muted(if (k.phase == Phase.TODAY) "Happening today" else fmtInstant(k.target, k.zone, c.allDay), size = 14)
@@ -143,7 +143,7 @@ private fun GridCard(vm: AppViewModel, c: Countdown, k: Computed, reduce: Boolea
         Column(Modifier.padding(start = 13.dp, end = 13.dp, top = 11.dp, bottom = 14.dp)) {
             H(c.title, 17, maxLinesCompat())
             H(shortCount(c, k), 22, Modifier.padding(top = 3.dp, bottom = 7.dp))
-            Chip("${k.stage.emoji} ${stageLabel(c, k)}", filled = accent, textColor = onAccent(accent), small = true)
+            Chip(stageLabel(c, k), filled = accent, textColor = onAccent(accent), small = true, icon = k.stage.icon)
         }
     }
 }

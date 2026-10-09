@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
@@ -138,8 +139,10 @@ fun DetailScreen(vm: AppViewModel, id: String) {
                 Row(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton("back", "Back", { vm.pop() }, glass = true)
                     Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        Text("${k.stage.emoji} ${stageLabel(c, k)}", Modifier.shadow(4.dp, RoundedCornerShape(50)).clip(RoundedCornerShape(50)).background(Color(0xC7FFFFFF)).padding(horizontal = 14.dp, vertical = 8.dp),
-                            style = T.body(14, FontWeight.ExtraBold).copy(color = Color(0xFF3D2616)))
+                        Row(Modifier.shadow(4.dp, RoundedCornerShape(50)).clip(RoundedCornerShape(50)).background(Color(0xC7FFFFFF)).padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(k.stage.icon, Color(0xFF3D2616), 16.dp); Box(Modifier.width(6.dp))
+                            Text(stageLabel(c, k), style = T.body(14, FontWeight.ExtraBold).copy(color = Color(0xFF3D2616)))
+                        }
                     }
                     IconButton("more", "More options for ${c.title}", { menu = true }, glass = true)
                 }
@@ -147,9 +150,9 @@ fun DetailScreen(vm: AppViewModel, id: String) {
                     if (ctrl.hint) Text("Tap to bark · Hold to pet · Shake", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
                     Text("♥  ${c.dog.name} is ${Joy.label(joy)}", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
                     Row(Modifier.padding(horizontal = 10.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        listOf("🦴" to "Treat", "🍖" to "Feed", "🎾" to "Ball", "🤗" to "Tickle").forEach { (emoji, label) ->
+                        listOf("bone" to "Treat", "bowl" to "Feed", "ball" to "Ball", "smile" to "Tickle").forEach { (iconName, label) ->
                             Column(Modifier.weight(1f).shadow(4.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(Color(0xEBFFFFFF)).clickable(role = Role.Button, onClickLabel = "$label ${c.dog.name}") { play(label) }.padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(emoji, style = T.body(20)); Text(label, style = T.body(12, FontWeight.ExtraBold).copy(color = Color(0xFF3D2616)))
+                                Icon(iconName, Color(0xFF3D2616), 22.dp); Text(label, style = T.body(12, FontWeight.ExtraBold).copy(color = Color(0xFF3D2616)))
                             }
                         }
                     }
@@ -159,7 +162,7 @@ fun DetailScreen(vm: AppViewModel, id: String) {
             // ---- sheet with the numbers ----
             Column(Modifier.offset(y = (-36).dp).fillMaxWidth().shadow(14.dp, RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp)).clip(RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp)).background(pc.bg).padding(horizontal = 20.dp).padding(top = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Chip("${type.emoji} ${type.short}")
+                    Chip(type.short, icon = type.icon)
                     c.destination?.let { Chip("${it.flag} ${it.city ?: it.country}") }
                     if (c.type == "birthday" && k.age != null) Chip("${c.person?.name?.ifBlank { "They" } ?: "They"} turn${if (c.person?.name.isNullOrBlank() || c.person?.name == "You" || c.person?.name == "They") "" else "s"} ${k.age}")
                     if (c.type == "anniversary" && k.together != null) Chip("Together for ${"%,d".format(k.together)} days")

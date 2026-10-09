@@ -20,6 +20,24 @@ private let ICONS: [String: String] = [
     "archive": "M4 6h16v4H4zM6 10v10h12V10M10 14h4", "download": "M12 4v11m0 0-4-4m4 4 4-4M5 20h14", "upload": "M12 16V5m0 0L8 9m4-4 4 4M5 20h14",
     "chevron": "m9 5 7 7-7 7", "globe": "\(circlePath(12, 12, 8.5)) M3.5 12h17M12 3.5c3 3.2 3 13.8 0 17M12 3.5c-3 3.2-3 13.8 0 17",
     "clock": "\(circlePath(12, 12, 8.5)) M12 7.5V12l3 2", "repeat": "M4 11V9a3 3 0 0 1 3-3h11l-3-3M20 13v2a3 3 0 0 1-3 3H6l3 3",
+    "heart": "M12 20s-7.5-4.6-7.5-10.3A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.3C19.5 15.4 12 20 12 20z",
+    "plane": "M21 15.5v-1.8L13.5 9V4.5a1.5 1.5 0 0 0-3 0V9L3 13.7v1.8l7.5-2.2v4.2L8.5 19v1.5l3.5-1 3.5 1V19l-2-1.5v-4.2z",
+    "beach": "M7 14a5 5 0 0 1 10 0M3 14h18M4 18c1.5-1.2 2.5-1.2 4 0s2.5 1.2 4 0 2.5-1.2 4 0 2.5 1.2 4 0M12 5v1.5M5.6 7.6l1 1M18.4 7.6l-1 1",
+    "cake": "M4 20h16M5 20v-6h14v6M5 16.5c2 1.5 3 1.5 5 0s3-1.5 5 0 2 1 4 0M12 14v-3M12 9.5c-1-1 0-2.4 0-3 1 .8 1.2 2 0 3z",
+    "rings": "M4 14a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M10 14a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M10 4.5h4l1.2 1.7L12 9.4 8.8 6.2z",
+    "snow": "M12 3v18M4.2 7.5l15.6 9M19.8 7.5 4.2 16.5M9.5 4.5 12 6.5l2.5-2M9.5 19.5 12 17.5l2.5 2",
+    "star": "m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9l-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z",
+    "moon": "M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z",
+    "eye": "M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12zM9 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0",
+    "hourglass": "M7 3.5h10M7 20.5h10M8 3.5c0 4 4 4.5 4 8.5s-4 4.5-4 8.5M16 3.5c0 4-4 4.5-4 8.5s4 4.5 4 8.5",
+    "suitcase": "M5 8h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 20H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 8zM9 8V5.5h6V8M3.5 13h17",
+    "bolt": "M13 3 5 13.5h6L10 21l8-10.5h-6z",
+    "sparkles": "M11 3c.6 4.5 2.5 6.4 7 7-4.5.6-6.4 2.5-7 7-.6-4.5-2.5-6.4-7-7 4.5-.6 6.4-2.5 7-7zM19 3v3M17.5 4.5h3",
+    "bone": "M7 12h10M3 9.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M3 14.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 9.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 14.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+    "bowl": "M3.5 11h17a8.5 8.5 0 0 1-17 0zM9 21h6M8 8.5l1 1.5M12 6l.5 2.5M16 8.5l-1 1.5",
+    "ball": "M3.5 12a8.5 8.5 0 1 0 17.0 0a8.5 8.5 0 1 0 -17.0 0M5 7.5c4 1 6 5 5.5 9M19 7.5c-4 1-6 5-5.5 9",
+    "smile": "M3.5 12a8.5 8.5 0 1 0 17.0 0a8.5 8.5 0 1 0 -17.0 0M8 14c1.2 2 2.5 3 4 3s2.8-1 4-3M9 9.5v.5M15 9.5v.5",
+    "ticket": "M3.5 8.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v1.5a2 2 0 0 0 0 4v1.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V14a2 2 0 0 0 0-4zM14 6.5v11",
     "more": "\(circlePath(5, 12, 1.4)) \(circlePath(12, 12, 1.4)) \(circlePath(19, 12, 1.4))",
 ]
 private let PAW = "M4 10.4a2.2 2.9 0 1 0 4.4 0a2.2 2.9 0 1 0 -4.4 0M8 6.4a2.2 3 0 1 0 4.4 0a2.2 3 0 1 0 -4.4 0M12.6 6.4a2.2 3 0 1 0 4.4 0a2.2 3 0 1 0 -4.4 0M16.6 10.4a2.2 2.9 0 1 0 4.4 0a2.2 2.9 0 1 0 -4.4 0M12.5 11.2c3.2 0 6 3.6 6 6.2 0 2-1.8 2.7-3.2 2.4-1.2-.3-1.9-.7-2.8-.7s-1.6.4-2.8.7c-1.4.3-3.2-.4-3.2-2.4 0-2.6 2.8-6.2 6-6.2z"
@@ -151,9 +169,12 @@ struct IconButton: View {
 
 struct Chip: View {
     @Environment(\.paw) var pc
-    let text: String; var filled: Color? = nil; var textColor: Color? = nil; var small = false
+    let text: String; var filled: Color? = nil; var textColor: Color? = nil; var small = false; var icon: String? = nil
     var body: some View {
-        Text(text).font(PawFont.body(small ? 12 : 13, 800)).foregroundColor(textColor ?? (filled != nil ? pc.ink : pc.ink2)).lineLimit(1)
+        HStack(spacing: 5) {
+            if let icon { PawIcon(name: icon, color: textColor ?? (filled != nil ? pc.ink : pc.ink2), size: small ? 13 : 15) }
+            Text(text).font(PawFont.body(small ? 12 : 13, 800)).foregroundColor(textColor ?? (filled != nil ? pc.ink : pc.ink2)).lineLimit(1)
+        }
             .padding(.horizontal, small ? 9 : 11).padding(.vertical, small ? 2 : 4)
             .background(Capsule().fill(filled ?? .clear))
             .overlay(Capsule().stroke(filled == nil ? pc.line : .clear, lineWidth: 1.5))
