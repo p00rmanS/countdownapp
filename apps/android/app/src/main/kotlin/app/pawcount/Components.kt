@@ -70,6 +70,7 @@ import androidx.compose.ui.graphics.toArgb
 private val circle = { cx: Float, cy: Float, r: Float -> "M${cx - r} $cy a$r $r 0 1 0 ${2 * r} 0 a$r $r 0 1 0 ${-2 * r} 0" }
 private val ICONS: Map<String, String> = mapOf(
     "home" to "M3 11.5 12 4l9 7.5M5.5 10v9.5h13V10M10 19.5v-5h4v5",
+    "heart" to "M12 20s-7.5-4.6-7.5-10.3A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.3C19.5 15.4 12 20 12 20z",
     "album" to "M12 20s-7.5-4.6-7.5-10.3A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.3C19.5 15.4 12 20 12 20z",
     "sliders" to "M4 7h9M17 7h3M4 17h3M11 17h9 ${circle(15f, 7f, 2f)} ${circle(9f, 17f, 2f)}",
     "plus" to "M12 5v14M5 12h14", "back" to "m15 5-7 7 7 7", "close" to "m6 6 12 12M18 6 6 18",

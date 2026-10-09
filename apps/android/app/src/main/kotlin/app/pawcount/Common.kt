@@ -1,5 +1,9 @@
 package app.pawcount
 
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.foundation.Canvas
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -101,15 +105,27 @@ private fun Tab(icon: String, label: String, on: Boolean, modifier: Modifier, on
 
 /* ---------------- rolling numerals ---------------- */
 
+/**
+ * One rolling digit: a spring moves a position 0..9 and we draw only the glyphs near the window.
+ * (Drawn on a Canvas rather than as a column of Text views, which is cheaper and lets the glyphs overlap smoothly.)
+ */
 @Composable
 private fun RollingDigit(d: Int, sizeSp: Int, color: Color) {
     val density = LocalDensity.current
-    val lineH = with(density) { (sizeSp * 1.1f).sp.toDp() }
-    val y by animateFloatAsState(-d.toFloat(), spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow), label = "digit")
-    Box(Modifier.width(with(density) { (sizeSp * 0.62f).sp.toDp() }).height(lineH).clipToBounds()) {
-        Column(Modifier.offset { IntOffset(0, (y * with(density) { lineH.toPx() }).roundToInt()) }) {
-            for (i in 0..9) Box(Modifier.height(lineH).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text("$i", style = T.display(sizeSp, FontWeight.SemiBold).copy(color = color, lineHeight = (sizeSp * 1.1f).sp))
+    val wDp = with(density) { (sizeSp * 0.62f).sp.toDp() }
+    val hDp = with(density) { (sizeSp * 1.1f).sp.toDp() }
+    val pos by animateFloatAsState(d.toFloat(), spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow), label = "digit")
+    Canvas(Modifier.width(wDp).height(hDp).clipToBounds()) {
+        val line = size.height
+        val p = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            typeface = fredoka; textSize = sizeSp * density.fontScale * density.density * 1f; textAlign = android.graphics.Paint.Align.CENTER; this.color = color.toArgb()
+        }
+        val base = line * 0.5f - (p.ascent() + p.descent()) / 2f      // vertically centre a glyph in the window
+        drawIntoCanvas { c ->
+            for (i in 0..9) {
+                val y = (i - pos) * line
+                if (y < -line || y > line) continue
+                c.nativeCanvas.drawText("$i", size.width / 2f, y + base, p)
             }
         }
     }

@@ -195,6 +195,8 @@ fun DetailScreen(vm: AppViewModel, id: String) {
     if (menu) PawSheet({ menu = false }) {
         H(c.title, 22, Modifier.fillMaxWidth().padding(bottom = 12.dp), TextAlign.Center)
         SheetItem("edit", "Edit countdown") { menu = false; vm.push(Route.Flow(c.id)) }
+        SheetItem("upload", "Share picture card") { menu = false; Share.shareCard(ctx, vm.art, vm.fonts, c) }
+        SheetItem("heart", "Share with your person") { menu = false; Share.shareLink(ctx, c) }
         SheetItem("archive", if (c.archived) "Move back to Home" else "Archive to Memories") { menu = false; vm.upsert(c.copy(archived = !c.archived)); vm.say(if (c.archived) "Back on Home" else "Archived to Memories"); if (!c.archived) vm.tab(Route.Memories) }
         SheetItem("trash", "Delete…", danger = true) { menu = false; confirmDelete = true }
     }

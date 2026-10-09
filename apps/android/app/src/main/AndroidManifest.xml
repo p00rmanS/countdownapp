@@ -20,12 +20,109 @@
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|keyboardHidden|uiMode">
+            <!-- opened from a shared link: pawcount://import?d=... -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="pawcount" />
+            </intent-filter>
+        </activity>
+
+        <!-- launcher entry "golden": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
+        <activity-alias
+            android:name=".IconGolden"
+            android:targetActivity=".MainActivity"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:label="Pawcount">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity-alias>
 
+        <!-- launcher entry "corgi": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
+        <activity-alias
+            android:name=".IconCorgi"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_corgi"
+            android:roundIcon="@mipmap/ic_launcher_corgi"
+            android:label="Pawcount">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- launcher entry "shiba": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
+        <activity-alias
+            android:name=".IconShiba"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_shiba"
+            android:roundIcon="@mipmap/ic_launcher_shiba"
+            android:label="Pawcount">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- launcher entry "dachshund": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
+        <activity-alias
+            android:name=".IconDachshund"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_dachshund"
+            android:roundIcon="@mipmap/ic_launcher_dachshund"
+            android:label="Pawcount">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- launcher entry "husky": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
+        <activity-alias
+            android:name=".IconHusky"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_husky"
+            android:roundIcon="@mipmap/ic_launcher_husky"
+            android:label="Pawcount">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- launcher entry "mutt": exactly one of these is enabled at a time (see IconSwitcher in Services.kt) -->
+        <activity-alias
+            android:name=".IconMutt"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_mutt"
+            android:roundIcon="@mipmap/ic_launcher_mutt"
+            android:label="Pawcount">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <receiver android:name=".PawWidget" android:exported="false" android:label="Pawcount">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/pawcount_widget_info" />
+        </receiver>
         <receiver android:name=".ReminderReceiver" android:exported="false" />
         <receiver android:name=".BootReceiver" android:exported="true">
             <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>

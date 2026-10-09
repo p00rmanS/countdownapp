@@ -59,6 +59,7 @@ class Repo(private val ctx: Context) {
         _data.value = next
         runCatching { file.writeText(next.toJson().toString()) }
         Reminders.reschedule(ctx, next)
+        PawWidget.updateAll(ctx)         // keep home-screen widgets in step with what was just saved
     }
 
     fun export(): String = JSONObject().put("app", "pawcount").put("version", 1).put("exportedAt", java.time.Instant.now().toString()).put("data", _data.value.toJson()).toString(2)
@@ -199,6 +200,46 @@ object Reminders {
         val plan = planReminders(data.countdowns)
         plan.forEach { am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, it.at, pending(ctx, it)) }
         prefs.edit().putStringSet("ids", plan.map { it.id.toString() }.toSet()).apply()
+        scheduleLive(ctx, data, am, prefs)
+    }
+
+    /* ---- the live countdown: in the last 24 hours a ticking, ongoing notification counts down to the moment ---- */
+
+    private fun liveId(c: Countdown) = 1_000_000_000 + Math.abs(c.id.hashCode()) % 900_000_000
+
+    private fun scheduleLive(ctx: Context, data: AppData, am: AlarmManager, prefs: android.content.SharedPreferences) {
+        val nm = ctx.getSystemService(NotificationManager::class.java)
+        prefs.getStringSet("live", emptySet())!!.forEach { id ->
+            nm.cancel(id.toInt())
+            val i = Intent(ctx, ReminderReceiver::class.java)
+            PendingIntent.getBroadcast(ctx, id.toInt(), i, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)?.let { am.cancel(it); it.cancel() }
+        }
+        val now = System.currentTimeMillis(); val ids = HashSet<String>()
+        for (c in data.countdowns.filter { !it.archived }) {
+            val k = compute(c, now)
+            if (k.phase != Phase.UPCOMING || k.remaining > 7 * DAY) continue
+            ids += liveId(c).toString()
+            if (k.remaining <= DAY) showLive(ctx, c, k.target, c.dog.name)
+            else {
+                val i = Intent(ctx, ReminderReceiver::class.java).putExtra("live", true).putExtra("id", liveId(c)).putExtra("title", "${c.dog.name} · ${c.title}")
+                    .putExtra("body", "Zoomies activated! ${plainTitle(c.title)} is almost here.").putExtra("target", k.target)
+                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, k.target - DAY, PendingIntent.getBroadcast(ctx, liveId(c), i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            }
+        }
+        prefs.edit().putStringSet("live", ids).apply()
+    }
+
+    fun showLive(ctx: Context, c: Countdown, target: Long, name: String, id: Int = liveId(c)) = showLiveRaw(ctx, id, "$name · ${c.title}", "Zoomies activated! ${plainTitle(c.title)} is almost here.", target)
+
+    fun showLiveRaw(ctx: Context, id: Int, title: String, body: String, target: Long) {
+        if (!hasPermission(ctx)) return
+        channel(ctx)
+        val open = PendingIntent.getActivity(ctx, 1, Intent(ctx, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE)
+        val n = NotificationCompat.Builder(ctx, CHANNEL).setSmallIcon(R.drawable.ic_stat_paw).setColor(0xFFE8A15C.toInt())
+            .setContentTitle(title).setContentText(body).setOngoing(true).setOnlyAlertOnce(true).setSilent(true)
+            .setUsesChronometer(true).setChronometerCountDown(true).setWhen(target).setShowWhen(true)
+            .setTimeoutAfter(maxOf(60_000L, target - System.currentTimeMillis() + 60_000L)).setContentIntent(open).build()
+        ctx.getSystemService(NotificationManager::class.java).notify(id, n)
     }
 
     fun show(ctx: Context, id: Int, title: String, body: String) {
@@ -213,7 +254,9 @@ object Reminders {
 
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(ctx: Context, i: Intent) {
-        Reminders.show(ctx, i.getIntExtra("id", 1), i.getStringExtra("title") ?: "Pawcount", i.getStringExtra("body") ?: "")
+        val id = i.getIntExtra("id", 1); val title = i.getStringExtra("title") ?: "Pawcount"; val body = i.getStringExtra("body") ?: ""
+        if (i.getBooleanExtra("live", false)) Reminders.showLiveRaw(ctx, id, title, body, i.getLongExtra("target", System.currentTimeMillis()))
+        else Reminders.show(ctx, id, title, body)
     }
 }
 
@@ -221,5 +264,34 @@ class ReminderReceiver : BroadcastReceiver() {
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(ctx: Context, i: Intent) {
         if (i.action == Intent.ACTION_BOOT_COMPLETED) Reminders.reschedule(ctx, Repo(ctx).data.value)
+    }
+}
+
+/* ------------------------------ alternate app icons ------------------------------ */
+
+/**
+ * The launcher icon is chosen by which <activity-alias> in the manifest is enabled. Exactly one is on at a time;
+ * flipping them swaps the icon on the home screen without restarting the app.
+ */
+object IconSwitcher {
+    val breeds = listOf("golden", "corgi", "shiba", "dachshund", "husky", "mutt")
+    private fun alias(ctx: Context, breed: String) = android.content.ComponentName(ctx, "app.pawcount.Icon${breed.replaceFirstChar { it.uppercase() }}")
+
+    fun current(ctx: Context): String {
+        val pm = ctx.packageManager
+        return breeds.firstOrNull { b ->
+            val st = pm.getComponentEnabledSetting(alias(ctx, b))
+            st == android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED ||
+                (b == "golden" && st == android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
+        } ?: "golden"
+    }
+
+    fun set(ctx: Context, breed: String) {
+        val pm = ctx.packageManager
+        // enable the new one first so there is never a moment with no launcher icon
+        pm.setComponentEnabledSetting(alias(ctx, breed), android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED, android.content.pm.PackageManager.DONT_KILL_APP)
+        breeds.filter { it != breed }.forEach {
+            pm.setComponentEnabledSetting(alias(ctx, it), android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED, android.content.pm.PackageManager.DONT_KILL_APP)
+        }
     }
 }

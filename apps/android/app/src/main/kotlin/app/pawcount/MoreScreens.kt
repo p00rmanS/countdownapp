@@ -192,6 +192,7 @@ fun SettingsScreen(vm: AppViewModel) {
     val pc = LocalPaw.current
     val ctx = LocalContext.current
     var confirmReset by remember { mutableStateOf(false) }
+    var showImport by remember { mutableStateOf(false) }
     val askNotify = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
         vm.settings { it.copy(notifications = ok || Build.VERSION.SDK_INT < 33) }; vm.say(if (ok || Build.VERSION.SDK_INT < 33) "Reminders are on 🔔" else "Reminders are blocked in your phone settings")
     }
@@ -229,6 +230,24 @@ fun SettingsScreen(vm: AppViewModel) {
                 else { vm.settings { it.copy(notifications = true) }; vm.say("Reminders are on 🔔") }
             }
         }
+        Group("App icon")
+        Panel {
+            var icon by remember { mutableStateOf(IconSwitcher.current(ctx)) }
+            Muted("Pick the dog that lives on your home screen.", Modifier.padding(bottom = 12.dp), 14)
+            vm.art.meta.breedOrder.chunked(3).forEach { row ->
+                Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    row.forEach { b ->
+                        val on = icon == b
+                        Column(Modifier.weight(1f).clip(RoundedCornerShape(20.dp)).border(2.5.dp, if (on) pc.kibble else Color.Transparent, RoundedCornerShape(20.dp))
+                            .clickable(role = Role.RadioButton) { IconSwitcher.set(ctx, b); icon = b; Haptics.play(ctx, s.haptics, "tick"); vm.say("${vm.art.meta.breeds.getValue(b).name} is your new icon 🐾") }.padding(vertical = 10.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally) {
+                            DogIcon(vm.art, Dog(b, "", if (b == "mutt") "#B98A62" else null, if (b == "mutt") "floppy" else null), Modifier.size(62.dp))
+                            Text(vm.art.meta.breeds.getValue(b).name, style = T.body(13, FontWeight.ExtraBold).copy(color = if (on) pc.ink else pc.ink2))
+                        }
+                    }
+                }
+            }
+        }
         Group("Your data")
         Panel(flush = true) {
             Muted("Everything stays on this phone. No account, no tracking, no ads.", Modifier.padding(vertical = 14.dp), 14)
@@ -238,6 +257,7 @@ fun SettingsScreen(vm: AppViewModel) {
                 ctx.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("application/json").putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), "Save backup"))
             }
             SettingLink("upload", "Import backup") { importer.launch(arrayOf("application/json", "*/*")) }
+            SettingLink("heart", "Add a shared countdown") { showImport = true }
             SettingLink("paw", "Load sample adventures") { vm.loadSamples(); vm.say("Seven sample adventures added 🐾") }
             if (data.countdowns.any { it.sample }) SettingLink("trash", "Remove sample adventures") { vm.repo.update { it.copy(countdowns = it.countdowns.filterNot { c -> c.sample }) }; vm.say("Samples removed") }
             SettingLink("trash", "Erase everything", danger = true) { confirmReset = true }
@@ -247,6 +267,20 @@ fun SettingsScreen(vm: AppViewModel) {
             Column { B("For two · coming in v1.1", size = 16, weight = FontWeight.ExtraBold); Muted("Share a countdown with your person. Both phones stay in sync and you'll see who petted the dog today.", size = 13) }
         }
         Muted("Pawcount · v1.0", Modifier.fillMaxWidth().padding(top = 26.dp), 13, TextAlign.Center)
+    }
+    if (showImport) {
+        var text by remember { mutableStateOf("") }
+        PawSheet({ showImport = false }) {
+            H("Add a shared countdown", 22, Modifier.fillMaxWidth(), TextAlign.Center)
+            Muted("Paste the link your person sent you.", Modifier.fillMaxWidth().padding(top = 6.dp), 15, TextAlign.Center)
+            Field("", text, { text = it }, placeholder = "https://…", maxLen = 6000)
+            Box(Modifier.padding(top = 14.dp)) {
+                PrimaryButton("Add countdown", {
+                    val id = vm.importShared(text)
+                    if (id != null) { showImport = false; vm.say("Added to your countdowns 🐾"); vm.stack.clear(); vm.stack.add(Route.Home); vm.push(Route.Detail(id)) } else vm.say("That doesn’t look like a Pawcount link")
+                }, Modifier.fillMaxWidth(), enabled = text.isNotBlank())
+            }
+        }
     }
     if (confirmReset) PawSheet({ confirmReset = false }) {
         H("Erase everything?", 22, Modifier.fillMaxWidth(), TextAlign.Center)
