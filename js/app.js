@@ -285,7 +285,7 @@
   /* profile picture: the person's own photo if they added one, otherwise their app-icon dog */
   function avatar(px) {
     const st = S.state.settings;
-    return st.profilePhoto ? `<img class="avatar" width="${px}" height="${px}" src="${st.profilePhoto}" alt="">` : `<span class="avatar" style="width:${px}px;height:${px}px">${P.dogIconSVG(st.icon || 'scott')}</span>`;
+    return /^data:image\//.test(st.profilePhoto || '') ? `<img class="avatar" width="${px}" height="${px}" src="${st.profilePhoto}" alt="">` : `<span class="avatar" style="width:${px}px;height:${px}px">${P.dogIconSVG(st.icon || 'scott')}</span>`;
   }
   function viewSettings() {
     const st = S.state.settings;
@@ -299,7 +299,7 @@
         <button class="avatar-edit" data-action="profile-photo" aria-label="Choose a profile photo">${avatar(72)}<span class="avatar-cam">${icon('camera')}</span></button>
         <div class="profile-body"><label class="field"><span>Your name</span>
           <input id="profileName" data-profile-name maxlength="30" autocomplete="given-name" placeholder="What should Scott call you?" value="${esc(st.profileName || '')}"></label>
-          ${st.profilePhoto ? `<button class="btn btn-small btn-ghost" data-action="profile-photo-clear">Remove photo</button>` : ''}</div>
+          ${/^data:image\//.test(st.profilePhoto || '') ? `<button class="btn btn-small btn-ghost" data-action="profile-photo-clear">Remove photo</button>` : ''}</div>
         <input type="file" accept="image/*" hidden data-profile-input>
       </div>
       <p class="muted small">Stays on this device and in your backup. Sign-in with Google or Apple, so your profile follows you between phones, is planned.</p>

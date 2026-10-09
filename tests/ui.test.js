@@ -90,6 +90,9 @@ test('play tray: treat, feed, ball and tickle raise the joy meter', () => {
   A.ui.sceneApi.play.ball(); A.ui.sceneApi.play.treat();
   assert.ok(doc.querySelector('[data-joy-text]').textContent.includes(c.dog.name));
 });
+test('profile photo from a phone backup (a file name, not an image) falls back to the dog', () => {
+  A.S.set('profilePhoto', 'abc123.jpg'); assert.ok(!go('#/').includes('<img class="avatar"')); A.S.set('profilePhoto', '');
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);
