@@ -65,13 +65,13 @@ class Repo(private val ctx: Context) {
     fun export(): String = JSONObject().put("app", "pawcount").put("version", 1).put("exportedAt", java.time.Instant.now().toString()).put("data", _data.value.toJson()).toString(2)
 
     /** Copies a picked photo into the app's own folder, scaled down so backups and memory stay small. */
-    fun importPhoto(uri: Uri): String? = runCatching {
+    fun importPhoto(uri: Uri, maxSide: Float = 960f): String? = runCatching {
         val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         ctx.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
         var sample = 1
         while (maxOf(opts.outWidth, opts.outHeight) / sample > 1600) sample *= 2
         val bmp = ctx.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = sample }) } ?: return null
-        val scale = minOf(1f, 960f / maxOf(bmp.width, bmp.height))
+        val scale = minOf(1f, maxSide / maxOf(bmp.width, bmp.height))
         val out = if (scale < 1f) Bitmap.createScaledBitmap(bmp, (bmp.width * scale).toInt(), (bmp.height * scale).toInt(), true) else bmp
         val name = newId() + ".jpg"
         File(photoDir, name).outputStream().use { out.compress(Bitmap.CompressFormat.JPEG, 82, it) }

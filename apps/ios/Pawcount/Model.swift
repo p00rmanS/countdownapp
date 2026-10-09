@@ -117,10 +117,12 @@ struct Settings: Equatable {
     var reduceMotion = "system"      // system | on | off
     var theme = "system"             // system | light | dark
     var notifications = false
+    var profileName = ""
+    var profilePhoto = ""            // file name in the photo folder
 }
 
 extension Settings: Codable {
-    private enum K: String, CodingKey { case displayMode, haptics, sound, motion, theme, notifications }
+    private enum K: String, CodingKey { case displayMode, haptics, sound, motion, theme, notifications, profileName, profilePhoto }
     init(from d: Decoder) throws {
         let c = try d.container(keyedBy: K.self)
         displayMode = DisplayMode(rawValue: (try c.decodeIfPresent(String.self, forKey: .displayMode)) ?? "") ?? .full
@@ -129,11 +131,14 @@ extension Settings: Codable {
         reduceMotion = try c.decodeIfPresent(String.self, forKey: .motion) ?? "system"
         theme = try c.decodeIfPresent(String.self, forKey: .theme) ?? "system"
         notifications = try c.decodeIfPresent(Bool.self, forKey: .notifications) ?? false
+        profileName = try c.decodeIfPresent(String.self, forKey: .profileName) ?? ""
+        profilePhoto = try c.decodeIfPresent(String.self, forKey: .profilePhoto) ?? ""
     }
     func encode(to e: Encoder) throws {
         var c = e.container(keyedBy: K.self)
         try c.encode(displayMode.rawValue, forKey: .displayMode); try c.encode(haptics, forKey: .haptics); try c.encode(sound, forKey: .sound)
         try c.encode(reduceMotion, forKey: .motion); try c.encode(theme, forKey: .theme); try c.encode(notifications, forKey: .notifications)
+        try c.encode(profileName, forKey: .profileName); try c.encode(profilePhoto, forKey: .profilePhoto)
     }
 }
 

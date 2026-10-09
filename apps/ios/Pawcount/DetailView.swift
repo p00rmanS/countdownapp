@@ -300,6 +300,18 @@ struct PhotoThumb: View {
 }
 
 /// the head of a dog as a small round picture (used for breed cards and settings)
+/// the person's profile picture: their own photo if they added one, otherwise Scott's face
+struct Avatar: View {
+    @EnvironmentObject var store: AppStore
+    var size: CGFloat
+    var body: some View {
+        Group {
+            if !store.settings.profilePhoto.isEmpty, let img = Photos.image(store.settings.profilePhoto) { Image(uiImage: img).resizable().scaledToFill() }
+            else { DogIcon(dog: Dog(breed: "scott", name: "Scott")) }
+        }.frame(width: size, height: size).clipShape(Circle())
+    }
+}
+
 struct DogIcon: View {
     @EnvironmentObject var store: AppStore
     let dog: Dog

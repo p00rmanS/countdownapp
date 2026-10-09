@@ -62,10 +62,10 @@ fun HomeScreen(vm: AppViewModel) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Eyebrow(java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.getDefault())))
-                    H(greeting(), 32)
+                    H(greeting() + data.settings.profileName.let { if (it.isBlank()) "" else ", $it" }, 32)
                     if (items.isNotEmpty()) Muted(if (items.size == 1) "1 adventure on the way" else "${items.size} adventures on the way", size = 16)
                 }
-                IconButton("sliders", "Settings", { vm.push(Route.Settings) })
+                Box(Modifier.clickable(role = Role.Button, onClickLabel = "Profile and settings") { vm.push(Route.Settings) }.semantics { contentDescription = "Profile and settings" }) { Avatar(vm, 46.dp) }
             }
             Box(Modifier.padding(top = 18.dp))
             if (hero == null) {

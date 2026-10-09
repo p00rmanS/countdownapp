@@ -59,6 +59,8 @@ data class Settings(
     val reduceMotion: String = "system",   // system | on | off
     val theme: String = "system",          // system | light | dark
     val notifications: Boolean = false,
+    val profileName: String = "",
+    val profilePhoto: String = "",        // file name in the photo folder
 )
 
 data class AppData(
@@ -118,6 +120,7 @@ fun AppData.toJson(): JSONObject = JSONObject().apply {
     put("settings", JSONObject().apply {
         put("displayMode", settings.displayMode.key); put("haptics", settings.haptics); put("sound", settings.sound)
         put("motion", settings.reduceMotion); put("theme", settings.theme); put("notifications", settings.notifications)
+        put("profileName", settings.profileName); put("profilePhoto", settings.profilePhoto)
     })
 }
 
@@ -134,6 +137,7 @@ fun appDataFromJson(raw: JSONObject): AppData {
             displayMode = DisplayMode.of(s?.optStr("displayMode")), haptics = s?.optBoolean("haptics", true) ?: true,
             sound = s?.optBoolean("sound") ?: false, reduceMotion = s?.optString("motion", "system") ?: "system",
             theme = s?.optString("theme", "system") ?: "system", notifications = s?.optBoolean("notifications") ?: false,
+            profileName = s?.optString("profileName", "") ?: "", profilePhoto = s?.optString("profilePhoto", "") ?: "",
         ),
     )
 }

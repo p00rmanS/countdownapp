@@ -1,4 +1,4 @@
-const CACHE = 'pawcount-v3';
+const CACHE = 'pawcount-v4';
 const ASSETS = ['./', 'index.html', 'manifest.json', 'icon.svg', 'css/styles.css',
   'js/util.js', 'js/countdown.js', 'js/store.js', 'js/dogs.js', 'js/scenes.js', 'js/fx.js', 'js/native.js', 'js/app.js',
   'fonts/fredoka.woff2', 'fonts/nunito.woff2', 'fonts/flags.woff2',

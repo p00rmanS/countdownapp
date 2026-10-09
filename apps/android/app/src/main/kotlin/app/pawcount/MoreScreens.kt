@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -209,6 +210,22 @@ fun SettingsScreen(vm: AppViewModel) {
         }
         Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             DogIcon(vm.art, Dog("scott", "Scott"), Modifier.size(64.dp)); Column { B("Pawcount", size = 17, weight = FontWeight.ExtraBold); Muted("Every day closer is another tail wag.") }
+        }
+        Group("Profile")
+        Panel {
+            var name by remember(s.profileName) { mutableStateOf(s.profileName) }
+            val pickAvatar = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+                val file = uri?.let { vm.repo.importPhoto(it, 256f) }
+                if (file != null) { val old = s.profilePhoto; vm.settings { it.copy(profilePhoto = file) }; if (old.isNotEmpty()) vm.repo.deletePhoto(old) } else if (uri != null) vm.say("Could not read that photo")
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Box(Modifier.clickable(role = Role.Button, onClickLabel = "Choose a profile photo") { pickAvatar.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) { Avatar(vm, 72.dp) }
+                Column(Modifier.weight(1f)) {
+                    Field("Your name", name, { name = it; vm.settings { st -> st.copy(profileName = it.trim()) } }, placeholder = "What should Scott call you?", maxLen = 30)
+                    if (s.profilePhoto.isNotEmpty()) Box(Modifier.padding(top = 10.dp)) { SmallButton("Remove photo", { vm.repo.deletePhoto(s.profilePhoto); vm.settings { it.copy(profilePhoto = "") } }, pc.surface) }
+                }
+            }
+            Muted("Stays on this device and in your backup. Sign-in with Google, so your profile follows you between phones, is planned.", Modifier.padding(top = 10.dp), size = 14)
         }
         Group("Look & feel")
         Panel(flush = true) {

@@ -255,9 +255,9 @@ enum Photos {
     }
 
     /// Saves a picked photo scaled down so backups and memory stay small. Returns the file name.
-    static func save(_ data: Data) -> String? {
+    static func save(_ data: Data, maxSide: CGFloat = 960) -> String? {
         guard let img = UIImage(data: data) else { return nil }
-        let scale = min(1, 960 / max(img.size.width, img.size.height))
+        let scale = min(1, maxSide / max(img.size.width, img.size.height))
         let size = CGSize(width: img.size.width * scale, height: img.size.height * scale)
         let out = UIGraphicsImageRenderer(size: size).image { _ in img.draw(in: CGRect(origin: .zero, size: size)) }
         guard let jpg = out.jpegData(compressionQuality: 0.82) else { return nil }

@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 import UniformTypeIdentifiers
 
 /* MoreViews.swift - Welcome (3 pages), Memories and Settings. */
@@ -174,6 +175,7 @@ struct SettingsView: View {
     @State var showImport = false
     @State var importText = ""
     @State var icon = AppIcon.current
+    @State var avatarPick: PhotosPickerItem? = nil
 
     var body: some View {
         let s = store.settings
@@ -184,6 +186,18 @@ struct SettingsView: View {
                     DogIcon(dog: Dog(breed: "scott", name: "Scott")).frame(width: 64, height: 64)
                     VStack(alignment: .leading, spacing: 2) { B("Pawcount", 17, weight: 800); Muted("Every day closer is another tail wag.") }
                 }.padding(.top, 12)
+
+                group("Profile")
+                Panel {
+                    HStack(spacing: 16) {
+                        PhotosPicker(selection: $avatarPick, matching: .images) { Avatar(size: 72) }.accessibilityLabel("Choose a profile photo")
+                        VStack(alignment: .leading, spacing: 10) {
+                            Field(label: "Your name", text: Binding(get: { s.profileName }, set: { v in store.setSettings { $0.profileName = v.trimmingCharacters(in: .whitespaces) } }), placeholder: "What should Scott call you?", maxLen: 30)
+                            if !s.profilePhoto.isEmpty { SmallButton(title: "Remove photo", tint: pc.surface) { Photos.delete(s.profilePhoto); store.setSettings { $0.profilePhoto = "" } } }
+                        }
+                    }
+                    Muted("Stays on this device and in your backup. Sign-in with Apple or Google, so your profile follows you between phones, is planned.", 14).padding(.top, 10)
+                }
 
                 group("Look & feel")
                 Panel(flush: true) {
@@ -254,6 +268,20 @@ struct SettingsView: View {
             if case .success(let url) = res {
                 let ok = url.startAccessingSecurityScopedResource(); defer { if ok { url.stopAccessingSecurityScopedResource() } }
                 if let d = try? Data(contentsOf: url), store.importJSON(d) { store.say("Backup restored 🐾") } else { store.say("That file isn’t a Pawcount backup") }
+            }
+        }
+        .onChange(of: avatarPick) { item in
+            guard let item else { return }
+            Task {
+                let data = try? await item.loadTransferable(type: Data.self)
+                await MainActor.run {
+                    avatarPick = nil
+                    guard let data, let name = Photos.save(data, maxSide: 256) else { store.say("Could not read that photo"); return }
+                    let old = store.settings.profilePhoto
+                    store.setSettings { $0.profilePhoto = name }
+                    if !old.isEmpty { Photos.delete(old) }
+                    Haptics.play(store.settings.haptics, "success")
+                }
             }
         }
         .sheet(isPresented: $showImport) {

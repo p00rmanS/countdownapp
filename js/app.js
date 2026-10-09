@@ -170,8 +170,8 @@
         <div class="grid">${rest.map((x) => gridCard(x.c, x.k)).join('')}</div>` : ''}`;
     }
     return `<section class="screen home">
-      <header class="topbar"><div><p class="eyebrow">${esc(date)}</p><h1 class="h-title">${greeting()}</h1>${items.length ? `<p class="sub">${items.length === 1 ? '1 adventure' : items.length + ' adventures'} on the way</p>` : ''}</div>
-        <a class="icon-btn" href="#/settings" aria-label="Settings">${icon('sliders')}</a></header>
+      <header class="topbar"><div><p class="eyebrow">${esc(date)}</p><h1 class="h-title">${greeting()}${S.state.settings.profileName ? ', ' + esc(S.state.settings.profileName) : ''}</h1>${items.length ? `<p class="sub">${items.length === 1 ? '1 adventure' : items.length + ' adventures'} on the way</p>` : ''}</div>
+        <a class="icon-btn avatar-btn" href="#/settings" aria-label="Profile and settings">${avatar(40)}</a></header>
       ${body}
       ${items.length ? `<p class="foot-hint">Pull down to throw the ball 🎾</p>` : ''}
     </section>`;
@@ -273,12 +273,27 @@
   }
 
   /* =============================== SETTINGS =============================== */
+  /* profile picture: the person's own photo if they added one, otherwise their app-icon dog */
+  function avatar(px) {
+    const st = S.state.settings;
+    return st.profilePhoto ? `<img class="avatar" width="${px}" height="${px}" src="${st.profilePhoto}" alt="">` : `<span class="avatar" style="width:${px}px;height:${px}px">${P.dogIconSVG(st.icon || 'scott')}</span>`;
+  }
   function viewSettings() {
     const st = S.state.settings;
     const perm = P.native.notifyState();
     return `<section class="screen settings">
       <header class="topbar"><button class="icon-btn" data-action="back" aria-label="Back">${icon('back')}</button><h1 class="h-title mid">Settings</h1><span class="icon-btn ghost-slot"></span></header>
       <div class="set-hero"><div class="set-logo">${P.dogIconSVG(st.icon || 'scott')}</div><div><p class="strong">Pawcount</p><p class="muted small">Every day closer is another tail wag.</p></div></div>
+
+      <h2 class="group-h">Profile</h2>
+      <div class="panel profile">
+        <button class="avatar-edit" data-action="profile-photo" aria-label="Choose a profile photo">${avatar(72)}<span class="avatar-cam">${icon('camera')}</span></button>
+        <div class="profile-body"><label class="field"><span>Your name</span>
+          <input id="profileName" data-profile-name maxlength="30" autocomplete="given-name" placeholder="What should Scott call you?" value="${esc(st.profileName || '')}"></label>
+          ${st.profilePhoto ? `<button class="btn btn-small btn-ghost" data-action="profile-photo-clear">Remove photo</button>` : ''}</div>
+        <input type="file" accept="image/*" hidden data-profile-input>
+      </div>
+      <p class="muted small">Stays on this device and in your backup. Sign-in with Google or Apple, so your profile follows you between phones, is planned.</p>
 
       <h2 class="group-h">Look &amp; feel</h2>
       <div class="panel flush">
@@ -789,6 +804,8 @@
       openSheet(`<h2 class="sheet-t">Erase everything?</h2><p class="muted center-t">All countdowns, memories and settings on this device will be removed.</p><div class="stack"><button class="btn btn-danger" data-action="reset-yes">Erase everything</button><button class="btn btn-ghost" data-action="close-sheet">Cancel</button></div>`, 'Confirm erase');
     },
     'reset-yes'() { closeSheet(); S.reset(); applySettings(); ui.draft = null; ui.welcome = 0; location.hash = '#/welcome'; render(); },
+    'profile-photo'() { $('[data-profile-input]').click(); },
+    'profile-photo-clear'() { S.set('profilePhoto', ''); render({ keepScroll: true, noAnim: true }); },
     'photo-pick'(el) { $(`[data-photo-input][data-id="${el.dataset.id}"]`).click(); },
     'photo-del'(el) { const c = S.get(route().id); c.memoryPhotos.splice(+el.dataset.i, 1); S.commit(); render({ keepScroll: true, noAnim: true }); },
 
@@ -841,6 +858,7 @@
 
   document.addEventListener('input', (e) => {
     const t = e.target;
+    if (t.matches('[data-profile-name]')) { S.state.settings.profileName = t.value.trim().slice(0, 30); S.save(); return; }
     if (t.dataset.bind) {
       setDraft(t.dataset.bind, t.value);
       if (['country'].includes(t.dataset.bind) || t.tagName === 'SELECT') { rerenderFlowBody(); if (t.dataset.bind === 'tz') { /* keep focus */ } }
@@ -852,6 +870,10 @@
     if (t.matches('[data-notes]')) { const c = S.get(route().id); c.notes = t.value; S.commit(); }
     if (t.matches('[data-bind="date"],[data-bind="time"]')) flowLight();
     if (t.matches('[data-photo-input]')) addPhotos(t);
+    if (t.matches('[data-profile-input]')) {
+      const f = t.files[0]; t.value = ''; if (!f) return;
+      shrink(f, 192).then((url) => { if (!url) return toast('Could not read that photo'); if (!S.set('profilePhoto', url)) toast('Storage is full'); render({ keepScroll: true, noAnim: true }); P.haptic('success'); });
+    }
     if (t.matches('[data-import-input]')) {
       const f = t.files[0]; if (!f) return;
       f.text().then((txt) => { try { S.importJSON(txt); applySettings(); toast('Backup restored 🐾'); render({ keepScroll: true, noAnim: true }); } catch (err) { toast('That file isn’t a Pawcount backup'); } });
@@ -888,11 +910,11 @@
     });
     input.value = '';
   }
-  function shrink(file) {
+  function shrink(file, max = 720) {
     return new Promise((res) => {
       const img = new Image(), url = URL.createObjectURL(file);
       img.onload = () => {
-        const m = 720, s = Math.min(1, m / Math.max(img.width, img.height)), cv = document.createElement('canvas');
+        const m = max, s = Math.min(1, m / Math.max(img.width, img.height)), cv = document.createElement('canvas');
         cv.width = Math.round(img.width * s); cv.height = Math.round(img.height * s);
         cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url); res(cv.toDataURL('image/jpeg', 0.72));
       };

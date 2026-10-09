@@ -388,6 +388,10 @@ kbd { font-family: var(--display); font-size: 12px; padding: 1px 7px; border-rad
 .pol-t { font-family: var(--display); font-weight: 600; font-size: 17px; margin-top: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .pol-d { color: #765039; }
 
 /* ---------- SETTINGS ---------- */
+.avatar { display: block; border-radius: 50%; object-fit: cover; overflow: hidden; background: var(--surface); } .avatar svg { width: 100%; height: 100%; }
+.icon-btn.avatar-btn { border-radius: 50%; padding: 3px; overflow: hidden; } .icon-btn.avatar-btn .avatar { width: 100%; height: 100%; }
+.panel.profile { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; } .profile-body { flex: 1; min-width: 160px; display: grid; gap: 6px; justify-items: start; } .profile-body .field { width: 100%; margin-top: 0; }
+.avatar-edit { position: relative; width: 72px; height: 72px; border-radius: 50%; flex: none; } .avatar-cam { position: absolute; right: -4px; bottom: -4px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--accent, #E8A15C); color: #fff; box-shadow: var(--shadow-1); } .avatar-cam svg { width: 16px; height: 16px; }
 .set-hero { display: flex; align-items: center; gap: 14px; padding: 4px 0 6px; } .set-logo { width: 64px; height: 64px; } .set-logo svg { width: 100%; height: 100%; filter: drop-shadow(0 6px 10px rgba(94, 60, 30, .25)); }
 .group-h { font-size: 13px; font-family: var(--body); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 26px 4px 0; }
 .set-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 64px; padding: 10px 0; border-top: 1px solid var(--line); } .set-row:first-child { border-top: 0; }

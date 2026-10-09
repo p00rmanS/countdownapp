@@ -305,6 +305,15 @@ fun PhotoThumb(vm: AppViewModel, name: String, modifier: Modifier) {
     if (bmp != null) Image(bmp.asImageBitmap(), null, modifier, contentScale = ContentScale.Crop) else Box(modifier.background(Color(0xFFEEEEEE)))
 }
 
+/** the person's profile picture: their own photo if they added one, otherwise Scott's face */
+@Composable
+fun Avatar(vm: AppViewModel, size: androidx.compose.ui.unit.Dp, modifier: Modifier = Modifier) {
+    val photo = vm.data.collectAsState().value.settings.profilePhoto
+    val bmp = remember(photo) { if (photo.isEmpty()) null else runCatching { BitmapFactory.decodeFile(vm.repo.photoFile(photo).path) }.getOrNull() }
+    if (bmp != null) Image(bmp.asImageBitmap(), null, modifier.size(size).clip(androidx.compose.foundation.shape.CircleShape), contentScale = ContentScale.Crop)
+    else DogIcon(vm.art, Dog("scott", "Scott"), modifier.size(size), circle = true)
+}
+
 /** the head of a dog as a small round picture (used for breed cards and settings) */
 @Composable
 fun DogIcon(art: Art, dog: Dog, modifier: Modifier = Modifier, bg: Color = Color(0xFFFFF1DC), circle: Boolean = false) {

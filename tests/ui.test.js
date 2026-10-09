@@ -72,6 +72,16 @@ test('a shared link adds a copy of the countdown', () => {
   const copy = A.S.get(id); assert.strictEqual(copy.title, c.title); assert.strictEqual(copy.timeZone, c.timeZone); assert.strictEqual(copy.dog.breed, c.dog.breed);
   assert.strictEqual(A.importShared('https://example.com/nothing'), null);
 });
+test('profile: name shows in the greeting, photo replaces the dog avatar, both survive a backup', () => {
+  assert.ok(go('#/').includes('class="avatar"') && !go('#/').includes('<img class="avatar"'));
+  A.S.set('profileName', 'Mia'); A.S.set('profilePhoto', 'data:image/jpeg;base64,AAAA');
+  assert.ok(go('#/').includes(', Mia</h1>'));
+  assert.ok(go('#/').includes('<img class="avatar"'));
+  const s = go('#/settings'); assert.ok(s.includes('data-profile-name') && s.includes('Remove photo'));
+  const backup = A.S.exportJSON(); A.S.set('profileName', ''); A.S.importJSON(backup);
+  assert.strictEqual(A.S.state.settings.profileName, 'Mia'); assert.strictEqual(A.S.state.settings.profilePhoto, 'data:image/jpeg;base64,AAAA');
+  A.S.set('profilePhoto', ''); A.S.set('profileName', '');
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

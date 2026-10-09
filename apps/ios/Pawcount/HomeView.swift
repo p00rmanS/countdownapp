@@ -33,11 +33,11 @@ struct HomeView: View {
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 2) {
                             Eyebrow(dateLine(now))
-                            H(greeting(now), 32)
+                            H(greeting(now) + (store.settings.profileName.isEmpty ? "" : ", \(store.settings.profileName)"), 32)
                             if !items.isEmpty { Muted(items.count == 1 ? "1 adventure on the way" : "\(items.count) adventures on the way", 16) }
                         }
                         Spacer()
-                        IconButton(icon: "sliders", label: "Settings") { store.push(.settings) }
+                        Button { store.push(.settings) } label: { Avatar(size: 46) }.buttonStyle(.plain).accessibilityLabel("Profile and settings")
                     }
                     .padding(.bottom, 18)
                     if let hero = items.first {
