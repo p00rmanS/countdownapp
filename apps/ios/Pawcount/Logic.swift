@@ -344,20 +344,20 @@ func makeSamples(now: Date = Date()) -> [Countdown] {
     let year = here.component(.year, from: now)
     let nowHour = here.component(.hour, from: now)
     return [
-        mk("japan", "Japan 🇯🇵", "intl_trip", wall(now.addingTimeInterval(190 * DAY), "Asia/Tokyo", 9, 30), since: 30, dog: Dog(breed: "shiba", name: "Miso"), tz: "Asia/Tokyo",
+        mk("japan", "Japan 🇯🇵", "intl_trip", wall(now.addingTimeInterval(190 * DAY), "Asia/Tokyo", 9, 30), since: 30, dog: Dog(breed: "scott", name: "Scott"), tz: "Asia/Tokyo",
            notes: "Book the ryokan. Learn how to say \"good dog\" in Japanese.", checks: [CheckItem(id: "a", text: "Renew passport", done: true), CheckItem(id: "b", text: "JR Pass", done: false), CheckItem(id: "c", text: "Portable Wi-Fi", done: false)],
            dest: Destination(country: "Japan", city: "Tokyo", flag: "🇯🇵")),
         mk("mia", "Mia's birthday", "birthday", ymd(now.addingTimeInterval(52 * DAY), yearShift: -30), since: 40, dog: Dog(breed: "corgi", name: "Biscuit"), allDay: true, yearly: true,
            mode: .days, notes: "Gift ideas: pottery class, the blue scarf.", person: Person(name: "Mia", birthYear: here.component(.year, from: now.addingTimeInterval(52 * DAY)) - 30)),
-        mk("bali", "Bali getaway", "vacation", wall(now.addingTimeInterval(28 * DAY), "Asia/Makassar", 14, 0), since: 52, dog: Dog(breed: "golden", name: "Sunny"), tz: "Asia/Makassar", mode: .sleeps,
+        mk("bali", "Bali getaway", "vacation", wall(now.addingTimeInterval(28 * DAY), "Asia/Makassar", 14, 0), since: 52, dog: Dog(breed: "scott", name: "Scott"), tz: "Asia/Makassar", mode: .sleeps,
            checks: [CheckItem(id: "a", text: "Sunscreen", done: true), CheckItem(id: "b", text: "Reef-safe snorkel gear", done: false)], dest: Destination(country: "Indonesia", city: "Bali", flag: "🇮🇩")),
-        mk("anniv", "Our anniversary", "anniversary", ymd(now.addingTimeInterval(5 * DAY), yearShift: -3, h: 19), since: 60, dog: Dog(breed: "dachshund", name: "Noodle"), yearly: true,
+        mk("anniv", "Our anniversary", "anniversary", ymd(now.addingTimeInterval(5 * DAY), yearShift: -3, h: 19), since: 60, dog: Dog(breed: "scott", name: "Scott"), yearly: true,
            mode: .weeks, notes: "Book the little place with the candles."),
         // tomorrow at (current hour - 2): always inside the last 24 h but not "today"
         mk("ski", "Ski weekend", "vacation", ymd(now.addingTimeInterval(DAY), h: max(0, nowHour - 2)), since: 18, dog: Dog(breed: "husky", name: "Blizzard"), accent: "#5DADE8"),
         mk("dad", "Dad's birthday", "birthday", ymd(now, yearShift: -61), since: 21, dog: Dog(breed: "mutt", name: "Lucky", furColor: "#B98A62", ears: "floppy"), allDay: true, yearly: true,
            person: Person(name: "Dad", birthYear: year - 61)),
-        mk("lisbon", "Lisbon 🇵🇹", "intl_trip", wall(now.addingTimeInterval(-30 * DAY), "Europe/Lisbon", 11, 0), since: 100, dog: Dog(breed: "golden", name: "Sunny"), tz: "Europe/Lisbon",
+        mk("lisbon", "Lisbon 🇵🇹", "intl_trip", wall(now.addingTimeInterval(-30 * DAY), "Europe/Lisbon", 11, 0), since: 100, dog: Dog(breed: "scott", name: "Scott"), tz: "Europe/Lisbon",
            notes: "Pastéis de nata at midnight. Worth it.", dest: Destination(country: "Portugal", city: "Lisbon", flag: "🇵🇹")),
     ]
 }

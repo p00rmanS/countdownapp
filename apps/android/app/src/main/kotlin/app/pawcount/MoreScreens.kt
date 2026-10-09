@@ -152,7 +152,7 @@ fun MemoriesScreen(vm: AppViewModel) {
             }
             if (items.isEmpty()) {
                 Column(Modifier.fillMaxWidth().padding(top = 28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    DogOnly(vm, Dog("dachshund", "Noodle"), Stage.MEMORY, Modifier.fillMaxWidth(0.7f))
+                    DogOnly(vm, Dog("scott", "Scott"), Stage.MEMORY, Modifier.fillMaxWidth(0.7f))
                     H("No memories yet", 26, align = TextAlign.Center)
                     Muted("When a countdown ends, it lands here as a keepsake — with your photos and a very proud dog.", Modifier.padding(top = 8.dp), 16, TextAlign.Center)
                 }
@@ -208,7 +208,7 @@ fun SettingsScreen(vm: AppViewModel) {
             IconButton("back", "Back", { vm.pop() }); H("Settings", 22, Modifier.weight(1f), TextAlign.Center); Box(Modifier.size(48.dp))
         }
         Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            DogIcon(vm.art, Dog("golden", "Sunny"), Modifier.size(64.dp)); Column { B("Pawcount", size = 17, weight = FontWeight.ExtraBold); Muted("Every day closer is another tail wag.") }
+            DogIcon(vm.art, Dog("scott", "Scott"), Modifier.size(64.dp)); Column { B("Pawcount", size = 17, weight = FontWeight.ExtraBold); Muted("Every day closer is another tail wag.") }
         }
         Group("Look & feel")
         Panel(flush = true) {
@@ -263,7 +263,7 @@ fun SettingsScreen(vm: AppViewModel) {
             SettingLink("trash", "Erase everything", danger = true) { confirmReset = true }
         }
         Row(Modifier.padding(top = 26.dp).fillMaxWidth().border(2.dp, pc.line, RoundedCornerShape(28.dp)).padding(16.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Row { DogIcon(vm.art, Dog("corgi", "Biscuit"), Modifier.size(46.dp)); DogIcon(vm.art, Dog("dachshund", "Noodle"), Modifier.padding(start = 0.dp).size(46.dp)) }
+            Row { DogIcon(vm.art, Dog("corgi", "Biscuit"), Modifier.size(46.dp)); DogIcon(vm.art, Dog("scott", "Scott"), Modifier.padding(start = 0.dp).size(46.dp)) }
             Column { B("For two · coming in v1.1", size = 16, weight = FontWeight.ExtraBold); Muted("Share a countdown with your person. Both phones stay in sync and you'll see who petted the dog today.", size = 13) }
         }
         Muted("Pawcount · v1.0", Modifier.fillMaxWidth().padding(top = 26.dp), 13, TextAlign.Center)

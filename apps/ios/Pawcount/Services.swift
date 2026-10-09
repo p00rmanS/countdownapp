@@ -272,11 +272,11 @@ enum Photos {
 /* ------------------------------ alternate app icons ------------------------------ */
 
 enum AppIcon {
-    static let breeds = ["golden", "corgi", "shiba", "dachshund", "husky", "scott", "mutt"]
-    /// the dog on the home screen right now ("AppIcon" itself is the golden retriever)
-    static var current: String { UIApplication.shared.alternateIconName.map { String($0.dropFirst("AppIcon-".count)) } ?? "golden" }
+    static let breeds = ["scott", "golden", "corgi", "shiba", "dachshund", "husky", "mutt"]
+    /// the dog on the home screen right now ("AppIcon" itself is Scott)
+    static var current: String { UIApplication.shared.alternateIconName.map { String($0.dropFirst("AppIcon-".count)) } ?? "scott" }
     static func set(_ breed: String, done: @escaping (Bool) -> Void) {
         guard UIApplication.shared.supportsAlternateIcons else { done(false); return }
-        UIApplication.shared.setAlternateIconName(breed == "golden" ? nil : "AppIcon-\(breed)") { err in DispatchQueue.main.async { done(err == nil) } }
+        UIApplication.shared.setAlternateIconName(breed == "scott" ? nil : "AppIcon-\(breed)") { err in DispatchQueue.main.async { done(err == nil) } }
     }
 }

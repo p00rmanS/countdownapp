@@ -119,7 +119,7 @@ struct MemoriesView: View {
                     HStack { VStack(alignment: .leading, spacing: 2) { Eyebrow("Keepsakes"); H("Memories", 32) }; Spacer(); IconButton(icon: "sliders", label: "Settings") { store.push(.settings) } }
                     if items.isEmpty {
                         VStack(spacing: 8) {
-                            DogOnly(dog: Dog(breed: "dachshund", name: "Noodle"), stage: .memory).frame(maxWidth: 260).padding(.top, 28)
+                            DogOnly(dog: Dog(breed: "scott", name: "Scott"), stage: .memory).frame(maxWidth: 260).padding(.top, 28)
                             H("No memories yet", 26, align: .center)
                             Muted("When a countdown ends, it lands here as a keepsake — with your photos and a very proud dog.", 16, align: .center)
                         }.frame(maxWidth: .infinity)
@@ -181,7 +181,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 0) {
                 HStack { IconButton(icon: "back", label: "Back") { store.pop() }; Spacer(); H("Settings", 22); Spacer(); Color.clear.frame(width: 48, height: 48) }
                 HStack(spacing: 14) {
-                    DogIcon(dog: Dog(breed: "golden", name: "Sunny")).frame(width: 64, height: 64)
+                    DogIcon(dog: Dog(breed: "scott", name: "Scott")).frame(width: 64, height: 64)
                     VStack(alignment: .leading, spacing: 2) { B("Pawcount", 17, weight: 800); Muted("Every day closer is another tail wag.") }
                 }.padding(.top, 12)
 

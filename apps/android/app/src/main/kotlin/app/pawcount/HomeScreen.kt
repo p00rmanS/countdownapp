@@ -95,14 +95,14 @@ private fun greeting(): String { val h = LocalDateTime.now().hour; return when {
 
 @Composable
 private fun EmptyHome(vm: AppViewModel, past: Int) {
-    val demo = remember { Countdown("empty", "", "custom", "2030-01-01T00:00", "UTC", false, false, System.currentTimeMillis(), Dog("golden", "Sunny"), "#E8A15C", DisplayMode.FULL) }
+    val demo = remember { Countdown("empty", "", "custom", "2030-01-01T00:00", "UTC", false, false, System.currentTimeMillis(), Dog("scott", "Scott"), "#E8A15C", DisplayMode.FULL) }
     val k = remember { compute(demo.copy(createdAt = System.currentTimeMillis() - DAY), System.currentTimeMillis()) }
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.fillMaxWidth().shadow(8.dp, RoundedCornerShape(34.dp)).clip(RoundedCornerShape(34.dp))) {
             SceneView(demo, k, vm.art, vm.fonts, SceneSize.HERO, stage = Stage.NAP, reduceMotion = LocalReduceMotion.current)
         }
         H("Nothing to wait for… yet", 26, Modifier.padding(top = 20.dp), TextAlign.Center)
-        Muted((if (past > 0) "Your past adventures live in Memories. " else "") + "Start a countdown and Sunny will do the rest.", Modifier.padding(top = 8.dp), 16, TextAlign.Center)
+        Muted((if (past > 0) "Your past adventures live in Memories. " else "") + "Start a countdown and Scott will do the rest.", Modifier.padding(top = 8.dp), 16, TextAlign.Center)
         Column(Modifier.padding(top = 18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             PrimaryButton("New countdown", { vm.push(Route.Flow(null)) }, Modifier.fillMaxWidth(), icon = "plus")
             GhostButton("Peek at sample adventures", { vm.loadSamples(); vm.say("Seven sample adventures added 🐾") })

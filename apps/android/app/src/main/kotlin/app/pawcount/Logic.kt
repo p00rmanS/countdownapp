@@ -271,20 +271,20 @@ fun makeSamples(now: Long = System.currentTimeMillis()): List<Countdown> {
     val today = Instant.ofEpochMilli(now).atZone(here).toLocalDate()
     val nowHour = Instant.ofEpochMilli(now).atZone(here).hour
     return listOf(
-        mk("japan", "Japan 🇯🇵", "intl_trip", wall(now + 190 * DAY, "Asia/Tokyo", 9, 30), 30, Dog("shiba", "Miso"), "Asia/Tokyo",
+        mk("japan", "Japan 🇯🇵", "intl_trip", wall(now + 190 * DAY, "Asia/Tokyo", 9, 30), 30, Dog("scott", "Scott"), "Asia/Tokyo",
             notes = "Book the ryokan. Learn how to say \"good dog\" in Japanese.", checks = listOf(CheckItem("a", "Renew passport", true), CheckItem("b", "JR Pass", false), CheckItem("c", "Portable Wi-Fi", false)),
             dest = Destination("Japan", "Tokyo", "🇯🇵")),
         mk("mia", "Mia's birthday", "birthday", today.plusDays(52).minusYears(30).atStartOfDay().toString().take(16), 40, Dog("corgi", "Biscuit"), allDay = true, yearly = true,
             mode = DisplayMode.DAYS, notes = "Gift ideas: pottery class, the blue scarf.", person = Person("Mia", today.plusDays(52).year - 30)),
-        mk("bali", "Bali getaway", "vacation", wall(now + 28 * DAY, "Asia/Makassar", 14, 0), 52, Dog("golden", "Sunny"), "Asia/Makassar", mode = DisplayMode.SLEEPS,
+        mk("bali", "Bali getaway", "vacation", wall(now + 28 * DAY, "Asia/Makassar", 14, 0), 52, Dog("scott", "Scott"), "Asia/Makassar", mode = DisplayMode.SLEEPS,
             checks = listOf(CheckItem("a", "Sunscreen", true), CheckItem("b", "Reef-safe snorkel gear", false)), dest = Destination("Indonesia", "Bali", "🇮🇩")),
-        mk("anniv", "Our anniversary", "anniversary", today.plusDays(5).minusYears(3).atTime(19, 0).toString().take(16), 60, Dog("dachshund", "Noodle"), yearly = true,
+        mk("anniv", "Our anniversary", "anniversary", today.plusDays(5).minusYears(3).atTime(19, 0).toString().take(16), 60, Dog("scott", "Scott"), yearly = true,
             mode = DisplayMode.WEEKS, notes = "Book the little place with the candles."),
         // tomorrow at (current hour - 2): always inside the last 24 h but not "today"
         mk("ski", "Ski weekend", "vacation", today.plusDays(1).atTime(max(0, nowHour - 2), 0).toString().take(16), 18, Dog("husky", "Blizzard"), accent = "#5DADE8"),
         mk("dad", "Dad's birthday", "birthday", today.minusYears(61).atStartOfDay().toString().take(16), 21, Dog("mutt", "Lucky", "#B98A62", "floppy"), allDay = true, yearly = true,
             person = Person("Dad", today.year - 61)),
-        mk("lisbon", "Lisbon 🇵🇹", "intl_trip", wall(now - 30 * DAY, "Europe/Lisbon", 11, 0), 100, Dog("golden", "Sunny"), "Europe/Lisbon",
+        mk("lisbon", "Lisbon 🇵🇹", "intl_trip", wall(now - 30 * DAY, "Europe/Lisbon", 11, 0), 100, Dog("scott", "Scott"), "Europe/Lisbon",
             notes = "Pastéis de nata at midnight. Worth it.", dest = Destination("Portugal", "Lisbon", "🇵🇹")),
     )
 }

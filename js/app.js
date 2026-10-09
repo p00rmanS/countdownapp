@@ -42,7 +42,7 @@
     if (tc) tc.content = dark ? '#171B28' : '#FFF8EE';
     P.native.applyTheme(dark);
     const fav = $('#favicon');
-    if (fav) { fav.type = st.icon && st.icon !== 'golden' ? 'image/svg+xml' : 'image/png'; fav.href = st.icon && st.icon !== 'golden' ? P.dogIconURI(st.icon) : 'icons/favicon-32.png'; }
+    if (fav) { fav.type = st.icon && st.icon !== 'scott' ? 'image/svg+xml' : 'image/png'; fav.href = st.icon && st.icon !== 'scott' ? P.dogIconURI(st.icon) : 'icons/favicon-32.png'; }
   }
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applySettings);
   matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', applySettings);
@@ -268,7 +268,7 @@
             <div class="pol-img">${ph ? `<img src="${ph}" alt="">` : P.sceneHTML(c, k, { size: 'card', stage: 'memory' })}</div>
             <p class="pol-t">${esc(c.title)}</p><p class="pol-d muted small">${tp.emoji} ${esc(P.fmtInstant(k.target, k.tz, { allDay: true, noYear: false }))}${c.archived ? ' · archived' : ''}</p></a>`;
         }).join('')}</div>`
-        : `<div class="empty"><div class="empty-scene">${P.sceneHTML({ id: 'x', type: 'custom', dog: { breed: 'dachshund', name: 'Noodle' }, accent: '#EE8FA0', title: '', displayMode: 'full' }, {}, { stage: 'memory', size: 'hero' })}</div><h2>No memories yet</h2><p class="muted">When a countdown ends, it lands here as a keepsake — with your photos and a very proud dog.</p></div>`}
+        : `<div class="empty"><div class="empty-scene">${P.sceneHTML({ id: 'x', type: 'custom', dog: { breed: 'scott', name: 'Scott' }, accent: '#EE8FA0', title: '', displayMode: 'full' }, {}, { stage: 'memory', size: 'hero' })}</div><h2>No memories yet</h2><p class="muted">When a countdown ends, it lands here as a keepsake — with your photos and a very proud dog.</p></div>`}
     </section>`;
   }
 
@@ -278,7 +278,7 @@
     const perm = P.native.notifyState();
     return `<section class="screen settings">
       <header class="topbar"><button class="icon-btn" data-action="back" aria-label="Back">${icon('back')}</button><h1 class="h-title mid">Settings</h1><span class="icon-btn ghost-slot"></span></header>
-      <div class="set-hero"><div class="set-logo">${P.dogIconSVG(st.icon || 'golden')}</div><div><p class="strong">Pawcount</p><p class="muted small">Every day closer is another tail wag.</p></div></div>
+      <div class="set-hero"><div class="set-logo">${P.dogIconSVG(st.icon || 'scott')}</div><div><p class="strong">Pawcount</p><p class="muted small">Every day closer is another tail wag.</p></div></div>
 
       <h2 class="group-h">Look &amp; feel</h2>
       <div class="panel flush">
@@ -905,7 +905,7 @@
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); ui.installEvt = e; if (route().name === 'settings') render({ keepScroll: true, noAnim: true }); });
   S.subscribe(() => P.native.reschedule()); P.native.reschedule();
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { tick(); P.native.reschedule(); } });
-  $('#brandLogo').innerHTML = P.dogIconSVG('golden');
+  $('#brandLogo').innerHTML = P.dogIconSVG('scott');
   $('[data-tab="home"] .tab-ic').innerHTML = icon('home');
   $('[data-tab="memories"] .tab-ic').innerHTML = icon('album');
   $('.tab-fab span').innerHTML = icon('plus');

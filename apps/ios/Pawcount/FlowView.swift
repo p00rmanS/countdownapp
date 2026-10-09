@@ -18,9 +18,9 @@ struct Draft {
     var country = ""
     var personName = ""
     var birthYear = ""
-    var breed = "shiba"
+    var breed = "scott"
     var breedTouched = false
-    var dogName = "Miso"
+    var dogName = "Scott"
     var nameTouched = false
     var fur = "#B98A62"
     var ears = "floppy"

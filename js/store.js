@@ -13,7 +13,7 @@
     countdowns: [],
     celebrated: {},
     lastNotified: '',
-    settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'golden' },
+    settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'scott' },
   });
   let state = defaults();
   const subs = [];

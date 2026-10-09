@@ -83,7 +83,7 @@ private struct EmptyHome: View {
             SceneView(c: demo, k: compute(demo), art: store.art, size: .hero, stage: .nap, reduceMotion: store.reduceMotion)
                 .clipShape(RoundedRectangle(cornerRadius: 34)).shadow(color: .black.opacity(0.15), radius: 10, y: 4)
             H("Nothing to wait for… yet", 26, align: .center).padding(.top, 14)
-            Muted((pastCount > 0 ? "Your past adventures live in Memories. " : "") + "Start a countdown and Sunny will do the rest.", 16, align: .center)
+            Muted((pastCount > 0 ? "Your past adventures live in Memories. " : "") + "Start a countdown and Scott will do the rest.", 16, align: .center)
             VStack(spacing: 10) {
                 PrimaryButton("New countdown", icon: "plus") { store.push(.flow(nil)) }
                 GhostButton("Peek at sample adventures") { store.loadSamples(); store.say("Seven sample adventures added 🐾") }

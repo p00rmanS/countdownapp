@@ -232,18 +232,18 @@
       checklist: o.checklist || [], destination: o.destination, person: o.person, notifications: P.defaultNotifications(o.type), archived: false, memoryPhotos: [],
     });
     const list = [];
-    list.push(mkc({ key: 'japan', title: 'Japan 🇯🇵', type: 'intl_trip', tz: 'Asia/Tokyo', targetAt: wallIn(now + 190 * DAY, 'Asia/Tokyo', 9, 30), since: 30, dog: { breed: 'shiba', name: 'Miso' }, destination: { country: 'Japan', city: 'Tokyo', flag: '🇯🇵' }, mode: 'full', notes: 'Book the ryokan. Learn how to say "good dog" in Japanese.', checklist: [{ id: 'a', text: 'Renew passport', done: true }, { id: 'b', text: 'JR Pass', done: false }, { id: 'c', text: 'Portable Wi-Fi', done: false }] }));
+    list.push(mkc({ key: 'japan', title: 'Japan 🇯🇵', type: 'intl_trip', tz: 'Asia/Tokyo', targetAt: wallIn(now + 190 * DAY, 'Asia/Tokyo', 9, 30), since: 30, dog: { breed: 'scott', name: 'Scott' }, destination: { country: 'Japan', city: 'Tokyo', flag: '🇯🇵' }, mode: 'full', notes: 'Book the ryokan. Learn how to say "good dog" in Japanese.', checklist: [{ id: 'a', text: 'Renew passport', done: true }, { id: 'b', text: 'JR Pass', done: false }, { id: 'c', text: 'Portable Wi-Fi', done: false }] }));
     const bd = now + 52 * DAY, bp = partsIn(bd, tzL);
     list.push(mkc({ key: 'mia', title: "Mia's birthday", type: 'birthday', targetAt: wallStr({ ...bp, y: bp.y - 30, h: 0, mi: 0 }), allDay: true, rec: 'yearly', since: 40, dog: { breed: 'corgi', name: 'Biscuit' }, person: { name: 'Mia', birthYear: bp.y - 30 }, mode: 'days', notes: 'Gift ideas: pottery class, the blue scarf.' }));
-    list.push(mkc({ key: 'bali', title: 'Bali getaway', type: 'vacation', tz: 'Asia/Makassar', targetAt: wallIn(now + 28 * DAY, 'Asia/Makassar', 14, 0), since: 52, dog: { breed: 'golden', name: 'Sunny' }, destination: { country: 'Indonesia', city: 'Bali', flag: '🇮🇩' }, mode: 'sleeps', checklist: [{ id: 'a', text: 'Sunscreen', done: true }, { id: 'b', text: 'Reef-safe snorkel gear', done: false }] }));
+    list.push(mkc({ key: 'bali', title: 'Bali getaway', type: 'vacation', tz: 'Asia/Makassar', targetAt: wallIn(now + 28 * DAY, 'Asia/Makassar', 14, 0), since: 52, dog: { breed: 'scott', name: 'Scott' }, destination: { country: 'Indonesia', city: 'Bali', flag: '🇮🇩' }, mode: 'sleeps', checklist: [{ id: 'a', text: 'Sunscreen', done: true }, { id: 'b', text: 'Reef-safe snorkel gear', done: false }] }));
     const ap = partsIn(now + 5 * DAY, tzL);
-    list.push(mkc({ key: 'anniv', title: 'Our anniversary', type: 'anniversary', targetAt: wallStr({ ...ap, y: ap.y - 3, h: 19, mi: 0 }), rec: 'yearly', since: 60, dog: { breed: 'dachshund', name: 'Noodle' }, mode: 'weeks', notes: 'Book the little place with the candles.' }));
+    list.push(mkc({ key: 'anniv', title: 'Our anniversary', type: 'anniversary', targetAt: wallStr({ ...ap, y: ap.y - 3, h: 19, mi: 0 }), rec: 'yearly', since: 60, dog: { breed: 'scott', name: 'Scott' }, mode: 'weeks', notes: 'Book the little place with the candles.' }));
     // tomorrow at (current hour - 2): always inside the last 24 h but not "today"
     const hNow = partsIn(now, tzL).h;
     list.push(mkc({ key: 'ski', title: 'Ski weekend', type: 'vacation', targetAt: wallIn(now + DAY, tzL, Math.max(0, hNow - 2), 0), since: 18, dog: { breed: 'husky', name: 'Blizzard' }, accent: '#5DADE8', mode: 'full' }));
     const tp = partsIn(now, tzL);
     list.push(mkc({ key: 'dad', title: "Dad's birthday", type: 'birthday', targetAt: wallStr({ ...tp, y: tp.y - 61, h: 0, mi: 0 }), allDay: true, rec: 'yearly', since: 21, dog: { breed: 'mutt', name: 'Lucky', colors: { fur: '#B98A62' }, ears: 'floppy' }, person: { name: 'Dad', birthYear: tp.y - 61 }, mode: 'full' }));
-    list.push(mkc({ key: 'lisbon', title: 'Lisbon 🇵🇹', type: 'intl_trip', tz: 'Europe/Lisbon', targetAt: wallIn(now - 30 * DAY, 'Europe/Lisbon', 11, 0), since: 100, dog: { breed: 'golden', name: 'Sunny' }, destination: { country: 'Portugal', city: 'Lisbon', flag: '🇵🇹' }, mode: 'full', notes: 'Pastéis de nata at midnight. Worth it.' }));
+    list.push(mkc({ key: 'lisbon', title: 'Lisbon 🇵🇹', type: 'intl_trip', tz: 'Europe/Lisbon', targetAt: wallIn(now - 30 * DAY, 'Europe/Lisbon', 11, 0), since: 100, dog: { breed: 'scott', name: 'Scott' }, destination: { country: 'Portugal', city: 'Lisbon', flag: '🇵🇹' }, mode: 'full', notes: 'Pastéis de nata at midnight. Worth it.' }));
     return list;
   };
 })();
