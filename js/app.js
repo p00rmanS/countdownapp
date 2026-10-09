@@ -985,13 +985,15 @@
   // Keep our own list of visited screens. Going back to the previous entry pops it, anything else pushes.
   // That lets the on-screen Back button know whether there is somewhere inside the app to go
   // (history.back() from the first screen would leave the app / close the PWA).
+  // the home screen lives at the plain address (no trailing "#/")
+  const tidyUrl = () => { if (location.hash === '#/' || location.hash === '#') { try { history.replaceState(history.state, '', location.pathname + location.search); } catch (e) { /* ignore */ } } };
   window.addEventListener('hashchange', () => {
     const h = location.hash || '#/', st = ui.stack;
     if (st.length > 1 && st[st.length - 2] === h) st.pop(); else st.push(h);
-    closeSheet(); P.confettiClear(); render();
+    closeSheet(); P.confettiClear(); render(); tidyUrl();
   });
   const live = document.createElement('div'); live.id = 'sr-live'; live.className = 'sr-only'; live.setAttribute('aria-live', 'polite'); document.body.appendChild(live);
-  render();
+  render(); tidyUrl();
   setInterval(tick, 1000);
   setTimeout(() => { if (!['welcome', 'new', 'edit'].includes(route().name) && route().name !== 'c') checkMilestones(); }, 1200);
   if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !P.native.isNative) navigator.serviceWorker.register('sw.js').catch(() => {});
