@@ -99,7 +99,9 @@
   const eyeShut = (x) => `<path class="eye-shut" style="display:none" d="M${x - 10} 103Q${x} 90 ${x + 10} 103" stroke="${INK}" stroke-width="4.2" fill="none" stroke-linecap="round"/>`;
 
   /* ---------- head & side props per event type ---------- */
+  const PROP_OF = { gotcha: 'anniversary' };
   function headProp(type, accent) {
+    type = PROP_OF[type] || type;
     switch (type) {
       case 'birthday':
         return `<g class="hat" transform="rotate(-12 120 60)"><path d="M120 4 96 60q24 9 48 0z" fill="${accent}"/><path d="m108 34 24 0M101 50h38" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".85"/><circle cx="120" cy="6" r="7" fill="#D4E157"/></g>`;
@@ -114,6 +116,7 @@
     }
   }
   function sideProp(type, accent) {
+    type = PROP_OF[type] || type;
     const suit = `<g class="prop suitcase" transform="translate(172 176) rotate(-4)"><path d="M16 6V-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v7" fill="none" stroke="#6B4A33" stroke-width="4"/><rect x="0" y="4" width="48" height="40" rx="8" fill="${accent}"/><rect x="0" y="21" width="48" height="4" fill="#000" opacity=".14"/><circle cx="13" cy="14" r="5" fill="#fff" opacity=".85"/><path d="m33 11 3 6-6-3h6z" fill="#fff" opacity=".7"/><circle cx="10" cy="46" r="4" fill="#3B2A22"/><circle cx="38" cy="46" r="4" fill="#3B2A22"/></g>`;
     switch (type) {
       case 'intl_trip':

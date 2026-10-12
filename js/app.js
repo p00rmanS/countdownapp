@@ -198,7 +198,7 @@
   }
 
   /* =============================== DETAIL =============================== */
-  function checklistLabel(t) { return t === 'intl_trip' || t === 'vacation' ? 'Packing list' : t === 'birthday' ? 'Gift ideas' : 'Checklist'; }
+  function checklistLabel(t) { return t === 'intl_trip' || t === 'vacation' ? 'Packing list' : t === 'birthday' ? 'Gift ideas' : t === 'vet' ? 'Vet questions' : 'Checklist'; }
 
   function viewDetail(id) {
     const c = S.get(id);
@@ -208,6 +208,7 @@
     const facts = [];
     if (c.type === 'birthday' && k.age != null) facts.push(`${esc(c.person.name || 'They')} turn${(c.person.name || '') && !/^(you|they)$/i.test(c.person.name) ? 's' : ''} <b>${k.age}</b>`);
     if (c.type === 'anniversary' && k.together != null) facts.push(`Together for <b>${k.together.toLocaleString()}</b> days`);
+    if (c.type === 'gotcha' && k.together != null) facts.push(`Home together for <b>${k.together.toLocaleString()}</b> days`);
     if (c.recurrence === 'yearly') facts.push('Repeats every year');
     const done = c.checklist.filter((x) => x.done).length;
     const earned = P.MILESTONES.filter((m) => (past || k.phase === 'today') ? true : k.daysCeil <= m && k.daysTotal >= m);
@@ -404,7 +405,7 @@
     dr.type = type;
     if (!dr.accentTouched) dr.accent = tp.accent;
     dr.recurrence = tp.repeat ? 'yearly' : 'none';
-    dr.allDay = type === 'birthday' || type === 'anniversary' || type === 'holiday';
+    dr.allDay = type === 'birthday' || type === 'anniversary' || type === 'holiday' || type === 'gotcha';
     if (!dr.breedTouched) { dr.breed = P.suggestedBreed(type); }
     if (!dr.nameTouched) dr.dogName = P.BREEDS[dr.breed].name;
     dr.notifications = P.defaultNotifications(type);
@@ -621,8 +622,7 @@
     // a sleeping dog opens his eyes for a few seconds when you play with him
     const wake = () => {
       if (K().stage !== 'nap') return;
-      if (napHTML == null) napHTML = hit.innerHTML;
-      hit.innerHTML = P.dogSVG(c.dog, 'curious', { type: c.type, accent: P.accentOf ? P.accentOf(c) : c.accent, label: c.dog.name });
+      if (napHTML == null) { napHTML = hit.innerHTML; hit.innerHTML = P.dogSVG(c.dog, 'curious', { type: c.type, accent: accentOf(c), label: c.dog.name }); }
       clearTimeout(wakeT);
       wakeT = setTimeout(() => { if (napHTML != null) { hit.innerHTML = napHTML; napHTML = null; } }, 6000);
     };

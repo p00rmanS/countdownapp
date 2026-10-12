@@ -84,7 +84,7 @@ data class Draft(
 private fun Draft.withType(meta: Meta, t: String): Draft {
     val info = meta.types.getValue(t)
     val b = if (breedTouched) breed else meta.suggestedBreed(t)
-    return copy(type = t, accent = if (accentTouched) accent else info.accent, yearly = info.repeats, allDay = t == "birthday" || t == "anniversary" || t == "holiday",
+    return copy(type = t, accent = if (accentTouched) accent else info.accent, yearly = info.repeats, allDay = t == "birthday" || t == "anniversary" || t == "holiday" || t == "gotcha",
         breed = b, dogName = if (nameTouched) dogName else meta.breeds.getValue(b).name, reminders = defaultReminders(t), country = if (t == "intl_trip") country else "",
         title = if (titleAuto) "" else title)
 }

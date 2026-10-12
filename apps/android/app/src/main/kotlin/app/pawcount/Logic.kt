@@ -103,7 +103,7 @@ fun compute(c: Countdown, now: Long = System.currentTimeMillis()): Computed {
     val daysTotal = max(1, Math.round(total.toDouble() / DAY).toInt())
     val daysIn = min(daysTotal, max(0, ((now - start) / DAY).toInt() + 1))
     val age = c.person?.birthYear?.let { date.year - it }
-    val together = if (c.type == "anniversary")
+    val together = if (c.type == "anniversary" || c.type == "gotcha")
         max(0, ((now - base.toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli()) / DAY).toInt()) else null
     return Computed(
         zone, target, start, total, remaining, leftPct, progress, phase, stage, parts, sleeps,
@@ -157,6 +157,8 @@ private val packLabel = mapOf(
     "vacation" to ("Packing" to "wearing sunglasses beside a suitcase"),
     "birthday" to ("Party prep" to "wearing a party hat beside a present"),
     "anniversary" to ("Flowers ready" to "holding a bouquet with a flower crown"),
+    "gotcha" to ("Welcome-home party" to "holding a bouquet with a flower crown"),
+    "vet" to ("Being brave" to "sitting very still, ready for the checkup"),
     "holiday" to ("Wrapping" to "in a holiday hat beside a present"),
     "custom" to ("Ready" to "ready with a tennis ball"),
 )
@@ -296,5 +298,5 @@ fun makeSamples(now: Long = System.currentTimeMillis()): List<Countdown> {
 }
 
 fun typeAccent(type: String) = when (type) {
-    "intl_trip" -> "#5DADE8"; "vacation" -> "#3FBFA8"; "birthday" -> "#FF7DAA"; "anniversary" -> "#EE8FA0"; "holiday" -> "#3E9C6C"; else -> "#E8A15C"
+    "intl_trip" -> "#5DADE8"; "vacation" -> "#3FBFA8"; "birthday" -> "#FF7DAA"; "anniversary" -> "#EE8FA0"; "holiday" -> "#3E9C6C"; "gotcha" -> "#F28C6B"; "vet" -> "#4FB3BF"; else -> "#E8A15C"
 }

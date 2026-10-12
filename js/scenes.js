@@ -12,7 +12,9 @@
   const cloud = (x, y, s = 1, o = 0.92) =>
     `<g class="cloud" transform="translate(${x} ${y}) scale(${s})" opacity="${o}"><ellipse rx="28" ry="11" fill="#fff"/><ellipse cx="-14" cy="-7" rx="14" ry="10" fill="#fff"/><ellipse cx="10" cy="-10" rx="17" ry="12" fill="#fff"/></g>`;
 
+  const SCENE_OF = { gotcha: 'anniversary' };
   function bg(type, accent, u) {
+    type = SCENE_OF[type] || type;
     switch (type) {
       case 'intl_trip':
         return `
@@ -90,6 +92,7 @@
   }
 
   function door(type) {
+    type = SCENE_OF[type] || type;
     if (type === 'vacation' || type === 'anniversary' || type === 'holiday')
       return `<g class="door"><rect x="8" y="132" width="12" height="104" rx="4" fill="#B98456"/><rect x="74" y="132" width="12" height="104" rx="4" fill="#B98456"/><path d="M20 152h54M20 196h54" stroke="#D2A06E" stroke-width="10" stroke-linecap="round"/><path d="M22 150 72 198M72 150 22 198" stroke="#C48F5E" stroke-width="6" stroke-linecap="round"/><circle cx="14" cy="128" r="7" fill="#D2A06E"/><circle cx="80" cy="128" r="7" fill="#D2A06E"/></g>`;
     return `<g class="door"><rect x="6" y="96" width="82" height="140" rx="6" fill="#A9784B"/><rect x="14" y="106" width="66" height="122" rx="4" fill="#BD8A58"/><rect x="22" y="116" width="50" height="42" rx="4" fill="#A9784B" opacity=".55"/><rect x="22" y="168" width="50" height="52" rx="4" fill="#A9784B" opacity=".55"/><circle cx="68" cy="170" r="5" fill="#F4C542"/><rect x="6" y="230" width="82" height="6" fill="#FFE9B0" opacity=".7"/></g>`;

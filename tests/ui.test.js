@@ -126,6 +126,13 @@ test('Scott has lots of lines for every kind of play, and none say "best human"'
   assert.ok(A.P.LINES.love.some((l) => /I love you/.test(l)) && /Papa/.test(A.P.LINES.love.map((l) => l.replace('{who}', A.P.callName())).join(' ')));
   A.S.set('parentTitle', '');
 });
+test('new fur-parent types: gotcha day and vet visit work end to end', () => {
+  const mk = (type, title) => A.P.cleanCountdown({ title, type, targetAt: '2030-05-01T10:00', dog: { breed: 'scott', name: 'Scott' } });
+  const g = mk('gotcha', "Scott's gotcha day"), v = mk('vet', "Scott's checkup");
+  assert.strictEqual(g.type, 'gotcha'); assert.strictEqual(v.type, 'vet');
+  for (const c of [g, v]) { A.S.upsert(c); const h = go('#/c/' + c.id); assert.ok(h.includes(c.title) && h.includes('data-dog')); A.S.remove(c.id); }
+  assert.ok(go('#/new').includes('Gotcha day') && doc.querySelectorAll('.type-card').length === 8);
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

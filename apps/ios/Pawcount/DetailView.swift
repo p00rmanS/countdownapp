@@ -94,6 +94,7 @@ struct DetailView: View {
                                 if let d = c.destination { Chip(text: "\(d.flag) \(d.city ?? d.country)") }
                                 if c.type == "birthday", let a = k.age { Chip(text: "\(c.person?.name.isEmpty == false ? c.person!.name : "They") turn\(c.person?.name.isEmpty == false ? "s" : "") \(a)") }
                                 if c.type == "anniversary", let t = k.together { Chip(text: "Together for \(t.formatted()) days") }
+                                if c.type == "gotcha", let t = k.together { Chip(text: "Home together for \(t.formatted()) days") }
                                 if c.yearly { Chip(text: "Repeats every year") }
                             }.frame(maxWidth: .infinity)
                             H(c.title, 31, align: .center).padding(.top, 12)
@@ -227,7 +228,7 @@ struct ChecklistPanel: View {
     let c: Countdown; let accent: Color
     @State var text = ""
     var body: some View {
-        let title = ["intl_trip", "vacation"].contains(c.type) ? "Packing list" : (c.type == "birthday" ? "Gift ideas" : "Checklist")
+        let title = ["intl_trip", "vacation"].contains(c.type) ? "Packing list" : (c.type == "birthday" ? "Gift ideas" : c.type == "vet" ? "Vet questions" : "Checklist")
         Panel {
             PanelTitle(title) { Muted("\(c.checklist.filter { $0.done }.count)/\(c.checklist.count)") }
             ForEach(Array(c.checklist.enumerated()), id: \.element.id) { i, it in

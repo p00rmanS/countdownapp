@@ -40,7 +40,7 @@ struct Draft {
         let info = meta.types[t]!
         let b = breedTouched ? breed : meta.suggestedBreed(t)
         type = t; if !accentTouched { accent = info.accent }; yearly = info.repeats
-        allDay = t == "birthday" || t == "anniversary" || t == "holiday"
+        allDay = t == "birthday" || t == "anniversary" || t == "holiday" || t == "gotcha"
         breed = b; if !nameTouched { dogName = meta.breeds[b]?.name ?? dogName }
         reminders = defaultReminders(t); if t != "intl_trip" { country = "" }
         if titleAuto { title = "" }

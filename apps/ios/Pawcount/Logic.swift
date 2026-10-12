@@ -142,7 +142,7 @@ func compute(_ c: Countdown, now: Date = Date()) -> Computed {
     let daysIn = min(daysTotal, max(0, Int(now.timeIntervalSince(start) / DAY) + 1))
     let age = c.person?.birthYear.map { date.0 - $0 }
     var together: Int? = nil
-    if c.type == "anniversary" {
+    if c.type == "anniversary" || c.type == "gotcha" {
         let b = cal.date(from: DateComponents(year: base.y, month: base.mo, day: base.d)) ?? now
         together = max(0, Int(now.timeIntervalSince(b) / DAY))
     }
@@ -193,6 +193,8 @@ func shortCount(_ c: Countdown, _ k: Computed) -> String {
 private let packLabel: [String: (String, String)] = [
     "intl_trip": ("Packing", "dragging a suitcase and clutching a passport"),
     "vacation": ("Packing", "wearing sunglasses beside a suitcase"),
+    "gotcha": ("Welcome-home party", "holding a bouquet with a flower crown"),
+    "vet": ("Being brave", "sitting very still, ready for the checkup"),
     "birthday": ("Party prep", "wearing a party hat beside a present"),
     "anniversary": ("Flowers ready", "holding a bouquet with a flower crown"),
     "holiday": ("Wrapping", "in a holiday hat beside a present"),
@@ -337,7 +339,7 @@ func planReminders(_ list: [Countdown], now: Date = Date()) -> [PlannedReminder]
 func typeAccent(_ type: String) -> String {
     switch type {
     case "intl_trip": return "#5DADE8"; case "vacation": return "#3FBFA8"; case "birthday": return "#FF7DAA"
-    case "anniversary": return "#EE8FA0"; case "holiday": return "#3E9C6C"; default: return "#E8A15C"
+    case "anniversary": return "#EE8FA0"; case "holiday": return "#3E9C6C"; case "gotcha": return "#F28C6B"; case "vet": return "#4FB3BF"; default: return "#E8A15C"
     }
 }
 

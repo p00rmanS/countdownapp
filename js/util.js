@@ -49,6 +49,7 @@
     bolt: '<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>',
     sparkles: '<path d="M11 3c.6 4.5 2.5 6.4 7 7-4.5.6-6.4 2.5-7 7-.6-4.5-2.5-6.4-7-7 4.5-.6 6.4-2.5 7-7zM19 3v3M17.5 4.5h3"/>',
     drop: '<path d="M12 3.5c3.2 4.2 6 7 6 10.2a6 6 0 0 1-12 0c0-3.2 2.8-6 6-10.2z"/>',
+    cross: '<path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5z"/>',
     bone: '<path d="M7 12h10M3 9.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M3 14.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 9.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 14.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>',
     bowl: '<path d="M3.5 11h17a8.5 8.5 0 0 1-17 0zM9 21h6M8 8.5l1 1.5M12 6l.5 2.5M16 8.5l-1 1.5"/>',
     ball: '<path d="M3.5 12a8.5 8.5 0 1 0 17.0 0a8.5 8.5 0 1 0 -17.0 0M5 7.5c4 1 6 5 5.5 9M19 7.5c-4 1-6 5-5.5 9"/>',
@@ -67,9 +68,11 @@
     birthday: { label: 'Birthday', short: 'Birthday', emoji: '🎂', icon: 'cake', accent: '#FF7DAA', hint: 'Repeats every year', ph: "Mia's birthday", repeat: true },
     anniversary: { label: 'Anniversary', short: 'Anniversary', emoji: '💍', icon: 'rings', accent: '#EE8FA0', hint: 'Together for X days', ph: 'Our anniversary', repeat: true },
     holiday: { label: 'Holiday', short: 'Holiday', emoji: '🎄', icon: 'snow', accent: '#3E9C6C', hint: 'Cozy seasonal scene', ph: 'Christmas Eve', repeat: true },
+    gotcha: { label: 'Gotcha day', short: 'Gotcha day', emoji: '🏡', icon: 'paw', accent: '#F28C6B', hint: 'The day they came home', ph: "Scott's gotcha day", repeat: true },
+    vet: { label: 'Vet & grooming', short: 'Vet visit', emoji: '🩺', icon: 'cross', accent: '#4FB3BF', hint: 'Checkups, shots & grooming', ph: "Scott's checkup", repeat: false },
     custom: { label: 'Custom', short: 'Custom', emoji: '⭐', icon: 'star', accent: '#E8A15C', hint: 'Anything you are excited about', ph: 'Concert night', repeat: false },
   };
-  P.TYPE_ORDER = ['intl_trip', 'vacation', 'birthday', 'anniversary', 'holiday', 'custom'];
+  P.TYPE_ORDER = ['intl_trip', 'vacation', 'birthday', 'anniversary', 'holiday', 'gotcha', 'vet', 'custom'];
 
   P.ACCENTS = [
     { v: '#E8A15C', n: 'Kibble' },

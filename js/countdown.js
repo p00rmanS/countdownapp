@@ -100,7 +100,7 @@
     const daysTotal = Math.max(1, Math.round(total / DAY));
     const daysIn = Math.min(daysTotal, Math.max(0, Math.floor((now - start) / DAY) + 1));
     const age = c.person && c.person.birthYear ? occ.y - c.person.birthYear : null;
-    const together = c.type === 'anniversary' ? Math.max(0, Math.floor((now - wallToInstant({ ...base, h: 0, mi: 0 }, tz)) / DAY)) : null;
+    const together = (c.type === 'anniversary' || c.type === 'gotcha') ? Math.max(0, Math.floor((now - wallToInstant({ ...base, h: 0, mi: 0 }, tz)) / DAY)) : null;
 
     return {
       tz, target, start, total, remaining, leftPct, progress, phase, stage, parts, sleeps,
@@ -169,6 +169,8 @@
     vacation: ['Packing', 'wearing sunglasses beside a suitcase'],
     birthday: ['Party prep', 'wearing a party hat beside a present'],
     anniversary: ['Flowers ready', 'holding a bouquet with a flower crown'],
+    gotcha: ['Welcome-home party', 'holding a bouquet with a flower crown'],
+    vet: ['Being brave', 'sitting very still, ready for the checkup'],
     holiday: ['Wrapping', 'in a holiday hat beside a present'],
     custom: ['Ready', 'ready with a tennis ball'],
   };
@@ -352,8 +354,8 @@
   ].concat(type === 'intl_trip' ? [{ offsetMinutes: 90 * 1440, label: 'Passport check · 90 days', enabled: true, passport: true }] : []);
 
   /* ---------- samples ---------- */
-  P.suggestedBreed = (type) => ({ intl_trip: 'shiba', vacation: 'golden', birthday: 'corgi', anniversary: 'dachshund', holiday: 'husky', custom: 'mutt' }[type] || 'golden');
-  P.BREED_BEST = { scott: [], golden: ['vacation'], corgi: ['birthday'], shiba: ['intl_trip'], dachshund: ['anniversary'], husky: ['holiday'], mutt: ['custom'] };
+  P.suggestedBreed = (type) => ({ intl_trip: 'shiba', vacation: 'golden', birthday: 'corgi', anniversary: 'dachshund', holiday: 'husky', gotcha: 'scott', vet: 'scott', custom: 'mutt' }[type] || 'golden');
+  P.BREED_BEST = { scott: ['gotcha', 'vet'], golden: ['vacation'], corgi: ['birthday'], shiba: ['intl_trip'], dachshund: ['anniversary'], husky: ['holiday'], mutt: ['custom'] };
 
   P.makeSamples = (now = Date.now()) => {
     const tzL = P.localTz();

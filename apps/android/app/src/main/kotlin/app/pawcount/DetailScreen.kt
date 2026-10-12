@@ -174,6 +174,7 @@ fun DetailScreen(vm: AppViewModel, id: String) {
                     c.destination?.let { Chip("${it.flag} ${it.city ?: it.country}") }
                     if (c.type == "birthday" && k.age != null) Chip("${c.person?.name?.ifBlank { "They" } ?: "They"} turn${if (c.person?.name.isNullOrBlank() || c.person?.name == "You" || c.person?.name == "They") "" else "s"} ${k.age}")
                     if (c.type == "anniversary" && k.together != null) Chip("Together for ${"%,d".format(k.together)} days")
+                    if (c.type == "gotcha" && k.together != null) Chip("Home together for ${"%,d".format(k.together)} days")
                     if (c.yearly) Chip("Repeats every year")
                 }
                 H(c.title, 31, Modifier.padding(top = 12.dp), TextAlign.Center)
@@ -277,7 +278,7 @@ private fun Kv(k: String, v: String) {
 private fun ChecklistPanel(vm: AppViewModel, c: Countdown, accent: Color) {
     val pc = LocalPaw.current
     var text by remember { mutableStateOf("") }
-    val title = when (c.type) { "intl_trip", "vacation" -> "Packing list"; "birthday" -> "Gift ideas"; else -> "Checklist" }
+    val title = when (c.type) { "intl_trip", "vacation" -> "Packing list"; "birthday" -> "Gift ideas"; "vet" -> "Vet questions"; else -> "Checklist" }
     Panel {
         PanelTitle(title) { Muted("${c.checklist.count { it.done }}/${c.checklist.size}") }
         c.checklist.forEachIndexed { i, it ->
