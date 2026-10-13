@@ -234,7 +234,7 @@ enum Reminders {
         center.getPendingNotificationRequests { pending in
             center.removePendingNotificationRequests(withIdentifiers: pending.map { $0.identifier }.filter { $0.hasPrefix(prefix) })
             guard data.settings.notifications else { return }
-            for p in planReminders(data.countdowns) {
+            for p in planReminders(data.countdowns) + planCare(data.settings, data.countdowns) {
                 let content = UNMutableNotificationContent()
                 content.title = p.title; content.body = p.body; content.sound = .default
                 let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: p.at)

@@ -304,7 +304,19 @@
     "Ahh, right there, {who}.",
     "You're the best at this."
   ],
-  "love": [
+      "care": [
+      "{who}, my bowl is looking lonely…",
+      "Walk, play or snuggle? I'm ready for all three!",
+      "Come say hi, {who}! I've been waiting.",
+      "A quick treat would make my whole day.",
+      "Don't forget my water, {who}!",
+      "I saved you a spot on the couch.",
+      "Check-in time! Tail wags are ready.",
+      "I miss you. Come play?",
+      "Dinner o'clock, anyone? Anyone?",
+      "I'm being so good. Come see!"
+    ],
+"love": [
     "I love you, {who}!",
     "I love you so much, {who}!",
     "You're my whole world.",

@@ -239,6 +239,21 @@ fun defaultReminders(type: String): List<Reminder> = buildList {
 
 data class PlannedReminder(val id: Int, val title: String, val body: String, val at: Long)
 
+/** the daily check-in nudge from the dog: one per day for the next week at the chosen time */
+fun planCare(settings: Settings, list: List<Countdown>, now: Long = System.currentTimeMillis()): List<PlannedReminder> {
+    if (!settings.careReminders) return emptyList()
+    val zone = ZoneId.systemDefault()
+    val dog = list.filter { !it.archived }.minByOrNull { compute(it, now).target }?.dog?.name ?: "Scott"
+    val (h, m) = settings.careTime.split(":").map { it.toIntOrNull() ?: 0 }.let { it[0] to it.getOrElse(1) { 0 } }
+    val pool = Lines.pools["care"].orEmpty().ifEmpty { listOf("Come say hi!") }
+    val who = Who.of(settings.parentTitle, settings.profileName)
+    return (0 until 7).mapNotNull { i ->
+        val day = Instant.ofEpochMilli(now).atZone(zone).toLocalDate().plusDays(i.toLong())
+        val at = day.atTime(h, m).atZone(zone).toInstant().toEpochMilli()
+        if (at <= now + MIN) null else PlannedReminder(2_000_000 + i, "$dog misses you", pool[(day.dayOfYear + i) % pool.size].replace("{who}", who), at)
+    }
+}
+
 /** The reminder schedule: at most one per local day, only in the future, iOS-style cap of 60 */
 fun planReminders(list: List<Countdown>, now: Long = System.currentTimeMillis()): List<PlannedReminder> {
     val out = mutableListOf<PlannedReminder>()

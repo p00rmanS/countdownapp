@@ -143,6 +143,15 @@
   }
 
   /* =============================== HOME =============================== */
+  /* care streak: days in a row on which you did anything for your dog (feed, water, play, pets) */
+  const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  function markCare() { const a = S.state.careDays || (S.state.careDays = []), k = dayKey(); if (a[a.length - 1] !== k) { a.push(k); S.state.careDays = a.slice(-400); S.save(); } }
+  function careStreak() {
+    const have = new Set(S.state.careDays || []), d = new Date();
+    if (!have.has(dayKey(d))) d.setDate(d.getDate() - 1);   // today is still open: yesterday keeps the streak alive
+    let n = 0; while (have.has(dayKey(d))) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
   function greeting() { const h = new Date().getHours(); return h < 5 ? 'Late night, huh?' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
 
   function viewHome() {
@@ -170,7 +179,7 @@
         <div class="grid">${rest.map((x) => gridCard(x.c, x.k)).join('')}</div>` : ''}`;
     }
     return `<section class="screen home">
-      <header class="topbar"><div><p class="eyebrow">${esc(date)}</p><h1 class="h-title">${greeting()}${S.state.settings.profileName ? ', ' + esc(S.state.settings.profileName) : ''}</h1>${items.length ? `<p class="sub">${items.length === 1 ? '1 adventure' : items.length + ' adventures'} on the way</p>` : ''}</div>
+      <header class="topbar"><div><p class="eyebrow">${esc(date)}</p><h1 class="h-title">${greeting()}${S.state.settings.profileName ? ', ' + esc(S.state.settings.profileName) : ''}</h1>${items.length ? `<p class="sub">${items.length === 1 ? '1 adventure' : items.length + ' adventures'} on the way${careStreak() > 1 ? ` · ${careStreak()}-day care streak` : ''}</p>` : ''}</div>
         <div class="top-actions"><a class="icon-btn avatar-btn" href="#/settings" aria-label="Your profile">${avatar(40)}</a><a class="icon-btn" href="#/settings" aria-label="Settings">${icon('sliders')}</a></div></header>
       ${body}
       ${items.length ? `<p class="foot-hint">Pull down to throw the ball 🎾</p>` : ''}
@@ -258,7 +267,7 @@
 
   const playTray = (c) => `<div class="play-tray" role="group" aria-label="Play with ${esc(c.dog.name)}">
       <div class="joy" data-joy role="status" aria-live="polite"><span class="joy-h" aria-hidden="true">♥</span><span class="joy-bar"><i data-joy-fill></i></span><span class="joy-t" data-joy-text></span></div>
-          <div class="needs" aria-live="polite"><span class="need" data-need="food">${icon('bowl')}<i><b data-need-fill="food"></b></i></span><span class="need" data-need="water">${icon('drop')}<i><b data-need-fill="water"></b></i></span></div>
+          <div class="needs" aria-live="polite" ${S.state.settings.needsOn ? '' : 'hidden'}><span class="need" data-need="food">${icon('bowl')}<i><b data-need-fill="food"></b></i></span><span class="need" data-need="water">${icon('drop')}<i><b data-need-fill="water"></b></i></span></div>
       <div class="play-btns">
         <button class="play-btn" data-play="treat">${icon('bone')}Treat</button>
         <button class="play-btn" data-play="feed">${icon('bowl')}Feed</button>
@@ -316,6 +325,12 @@
         <div class="set-row col"><span class="set-t">Default display</span>${seg('set-default-mode', MODES, st.displayMode, 'aria-label="Default display mode"')}</div>
         <div class="set-row col"><span class="set-t">Theme</span>${seg('set-theme', [['system', 'System'], ['light', 'Light'], ['dark', 'Dark']], st.theme, 'aria-label="Theme"')}</div>
         <div class="set-row col"><span class="set-t">Reduce motion</span><span class="muted small">Swaps loops for gentle cross-fades. The dog keeps their expression.</span>${seg('set-motion', [['system', 'System'], ['on', 'On'], ['off', 'Off']], st.motion, 'aria-label="Reduce motion"')}</div>
+      </div>
+
+      <h2 class="group-h">Care</h2>
+      <div class="panel flush">
+        <div class="set-row"><div><span class="set-t">Hunger &amp; thirst</span><span class="muted small block">Your dog gets hungry and thirsty while you are away. Off keeps it just playful.</span></div>${sw('needsOn', st.needsOn, 'Hunger and thirst')}</div>
+        <div class="set-row"><div><span class="set-t">Care streak</span><span class="muted small block">Days in a row you cared for your dog</span></div><b class="strong">${careStreak()}</b></div>
       </div>
 
       <h2 class="group-h">Feedback</h2>
@@ -633,7 +648,7 @@
 
     const bark = () => { used(); flash('bark', 520); say(P.dogLine(c, K(), 'tap')); P.haptic('tick'); P.sound('bark'); };
     const startPet = () => {
-      petting = true; used(); wake(); svgEl().classList.add('petting'); say(P.dogLine(c, K(), 'pet'), 3000);
+      petting = true; used(); wake(); markCare(); svgEl().classList.add('petting'); say(P.dogLine(c, K(), 'pet'), 3000);
       let n = 0;
       loop = setInterval(() => { P.hearts(fx2, 1, pt && pt.x, pt && pt.y); if (n++ % 3 === 0) P.haptic('purr'); }, 280);
       P.hearts(fx2, 2, pt && pt.x, pt && pt.y);
@@ -663,7 +678,7 @@
     const joyLabel = (v) => (v < 25 ? 'Sleepy' : v < 55 ? 'Content' : v < 85 ? 'Happy' : 'Over the moon');
     const showJoy = () => { const v = Math.round(joyNow()), f = $('[data-joy-fill]', root), t = $('[data-joy-text]', root); if (f) f.style.width = v + '%'; if (t) t.textContent = `${c.dog.name} is ${joyLabel(v).toLowerCase()}`; };
     const addJoy = (n) => {
-      const before = joyNow(); c.joy = { v: Math.min(100, before + n), t: Date.now() }; S.save(); showJoy();
+      markCare(); const before = joyNow(); c.joy = { v: Math.min(100, before + n), t: Date.now() }; S.save(); showJoy();
       if (before < 100 && c.joy.v >= 100) { P.confetti({ count: 70, power: 0.8 }); P.haptic('success'); say(P.dogLine(c, K(), 'love'), 3000); }
     };
     const drop = (cls, emoji, ms) => { const el = document.createElement('i'); el.className = cls; el.innerHTML = icon(emoji); fx2.appendChild(el); setTimeout(() => el.remove(), ms); return el; };
@@ -671,7 +686,7 @@
     const needNow = () => { const n = c.needs || { food: 70, water: 70, t: Date.now() }, h = (Date.now() - n.t) / 3600000; return { food: Math.max(0, n.food - h * 5), water: Math.max(0, n.water - h * 8) }; };
     const showNeeds = () => { const n = needNow(); ['food', 'water'].forEach((k) => { const f = $(`[data-need-fill="${k}"]`, root), w = $(`[data-need="${k}"]`, root); if (f) { f.style.width = Math.round(n[k]) + '%'; w.classList.toggle('low', n[k] < 30); } }); };
     const fill = (food, water) => { const n = needNow(); c.needs = { food: Math.min(100, n.food + food), water: Math.min(100, n.water + water), t: Date.now() }; S.save(); showNeeds(); };
-    const nudge = () => { const n = needNow(); if (n.water < 30) say(P.dogLine(c, K(), 'thirsty'), 3200); else if (n.food < 30) say(P.dogLine(c, K(), 'hungry'), 3200); };
+    const nudge = () => { if (!S.state.settings.needsOn) return; const n = needNow(); if (n.water < 30) say(P.dogLine(c, K(), 'thirsty'), 3200); else if (n.food < 30) say(P.dogLine(c, K(), 'hungry'), 3200); };
     const play = {
       drink() { used(); drop('bowl', 'drop', 2400); flash('munch', 2000); say(P.dogLine(c, K(), 'drink'), 2400); P.haptic('purr'); fill(0, 60); addJoy(6); },
       treat() { used(); drop('treat-drop', 'bone', 1000); setTimeout(() => { fill(8, 0); flash('munch', 1100); P.hearts(fx2, 2); say(P.dogLine(c, K(), 'treat')); P.haptic('tick'); P.sound('chime'); addJoy(8); }, 750); },

@@ -151,10 +151,13 @@ struct Settings: Equatable {
     var profileName = ""
     var profilePhoto = ""            // file name in the photo folder
     var parentTitle = ""             // what the dog calls the person: mama | papa | parent
+    var needsOn = true               // the dog gets hungry and thirsty
+    var careReminders = false        // a daily check-in notification
+    var careTime = "18:00"
 }
 
 extension Settings: Codable {
-    private enum K: String, CodingKey { case displayMode, haptics, sound, motion, theme, notifications, profileName, profilePhoto, parentTitle }
+    private enum K: String, CodingKey { case displayMode, haptics, sound, motion, theme, notifications, profileName, profilePhoto, parentTitle, needsOn, careReminders, careTime }
     init(from d: Decoder) throws {
         let c = try d.container(keyedBy: K.self)
         displayMode = DisplayMode(rawValue: (try c.decodeIfPresent(String.self, forKey: .displayMode)) ?? "") ?? .full
@@ -168,12 +171,17 @@ extension Settings: Codable {
         profilePhoto = isSafePhotoName(pp) ? pp : ""
         let pt = try c.decodeIfPresent(String.self, forKey: .parentTitle) ?? ""
         parentTitle = ["mama", "papa", "parent"].contains(pt) ? pt : ""
+        needsOn = try c.decodeIfPresent(Bool.self, forKey: .needsOn) ?? true
+        careReminders = try c.decodeIfPresent(Bool.self, forKey: .careReminders) ?? false
+        let ct = try c.decodeIfPresent(String.self, forKey: .careTime) ?? "18:00"
+        careTime = ["08:00", "12:00", "18:00", "21:00"].contains(ct) ? ct : "18:00"
     }
     func encode(to e: Encoder) throws {
         var c = e.container(keyedBy: K.self)
         try c.encode(displayMode.rawValue, forKey: .displayMode); try c.encode(haptics, forKey: .haptics); try c.encode(sound, forKey: .sound)
         try c.encode(reduceMotion, forKey: .motion); try c.encode(theme, forKey: .theme); try c.encode(notifications, forKey: .notifications)
         try c.encode(profileName, forKey: .profileName); try c.encode(profilePhoto, forKey: .profilePhoto); try c.encode(parentTitle, forKey: .parentTitle)
+        try c.encode(needsOn, forKey: .needsOn); try c.encode(careReminders, forKey: .careReminders); try c.encode(careTime, forKey: .careTime)
     }
 }
 

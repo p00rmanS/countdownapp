@@ -34,7 +34,7 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Eyebrow(dateLine(now))
                             H(greeting(now) + (store.settings.profileName.isEmpty ? "" : ", \(store.settings.profileName)"), 32)
-                            if !items.isEmpty { Muted(items.count == 1 ? "1 adventure on the way" : "\(items.count) adventures on the way", 16) }
+                            if !items.isEmpty { Muted((items.count == 1 ? "1 adventure on the way" : "\(items.count) adventures on the way") + (Joy.streak() > 1 ? " · \(Joy.streak())-day care streak" : ""), 16) }
                         }
                         Spacer()
                         Button { store.push(.settings) } label: { Avatar(size: 46) }.buttonStyle(.plain).accessibilityLabel("Your profile")

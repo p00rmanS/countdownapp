@@ -197,7 +197,7 @@ object Reminders {
             PendingIntent.getBroadcast(ctx, id.toInt(), i, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)?.let { am.cancel(it); it.cancel() }
         }
         if (!data.settings.notifications) { prefs.edit().putStringSet("ids", emptySet()).apply(); return }
-        val plan = planReminders(data.countdowns)
+        val plan = planReminders(data.countdowns) + planCare(data.settings, data.countdowns)
         plan.forEach { am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, it.at, pending(ctx, it)) }
         prefs.edit().putStringSet("ids", plan.map { it.id.toString() }.toSet()).apply()
         scheduleLive(ctx, data, am, prefs)

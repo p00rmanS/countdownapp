@@ -21,7 +21,7 @@ struct DetailView: View {
     /// treat / feed / ball / tickle: the dog reacts and gets happier (the meter fades while you are away)
     func play(_ what: String, _ c: Countdown) {
         let s = store.settings
-        ctrl.hint = false; ctrl.wake()
+        ctrl.hint = false; ctrl.wake(); Joy.markCare()
         switch what {
         case "Ball": ctrl.fetchAt = ctrl.clock; Haptics.play(s.haptics, "soft"); ctrl.bubble = dogLine(c, compute(c), kind: "fetch")
         case "Tickle":
@@ -61,7 +61,7 @@ struct DetailView: View {
                         ZStack(alignment: .top) {
                             SceneView(c: c, k: k, art: store.art, size: .detail, controller: ctrl, reduceMotion: store.reduceMotion, interactive: true,
                                       onBark: { ctrl.wake(); ctrl.bubble = dogLine(c, compute(c), kind: "tap"); Haptics.play(s.haptics, "tick"); Sounds.play(s.sound, "bark") },
-                                      onPetStart: { ctrl.wake(); ctrl.bubble = dogLine(c, compute(c), kind: "pet") })
+                                      onPetStart: { ctrl.wake(); Joy.markCare(); ctrl.bubble = dogLine(c, compute(c), kind: "pet") })
                                 .frame(height: sceneH + geo.safeAreaInsets.top).offset(y: 0)
                             LinearGradient(colors: [Color.black.opacity(0.32), .clear], startPoint: .top, endPoint: .bottom).frame(height: 110 + geo.safeAreaInsets.top).allowsHitTesting(false)
                             HStack {
@@ -75,7 +75,7 @@ struct DetailView: View {
                             VStack { Spacer()
                                 VStack(spacing: 6) {
                                     if ctrl.hint { Text("Tap to bark · Hold to pet · Shake").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66))) }
-                                    Text("♥  \(c.dog.name) is \(Joy.label(joy))\(needs.water < 30 ? " · thirsty" : needs.food < 30 ? " · hungry" : "")").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66)))
+                                    Text("♥  \(c.dog.name) is \(Joy.label(joy))\(!store.settings.needsOn ? "" : needs.water < 30 ? " · thirsty" : needs.food < 30 ? " · hungry" : "")").font(PawFont.body(12, 800)).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 6).background(Capsule().fill(Color(hex: "#1F2433").opacity(0.66)))
                                     HStack(spacing: 6) {
                                         ForEach([("bone", "Treat"), ("bowl", "Feed"), ("drop", "Water"), ("ball", "Ball"), ("smile", "Tickle")], id: \.1) { item in
                                             Button { play(item.1, c) } label: {
@@ -150,6 +150,7 @@ struct DetailView: View {
         .onAppear {
             joy = Joy.now(id); needs = Joy.needs(id); Who.name = Who.of(store.settings.parentTitle, store.settings.profileName)
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.6) {
+                guard store.settings.needsOn else { return }
                 let n = Joy.needs(id), cc = store.countdown(id) ?? c
                 if n.water < 30 { ctrl.bubble = dogLine(cc, compute(cc), kind: "thirsty") } else if n.food < 30 { ctrl.bubble = dogLine(cc, compute(cc), kind: "hungry") }
             }
@@ -367,6 +368,20 @@ struct DogIcon: View {
 
 /// How happy each dog is (0-100). Goes up with treats and play, and fades by about 6 points an hour. Kept per countdown on this device only.
 enum Joy {
+    /// care streak: days in a row on which you did anything for your dog
+    private static func dayKey(_ d: Date) -> String { let c = Calendar.current.dateComponents([.year, .month, .day], from: d); return String(format: "%04d-%02d-%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0) }
+    static func markCare() {
+        var days = (UserDefaults.standard.string(forKey: "care") ?? "").split(separator: ",").map(String.init)
+        let today = dayKey(Date())
+        if days.last != today { days.append(today); UserDefaults.standard.set(days.suffix(400).joined(separator: ","), forKey: "care") }
+    }
+    static func streak() -> Int {
+        let have = Set((UserDefaults.standard.string(forKey: "care") ?? "").split(separator: ",").map(String.init))
+        var d = Date(); if !have.contains(dayKey(d)) { d = Calendar.current.date(byAdding: .day, value: -1, to: d) ?? d }
+        var n = 0
+        while have.contains(dayKey(d)) { n += 1; d = Calendar.current.date(byAdding: .day, value: -1, to: d) ?? d }
+        return n
+    }
     static func now(_ id: String) -> Double {
         guard let raw = UserDefaults.standard.string(forKey: "joy." + id) else { return 20 }
         let p = raw.split(separator: "|")

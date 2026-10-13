@@ -63,7 +63,7 @@ fun HomeScreen(vm: AppViewModel) {
                 Column(Modifier.weight(1f)) {
                     Eyebrow(java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.getDefault())))
                     H(greeting() + data.settings.profileName.let { if (it.isBlank()) "" else ", $it" }, 32)
-                    if (items.isNotEmpty()) Muted(if (items.size == 1) "1 adventure on the way" else "${items.size} adventures on the way", size = 16)
+                    if (items.isNotEmpty()) Muted((if (items.size == 1) "1 adventure on the way" else "${items.size} adventures on the way") + Joy.streak(LocalContext.current).let { if (it > 1) " · $it-day care streak" else "" }, size = 16)
                 }
                 Box(Modifier.clickable(role = Role.Button, onClickLabel = "Your profile") { vm.push(Route.Settings) }.semantics { contentDescription = "Your profile" }) { Avatar(vm, 46.dp) }
                 Box(Modifier.width(10.dp))

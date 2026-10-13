@@ -133,6 +133,20 @@ test('new fur-parent types: gotcha day and vet visit work end to end', () => {
   for (const c of [g, v]) { A.S.upsert(c); const h = go('#/c/' + c.id); assert.ok(h.includes(c.title) && h.includes('data-dog')); A.S.remove(c.id); }
   assert.ok(go('#/new').includes('Gotcha day') && doc.querySelectorAll('.type-card').length === 8);
 });
+test('care streak counts days in a row; hunger & thirst can be switched off; settings survive a backup', () => {
+  const key = (n) => { const d = new w.Date(); d.setDate(d.getDate() - n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  A.S.state.careDays = [key(3), key(2), key(1)]; A.S.save();   // today still open: yesterday keeps three days alive
+  assert.ok(go('#/').includes('3-day care streak'));
+  A.S.state.careDays = [key(5), key(4), key(1)]; A.S.save(); assert.ok(!go('#/').includes('care streak'));
+  go('#/c/sample-bali'); A.ui.sceneApi.play.treat();
+  A.S.set('needsOn', false); assert.ok(go('#/c/sample-bali').includes('class="needs"') && doc.querySelector('.needs[hidden]'));
+  assert.ok(go('#/settings').includes('Hunger &amp; thirst'));
+  A.S.set('careTime', '21:00'); const b = A.S.exportJSON(); A.S.set('careTime', '08:00'); A.S.importJSON(b);
+  assert.strictEqual(A.S.state.settings.careTime, '21:00'); assert.strictEqual(A.S.state.settings.needsOn, false);
+  A.S.importJSON(JSON.stringify({ data: { countdowns: [], settings: { careTime: 'zzz', needsOn: 'yes' }, careDays: ['bad', '2030-01-01'] } }));
+  assert.strictEqual(A.S.state.settings.careTime, '18:00'); assert.strictEqual(A.S.state.settings.needsOn, true); assert.strictEqual(A.S.state.careDays.length, 1);
+  A.S.state.careDays = []; A.S.loadSamples();
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

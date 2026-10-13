@@ -62,6 +62,9 @@ data class Settings(
     val profileName: String = "",
     val profilePhoto: String = "",        // file name in the photo folder
     val parentTitle: String = "",         // what the dog calls the person: mama | papa | parent
+    val needsOn: Boolean = true,          // the dog gets hungry and thirsty
+    val careReminders: Boolean = false,   // a daily check-in notification
+    val careTime: String = "18:00",
 )
 
 data class AppData(
@@ -149,7 +152,7 @@ fun AppData.toJson(): JSONObject = JSONObject().apply {
     put("settings", JSONObject().apply {
         put("displayMode", settings.displayMode.key); put("haptics", settings.haptics); put("sound", settings.sound)
         put("motion", settings.reduceMotion); put("theme", settings.theme); put("notifications", settings.notifications)
-        put("profileName", settings.profileName); put("profilePhoto", settings.profilePhoto); put("parentTitle", settings.parentTitle)
+        put("profileName", settings.profileName); put("profilePhoto", settings.profilePhoto); put("parentTitle", settings.parentTitle); put("needsOn", settings.needsOn); put("careReminders", settings.careReminders); put("careTime", settings.careTime)
     })
 }
 
@@ -168,6 +171,8 @@ fun appDataFromJson(raw: JSONObject): AppData {
             theme = s?.optString("theme", "system") ?: "system", notifications = s?.optBoolean("notifications") ?: false,
             profileName = (s?.optString("profileName", "") ?: "").take(30), profilePhoto = (s?.optString("profilePhoto", "") ?: "").takeIf { SAFE_PHOTO.matches(it) } ?: "",
             parentTitle = (s?.optString("parentTitle", "") ?: "").takeIf { it in setOf("mama", "papa", "parent") } ?: "",
+            needsOn = s?.optBoolean("needsOn", true) ?: true, careReminders = s?.optBoolean("careReminders") ?: false,
+            careTime = (s?.optString("careTime", "18:00") ?: "18:00").takeIf { it in setOf("08:00", "12:00", "18:00", "21:00") } ?: "18:00",
         ),
     )
 }

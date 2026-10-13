@@ -100,11 +100,12 @@ fun DetailScreen(vm: AppViewModel, id: String) {
     LaunchedEffect(id) {
         delay(2600)
         val (food, water) = Joy.needs(ctx, id)
+        if (!settings.needsOn) return@LaunchedEffect
         if (water < 30f) ctrl.bubble = dogLine(c, compute(c), "thirsty") else if (food < 30f) ctrl.bubble = dogLine(c, compute(c), "hungry")
     }
     val scope = rememberCoroutineScope()
     fun play(what: String) {
-        ctrl.hint = false; ctrl.wake(scope)
+        ctrl.hint = false; ctrl.wake(scope); Joy.markCare(ctx)
         val kind = when (what) { "Treat" -> "treat"; "Feed" -> "feed"; "Water" -> "drink"; "Tickle" -> "tickle"; else -> "ball" }
         when (what) {
             "Ball" -> { ctrl.fetchAt = ctrl.clock; Haptics.play(ctx, settings.haptics, "soft"); ctrl.bubble = dogLine(c, compute(c), "fetch") }
@@ -141,7 +142,7 @@ fun DetailScreen(vm: AppViewModel, id: String) {
             Box(Modifier.fillMaxWidth().height(sceneH)) {
                 SceneView(c, k, vm.art, vm.fonts, SceneSize.DETAIL, controller = ctrl, interactive = true, reduceMotion = reduce,
                     onBark = { ctrl.wake(scope); ctrl.bubble = dogLine(c, compute(c), "tap"); Haptics.play(ctx, settings.haptics, "tick"); Sounds.play(settings.sound, "bark") },
-                    onPetStart = { ctrl.wake(scope); ctrl.bubble = dogLine(c, compute(c), "pet") }, onPetEnd = {})
+                    onPetStart = { ctrl.wake(scope); Joy.markCare(ctx); ctrl.bubble = dogLine(c, compute(c), "pet") }, onPetEnd = {})
                 // dark strip so status-bar icons stay readable over a bright scene
                 Box(Modifier.fillMaxWidth().height(110.dp).background(Brush.verticalGradient(listOf(Color(0x52140C08), Color.Transparent))))
                 Row(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -156,7 +157,7 @@ fun DetailScreen(vm: AppViewModel, id: String) {
                 }
                 Column(Modifier.align(Alignment.BottomCenter).padding(bottom = 44.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     if (ctrl.hint) Text("Tap to bark · Hold to pet · Shake", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
-                    Text("♥  ${c.dog.name} is ${Joy.label(joy)}${if (needs.second < 30f) " · thirsty" else if (needs.first < 30f) " · hungry" else ""}", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
+                    Text("♥  ${c.dog.name} is ${Joy.label(joy)}${if (!settings.needsOn) "" else if (needs.second < 30f) " · thirsty" else if (needs.first < 30f) " · hungry" else ""}", Modifier.clip(RoundedCornerShape(50)).background(Color(0xA81F2433)).padding(horizontal = 14.dp, vertical = 6.dp), style = T.body(12, FontWeight.ExtraBold).copy(color = Color.White))
                     Row(Modifier.padding(horizontal = 10.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         listOf("bone" to "Treat", "bowl" to "Feed", "drop" to "Water", "ball" to "Ball", "smile" to "Tickle").forEach { (iconName, label) ->
                             Column(Modifier.weight(1f).shadow(4.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(Color(0xEBFFFFFF)).clickable(role = Role.Button, onClickLabel = "$label ${c.dog.name}") { play(label) }.padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -376,6 +377,18 @@ object Joy {
         val v = minOf(100f, now(ctx, id) + n)
         prefs(ctx).edit().putString(id, "$v|${System.currentTimeMillis()}").apply()
         return v
+    }
+    /** care streak: days in a row on which you did anything for your dog */
+    fun markCare(ctx: android.content.Context) {
+        val today = java.time.LocalDate.now().toString()
+        val days = prefs(ctx).getString("care", "").orEmpty().split(",").filter { it.isNotEmpty() }
+        if (days.lastOrNull() != today) prefs(ctx).edit().putString("care", (days + today).takeLast(400).joinToString(",")).apply()
+    }
+    fun streak(ctx: android.content.Context): Int {
+        val have = prefs(ctx).getString("care", "").orEmpty().split(",").toSet()
+        var d = java.time.LocalDate.now(); if (d.toString() !in have) d = d.minusDays(1)
+        var n = 0; while (d.toString() in have) { n++; d = d.minusDays(1) }
+        return n
     }
     /** hunger and thirst (0-100, full = 100): they run down while you are away, about 5 and 8 points an hour */
     fun needs(ctx: android.content.Context, id: String): Pair<Float, Float> {

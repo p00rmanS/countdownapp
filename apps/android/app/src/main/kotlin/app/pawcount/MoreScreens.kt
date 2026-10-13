@@ -244,6 +244,15 @@ fun SettingsScreen(vm: AppViewModel) {
             Divider()
             SettingCol("Reduce motion", "Swaps loops for still poses. The dog keeps their expression.") { Seg(listOf("system" to "System", "on" to "On", "off" to "Off"), s.reduceMotion, { m -> vm.settings { it.copy(reduceMotion = m) } }, label = "Reduce motion") }
         }
+        Group("Care")
+        Panel(flush = true) {
+            SettingSwitch("Hunger & thirst", "Your dog gets hungry and thirsty while you are away", s.needsOn) { on -> vm.settings { it.copy(needsOn = on) } }
+            Divider()
+            SettingSwitch("Daily check-in", if (s.notifications) "A nudge from your dog to feed, water and play" else "Turn on Reminders below first", s.careReminders && s.notifications) { on -> vm.settings { it.copy(careReminders = on && it.notifications) } }
+            if (s.careReminders && s.notifications) SettingCol("Check-in time") { Seg(listOf("08:00" to "Morning", "12:00" to "Noon", "18:00" to "Evening", "21:00" to "Night"), s.careTime, { v -> vm.settings { it.copy(careTime = v) } }, label = "Check-in time") }
+            Divider()
+            Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { B("Care streak", weight = FontWeight.ExtraBold); Muted("Days in a row you cared for your dog") }; B("${Joy.streak(ctx)}", size = 20, weight = FontWeight.ExtraBold) }
+        }
         Group("Feedback")
         Panel(flush = true) {
             SettingSwitch("Haptics", "Taps, purrs and milestone bursts", s.haptics) { on -> vm.settings { it.copy(haptics = on) }; if (on) Haptics.play(ctx, true, "purr") }

@@ -302,6 +302,22 @@ func defaultReminders(_ type: String) -> [Reminder] {
 
 struct PlannedReminder { var id: String; var title: String; var body: String; var at: Date }
 
+/// the daily check-in nudge from the dog: one per day for the next week at the chosen time
+func planCare(_ settings: Settings, _ list: [Countdown], now: Date = Date()) -> [PlannedReminder] {
+    guard settings.careReminders else { return [] }
+    let cal = Calendar.current
+    let dog = list.filter { !$0.archived }.min { compute($0, now: now).target < compute($1, now: now).target }?.dog.name ?? "Scott"
+    let hm = settings.careTime.split(separator: ":").compactMap { Int($0) }
+    let h = hm.first ?? 18, m = hm.count > 1 ? hm[1] : 0
+    let pool = Lines.pools["care"] ?? ["Come say hi!"]
+    let who = Who.of(settings.parentTitle, settings.profileName)
+    return (0..<7).compactMap { i in
+        guard let day = cal.date(byAdding: .day, value: i, to: now), let at = cal.date(bySettingHour: h, minute: m, second: 0, of: day), at > now.addingTimeInterval(60) else { return nil }
+        let doy = cal.ordinality(of: .day, in: .year, for: day) ?? i
+        return PlannedReminder(id: "care.\(i)", title: "\(dog) misses you", body: pool[(doy + i) % pool.count].replacingOccurrences(of: "{who}", with: who), at: at)
+    }
+}
+
 /// The reminder schedule: at most one per local day, only in the future, capped at 60 (iOS allows 64 pending)
 func planReminders(_ list: [Countdown], now: Date = Date()) -> [PlannedReminder] {
     var out: [PlannedReminder] = []

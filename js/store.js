@@ -13,7 +13,8 @@
     countdowns: [],
     celebrated: {},
     lastNotified: '',
-    settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'scott', profileName: '', profilePhoto: '', parentTitle: '' },
+    settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'scott', profileName: '', profilePhoto: '', parentTitle: '', needsOn: true, careReminders: false, careTime: '18:00' },
+    careDays: [],
   });
   // settings come from storage / backups: keep only values of the right type
   function sanitizeSettings(s) {
@@ -24,10 +25,12 @@
     if (!['system', 'on', 'off'].includes(out.motion)) out.motion = 'system';
     if (!/^[a-z]+$/.test(out.icon)) out.icon = 'scott';
     out.profileName = out.profileName.slice(0, 30);
+    if (!['08:00', '12:00', '18:00', '21:00'].includes(out.careTime)) out.careTime = '18:00';
     if (!['', 'mama', 'papa', 'parent'].includes(out.parentTitle)) out.parentTitle = '';
     if (out.profilePhoto && !P.PHOTO_RE.test(out.profilePhoto) && !/^[\w.-]{1,80}$/.test(out.profilePhoto)) out.profilePhoto = '';
     return out;
   }
+  const cleanDays = (a) => (Array.isArray(a) ? a.filter((d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(-400) : []);
   let state = defaults();
   const subs = [];
   let memoryOnly = false;
@@ -38,7 +41,7 @@
       if (raw) {
         const d = JSON.parse(raw);
         const base = defaults();
-        state = { ...base, ...d, countdowns: Array.isArray(d.countdowns) ? d.countdowns.map(P.cleanCountdown).filter(Boolean) : [], settings: sanitizeSettings({ ...base.settings, ...(d.settings || {}) }) };
+        state = { ...base, ...d, countdowns: Array.isArray(d.countdowns) ? d.countdowns.map(P.cleanCountdown).filter(Boolean) : [], settings: sanitizeSettings({ ...base.settings, ...(d.settings || {}) }), careDays: cleanDays(d.careDays) };
       }
     } catch (e) { memoryOnly = true; }
   }
@@ -74,7 +77,7 @@
       const d = j.data || j;
       if (!Array.isArray(d.countdowns)) throw new Error('Not a Pawcount backup');
       const base = defaults();
-      state = { ...base, ...d, countdowns: d.countdowns.map(P.cleanCountdown).filter(Boolean), settings: sanitizeSettings({ ...base.settings, ...(d.settings || {}) }) };
+      state = { ...base, ...d, countdowns: d.countdowns.map(P.cleanCountdown).filter(Boolean), settings: sanitizeSettings({ ...base.settings, ...(d.settings || {}) }), careDays: cleanDays(d.careDays) };
       return this.commit();
     },
   };

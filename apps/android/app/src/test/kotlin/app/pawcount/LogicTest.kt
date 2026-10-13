@@ -73,6 +73,11 @@ class LogicTest {
         assertEquals("custom", c.type); assertEquals("#E8A15C", c.accent); assertEquals("mutt", c.dog.breed); assertEquals(null, c.dog.furColor)
         assertEquals(listOf("ok-1.jpg"), c.photos); assertTrue(!c.id.contains("."))
     }
+    @Test fun careCheckInIsOnePerDayAtTheChosenTime() {
+        val plan = planCare(Settings(careReminders = true, careTime = "18:00"), listOf(cd("2031-01-01T10:00")), now)
+        assertTrue(plan.size in 6..7); assertEquals(plan.size, plan.map { it.id }.toSet().size); assertTrue(plan.all { it.at > now })
+        assertTrue(planCare(Settings(), emptyList(), now).isEmpty())
+    }
     @Test fun badDateIsRejected() {
         val o = org.json.JSONObject("""{"id":"a","title":"t","type":"custom","targetAt":"tomorrow","dog":{"breed":"mutt","name":"n"}}""")
         assertTrue(runCatching { countdownFromJson(o) }.isFailure)

@@ -3,6 +3,12 @@ import XCTest
 
 /* Unit tests for Logic.swift. They mirror tests/countdown.test.js and the Android LogicTest so all platforms agree. */
 final class LogicTests: XCTestCase {
+    func testCareCheckInIsOnePerDay() {
+        var s = Settings(); s.careReminders = true; s.careTime = "18:00"
+        let plan = planCare(s, [cd("2031-01-01T10:00")], now: now)
+        XCTAssertTrue((6...7).contains(plan.count)); XCTAssertEqual(Set(plan.map { $0.id }).count, plan.count); XCTAssertTrue(plan.allSatisfy { $0.at > now })
+        XCTAssertTrue(planCare(Settings(), [], now: now).isEmpty)
+    }
     func testHostileBackupIsCleaned() throws {
         let json = #"{"id":"../x","title":"t","type":"nope","targetAt":"2031-01-01T10:00","timeZone":"Mars/Base","accent":"zzz","dog":{"breed":"x","name":"n","colors":{"fur":"bad"},"ears":"bad"},"memoryPhotos":["../../x","ok-1.jpg"]}"#
         let c = try JSONDecoder().decode(Countdown.self, from: Data(json.utf8))

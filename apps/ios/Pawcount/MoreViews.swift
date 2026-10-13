@@ -216,6 +216,19 @@ struct SettingsView: View {
                     col("Reduce motion", sub: "Swaps loops for still poses. The dog keeps their expression.") { Seg(options: [("system", "System"), ("on", "On"), ("off", "Off")], selected: s.reduceMotion, label: "Reduce motion") { m in store.setSettings { $0.reduceMotion = m } } }
                 }
 
+                group("Care")
+                Panel(flush: true) {
+                    row("Hunger & thirst", "Your dog gets hungry and thirsty while you are away", s.needsOn) { on in store.setSettings { $0.needsOn = on } }
+                    Divider2()
+                    row("Daily check-in", s.notifications ? "A nudge from your dog to feed, water and play" : "Turn on Reminders below first", s.careReminders && s.notifications) { on in store.setSettings { $0.careReminders = on && $0.notifications } }
+                    if s.careReminders && s.notifications {
+                        Divider2()
+                        col("Check-in time") { Seg(options: [("08:00", "Morning"), ("12:00", "Noon"), ("18:00", "Evening"), ("21:00", "Night")], selected: s.careTime, label: "Check-in time") { v in store.setSettings { $0.careTime = v } } }
+                    }
+                    Divider2()
+                    HStack { VStack(alignment: .leading, spacing: 2) { B("Care streak", 16, weight: 800); Muted("Days in a row you cared for your dog") }; Spacer(); B("\(Joy.streak())", 20, weight: 800) }.padding(.vertical, 14)
+                }
+
                 group("Feedback")
                 Panel(flush: true) {
                     row("Haptics", "Taps, purrs and milestone bursts", s.haptics) { on in store.setSettings { $0.haptics = on }; if on { Haptics.play(true, "purr") } }
