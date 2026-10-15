@@ -170,6 +170,11 @@ struct DetailView: View {
             VStack(spacing: 0) {
                 H(c.title, 22, align: .center).padding(.bottom, 12)
                 SheetItem(icon: "edit", text: "Edit countdown") { menu = false; store.push(.flow(c.id)) }
+                SheetItem(icon: "pin", text: c.pinned ? "Unpin from the top" : "Pin to the top of Home") { menu = false; var n = c; n.pinned.toggle(); store.upsert(n); store.say(n.pinned ? "Pinned to the top of Home" : "Unpinned") }
+                SheetItem(icon: "repeat", text: "Duplicate") {
+                    menu = false; var n = c; n.id = newId(); n.title = String((c.title + " (copy)").prefix(80)); n.createdAt = Date(); n.photos = []; n.archived = false; n.sample = false; n.pinned = false
+                    store.upsert(n); store.say("Duplicated. Change the date and name."); store.push(.flow(n.id))
+                }
                 SheetItem(icon: "heart", text: "Share…") { menu = false; DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { sharing = true } }
                 SheetItem(icon: "archive", text: c.archived ? "Move back to Home" : "Archive to Memories") {
                     menu = false; var n = c; n.archived.toggle(); store.upsert(n); store.say(n.archived ? "Archived to Memories" : "Back on Home"); if n.archived { store.tab(.memories) }

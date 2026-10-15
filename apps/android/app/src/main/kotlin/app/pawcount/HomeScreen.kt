@@ -51,7 +51,7 @@ fun HomeScreen(vm: AppViewModel) {
     val reduce = LocalReduceMotion.current
     var sort by rememberSaveable { mutableStateOf("soonest") }
     val items = data.countdowns.filter { !it.archived }.map { it to compute(it, now) }.filter { it.second.phase != Phase.PAST }
-        .sortedWith(compareBy({ if (it.second.phase == Phase.TODAY) 0 else 1 }, { it.second.target }))
+        .sortedWith(compareBy({ if (it.first.pinned) 0 else 1 }, { if (it.second.phase == Phase.TODAY) 0 else 1 }, { it.second.target }))
     val hero = items.firstOrNull()
     var rest = items.drop(1)
     if (sort == "type") rest = rest.sortedWith(compareBy({ vm.art.meta.typeOrder.indexOf(it.first.type) }, { it.second.target }))
@@ -125,6 +125,7 @@ private fun HeroCard(vm: AppViewModel, c: Countdown, k: Computed, reduce: Boolea
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Chip(stageLabel(c, k), filled = accent, textColor = onAccent(accent), icon = k.stage.icon)
                 Chip(type.short, icon = type.icon)
+                if (c.pinned) Chip("Pinned", icon = "pin")
             }
             H(c.title, 28, Modifier.padding(top = 10.dp))
             Muted(if (k.phase == Phase.TODAY) "Happening today" else fmtInstant(k.target, k.zone, c.allDay), size = 14)

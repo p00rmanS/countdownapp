@@ -16,6 +16,7 @@ struct HomeView: View {
     func content(_ now: Date) -> some View {
             let all = store.data.countdowns.filter { !$0.archived }.map { ($0, compute($0, now: now)) }
             let items = all.filter { $0.1.phase != .past }.sorted { a, b in
+                if a.0.pinned != b.0.pinned { return a.0.pinned }
                 let ra = a.1.phase == .today ? 0 : 1, rb = b.1.phase == .today ? 0 : 1
                 return ra != rb ? ra < rb : a.1.target < b.1.target
             }
@@ -108,6 +109,7 @@ private struct HeroCard: View {
                     HStack(spacing: 6) {
                         Chip(text: stageLabel(c, k), filled: accent, textColor: accent.onColor, icon: k.stage.icon)
                         Chip(text: type.short, icon: type.icon)
+                        if c.pinned { Chip(text: "Pinned", icon: "pin") }
                     }
                     H(c.title, 28).padding(.top, 10)
                     Muted(k.phase == .today ? "Happening today" : w.0, 14)

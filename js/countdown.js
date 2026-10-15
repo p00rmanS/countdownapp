@@ -416,7 +416,7 @@
       createdAt: Number.isFinite(Date.parse(o.createdAt)) ? new Date(o.createdAt).toISOString() : new Date().toISOString(),
       dog, accent: HEX.test(o.accent || '') ? o.accent : P.TYPES[type].accent,
       displayMode: ['full', 'days', 'sleeps', 'weeks'].includes(o.displayMode) ? o.displayMode : 'full',
-      notes: str(o.notes, 2000), archived: !!o.archived, sample: !!o.sample,
+      notes: str(o.notes, 2000), archived: !!o.archived, sample: !!o.sample, pinned: !!o.pinned,
       checklist: (Array.isArray(o.checklist) ? o.checklist : []).slice(0, 100).filter((i) => i && typeof i.text === 'string').map((i) => ({ id: str(i.id, 64).replace(/[^\w-]/g, '') || P.uuid(), text: str(i.text, 200), done: !!i.done })),
       memoryPhotos: (Array.isArray(o.memoryPhotos) ? o.memoryPhotos : []).slice(0, 6).filter((u) => typeof u === 'string' && PHOTO.test(u)),
       notifications: (Array.isArray(o.notifications) ? o.notifications : P.defaultNotifications(type)).slice(0, 12).filter((n) => n && Number.isFinite(n.offsetMinutes)).map((n) => ({ offsetMinutes: n.offsetMinutes, label: str(n.label, 60), enabled: !!n.enabled })),

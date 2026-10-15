@@ -65,12 +65,13 @@ struct Countdown: Identifiable, Equatable {
     var archived: Bool = false
     var photos: [String] = []       // file names in the app's photo folder
     var sample: Bool = false
+    var pinned: Bool = false        // stays at the top of Home
 }
 
 extension Countdown: Codable {
     private enum K: String, CodingKey {
         case id, title, type, targetAt, timeZone, allDay, recurrence, createdAt, dog, accent, displayMode, notes, checklist
-        case destination, person, notifications, archived, memoryPhotos, sample
+        case destination, person, notifications, archived, memoryPhotos, sample, pinned
     }
     init(from d: Decoder) throws {
         let c = try d.container(keyedBy: K.self)
@@ -95,6 +96,7 @@ extension Countdown: Codable {
         // web backups embed photos as data: URLs; only keep file names
         photos = (try c.decodeIfPresent([String].self, forKey: .memoryPhotos) ?? []).filter { !$0.hasPrefix("data:") && !$0.isEmpty }
         sample = try c.decodeIfPresent(Bool.self, forKey: .sample) ?? false
+        pinned = try c.decodeIfPresent(Bool.self, forKey: .pinned) ?? false
         try sanitize()
     }
 
@@ -134,7 +136,7 @@ extension Countdown: Codable {
         try c.encode(notes, forKey: .notes); try c.encode(checklist, forKey: .checklist)
         try c.encodeIfPresent(destination, forKey: .destination); try c.encodeIfPresent(person, forKey: .person)
         try c.encode(reminders, forKey: .notifications); try c.encode(archived, forKey: .archived)
-        try c.encode(photos, forKey: .memoryPhotos); try c.encode(sample, forKey: .sample)
+        try c.encode(photos, forKey: .memoryPhotos); try c.encode(sample, forKey: .sample); try c.encode(pinned, forKey: .pinned)
     }
 }
 

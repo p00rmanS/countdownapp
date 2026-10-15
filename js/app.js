@@ -159,7 +159,7 @@
     const all = S.active().map((c) => ({ c, k: P.compute(c, now) }));
     const items = all.filter((x) => x.k.phase !== 'past');
     const mem = all.length - items.length + S.state.countdowns.filter((c) => c.archived).length;
-    items.sort((a, b) => (a.k.phase === 'today' ? 0 : 1) - (b.k.phase === 'today' ? 0 : 1) || a.k.target - b.k.target);
+    items.sort((a, b) => (b.c.pinned ? 1 : 0) - (a.c.pinned ? 1 : 0) || (a.k.phase === 'today' ? 0 : 1) - (b.k.phase === 'today' ? 0 : 1) || a.k.target - b.k.target);
     const date = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' }).format(now);
 
     let body;
@@ -191,7 +191,7 @@
     return `<a class="hero-card" href="#/c/${c.id}" style="${styleVars(c)}" aria-label="${esc(c.title)}. ${esc(P.spoken(k))} left. ${esc(P.describeDog(c, k))}">
       ${P.sceneHTML(c, k, { size: 'hero' })}
       <div class="hero-body">
-        <div class="chip-row">${stageChip(c, k)}${chip(`${icon(tp.icon)} ${tp.short}`, 'ghost')}</div>
+        <div class="chip-row">${stageChip(c, k)}${chip(`${icon(tp.icon)} ${tp.short}`, 'ghost')}${c.pinned ? chip(`${icon('pin')} Pinned`, 'ghost') : ''}</div>
         <h2 class="hero-title">${esc(c.title)}</h2>
         <p class="muted small">${k.phase === 'today' ? 'Happening today' : esc(w.dest)}</p>
         ${numeralsHTML(c, k, 'sz-hero')}
@@ -817,9 +817,17 @@
       const c = S.get(route().id); if (!c) return;
       openSheet(`<h2 class="sheet-t">${esc(c.title)}</h2><div class="sheet-list">
         <a class="sheet-item" href="#/edit/${c.id}" data-action="close-sheet">${icon('edit')}<span>Edit countdown</span></a>
+        <button class="sheet-item" data-action="pin">${icon('pin')}<span>${c.pinned ? 'Unpin from the top' : 'Pin to the top of Home'}</span></button>
+        <button class="sheet-item" data-action="duplicate">${icon('repeat')}<span>Duplicate</span></button>
         <button class="sheet-item" data-action="share">${icon('upload')}<span>Share with your person</span></button>
         <button class="sheet-item" data-action="${c.archived ? 'unarchive' : 'archive'}">${icon('archive')}<span>${c.archived ? 'Move back to Home' : 'Archive to Memories'}</span></button>
         <button class="sheet-item danger" data-action="delete-ask">${icon('trash')}<span>Delete…</span></button></div>`, 'Countdown options');
+    },
+    pin() { const c = S.get(route().id); if (!c) return; c.pinned = !c.pinned; S.commit(); closeSheet(); toast(c.pinned ? 'Pinned to the top of Home' : 'Unpinned'); render({ keepScroll: true, noAnim: true }); },
+    duplicate() {
+      const c = S.get(route().id); if (!c) return;
+      const copy = P.cleanCountdown({ ...c, id: P.uuid(), title: (c.title + ' (copy)').slice(0, 80), createdAt: new Date().toISOString(), pinned: false, archived: false, sample: false, memoryPhotos: [], joy: undefined, needs: undefined });
+      if (!copy) return; S.upsert(copy); closeSheet(); toast('Duplicated. Change the date and name.'); location.hash = '#/edit/' + copy.id;
     },
     share() {
       const c = S.get(route().id); if (!c) return;
@@ -1012,5 +1020,5 @@
   setInterval(tick, 1000);
   setTimeout(() => { if (!['welcome', 'new', 'edit'].includes(route().name) && route().name !== 'c') checkMilestones(); }, 1200);
   if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !P.native.isNative) navigator.serviceWorker.register('sw.js').catch(() => {});
-  window.Pawcount = { S, P, ui, render, shareLink, importShared };
+  window.Pawcount = { S, P, ui, render, shareLink, importShared, actions };
 })();

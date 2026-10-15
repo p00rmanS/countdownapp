@@ -231,6 +231,12 @@ fun DetailScreen(vm: AppViewModel, id: String) {
     if (menu) PawSheet({ menu = false }) {
         H(c.title, 22, Modifier.fillMaxWidth().padding(bottom = 12.dp), TextAlign.Center)
         SheetItem("edit", "Edit countdown") { menu = false; vm.push(Route.Flow(c.id)) }
+        SheetItem("pin", if (c.pinned) "Unpin from the top" else "Pin to the top of Home") { menu = false; vm.upsert(c.copy(pinned = !c.pinned)); vm.say(if (c.pinned) "Unpinned" else "Pinned to the top of Home") }
+        SheetItem("repeat", "Duplicate") {
+            menu = false
+            val copy = c.copy(id = newId(), title = (c.title + " (copy)").take(80), createdAt = System.currentTimeMillis(), photos = emptyList(), archived = false, sample = false, pinned = false)
+            vm.upsert(copy); vm.say("Duplicated. Change the date and name."); vm.push(Route.Flow(copy.id))
+        }
         SheetItem("upload", "Share picture card") { menu = false; Share.shareCard(ctx, vm.art, vm.fonts, c) }
         SheetItem("heart", "Share with your person") { menu = false; Share.shareLink(ctx, c) }
         SheetItem("archive", if (c.archived) "Move back to Home" else "Archive to Memories") { menu = false; vm.upsert(c.copy(archived = !c.archived)); vm.say(if (c.archived) "Back on Home" else "Archived to Memories"); if (!c.archived) vm.tab(Route.Memories) }

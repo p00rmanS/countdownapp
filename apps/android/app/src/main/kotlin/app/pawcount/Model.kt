@@ -50,6 +50,7 @@ data class Countdown(
     val archived: Boolean = false,
     val photos: List<String> = emptyList(), // file names inside the app's photo folder
     val sample: Boolean = false,
+    val pinned: Boolean = false,    // stays at the top of Home
 )
 
 data class Settings(
@@ -93,7 +94,7 @@ fun Countdown.toJson(): JSONObject = JSONObject().apply {
     destination?.let { put("destination", JSONObject().put("country", it.country).put("city", it.city ?: JSONObject.NULL).put("flag", it.flag)) }
     person?.let { put("person", JSONObject().put("name", it.name).apply { if (it.birthYear != null) put("birthYear", it.birthYear) }) }
     put("notifications", JSONArray(reminders.map { JSONObject().put("offsetMinutes", it.offsetMinutes).put("label", it.label).put("enabled", it.enabled).apply { if (it.passport) put("passport", true) } }))
-    put("archived", archived); put("memoryPhotos", JSONArray(photos)); put("sample", sample)
+    put("archived", archived); put("memoryPhotos", JSONArray(photos)); put("sample", sample); put("pinned", pinned)
 }
 
 /* ---------- untrusted data (shared links, backup files): only known-good shapes survive ---------- */
@@ -141,7 +142,7 @@ private fun rawCountdownFromJson(o: JSONObject): Countdown {
         person = o.optJSONObject("person")?.let { Person(it.optString("name", ""), if (it.has("birthYear")) it.optInt("birthYear") else null) },
         reminders = (0 until notifs.length()).map { notifs.getJSONObject(it).let { n -> Reminder(n.getInt("offsetMinutes"), n.optString("label", ""), n.optBoolean("enabled", true), n.optBoolean("passport")) } },
         archived = o.optBoolean("archived"), photos = (0 until photos.length()).mapNotNull { photos.optString(it).takeIf { s -> s.isNotEmpty() && !s.startsWith("data:") } },
-        sample = o.optBoolean("sample"),
+        sample = o.optBoolean("sample"), pinned = o.optBoolean("pinned"),
     )
 }
 

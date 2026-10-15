@@ -147,6 +147,17 @@ test('care streak counts days in a row; hunger & thirst can be switched off; set
   assert.strictEqual(A.S.state.settings.careTime, '18:00'); assert.strictEqual(A.S.state.settings.needsOn, true); assert.strictEqual(A.S.state.careDays.length, 1);
   A.S.state.careDays = []; A.S.loadSamples();
 });
+test('pin puts a countdown first on Home; duplicate makes a fresh copy to edit', () => {
+  const heroOf = () => { go('#/'); return (doc.querySelector('.hero-card .card-title, .hero-card h2, .hero-card [class*="title"]') || {}).textContent || ''; };
+  go('#/c/sample-ski'); A.actions.pin(); assert.ok(A.S.get('sample-ski').pinned);
+  const html = go('#/'); assert.ok(html.indexOf('Ski weekend') < html.indexOf('Bali getaway') && html.includes('Pinned'));
+  go('#/c/sample-ski'); A.actions.pin(); assert.ok(!A.S.get('sample-ski').pinned);
+  go('#/c/sample-bali'); const before = A.S.state.countdowns.length; A.S.get('sample-bali').memoryPhotos = ['data:image/jpeg;base64,AAAA'];
+  A.actions.duplicate(); assert.strictEqual(A.S.state.countdowns.length, before + 1);
+  const copy = A.S.state.countdowns[A.S.state.countdowns.length - 1];
+  assert.ok(copy.title.endsWith('(copy)') && copy.id !== 'sample-bali' && copy.memoryPhotos.length === 0 && !copy.sample && !copy.pinned);
+  A.S.remove(copy.id); A.S.get('sample-bali').memoryPhotos = [];
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);
