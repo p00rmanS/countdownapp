@@ -96,6 +96,7 @@ struct DetailView: View {
                                 if c.type == "anniversary", let t = k.together { Chip(text: "Together for \(t.formatted()) days") }
                                 if c.type == "gotcha", let t = k.together { Chip(text: "Home together for \(t.formatted()) days") }
                                 if c.yearly { Chip(text: "Repeats every year") }
+                                if c.monthly { Chip(text: "Repeats every month") }
                             }.frame(maxWidth: .infinity)
                             H(c.title, 31, align: .center).padding(.top, 12)
                             let w = whenText(c, k)
@@ -221,6 +222,7 @@ struct WhenPanel: View {
             if let l = w.1 { kv("Your time", l) }
             kv("Time zone", tzLabel(c.timeZone))
             if c.yearly { kv("Repeats", "Every year · next is \(k.occYear)") }
+            if c.monthly { kv("Repeats", "Every month") }
         }
     }
     private func kv(_ a: String, _ b: String) -> some View {

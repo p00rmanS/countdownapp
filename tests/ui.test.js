@@ -158,6 +158,15 @@ test('pin puts a countdown first on Home; duplicate makes a fresh copy to edit',
   assert.ok(copy.title.endsWith('(copy)') && copy.id !== 'sample-bali' && copy.memoryPhotos.length === 0 && !copy.sample && !copy.pinned);
   A.S.remove(copy.id); A.S.get('sample-bali').memoryPhotos = [];
 });
+test('monthly repeat: pick it in the flow, it shows on the countdown and survives import', () => {
+  const c = A.P.cleanCountdown({ title: 'Flea & tick', type: 'vet', targetAt: '2030-01-31T09:00', recurrence: 'monthly', dog: { breed: 'scott', name: 'Scott' } });
+  assert.strictEqual(c.recurrence, 'monthly'); A.S.upsert(c);
+  assert.ok(go('#/c/' + c.id).includes('Repeats every month'));
+  go('#/edit/' + c.id); A.ui.step = 1; A.render(); assert.ok(doc.querySelector('[data-action="set-recur"][data-v="monthly"].on'));
+  A.actions['set-recur']({ dataset: { v: 'yearly' } }); assert.strictEqual(A.ui.draft.recurrence, 'yearly');
+  A.actions['set-recur']({ dataset: { v: 'nonsense' } }); assert.strictEqual(A.ui.draft.recurrence, 'none');
+  A.ui.draft = null; A.S.remove(c.id); go('#/');
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

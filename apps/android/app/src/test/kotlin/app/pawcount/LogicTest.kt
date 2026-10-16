@@ -78,6 +78,11 @@ class LogicTest {
         assertTrue(plan.size in 6..7); assertEquals(plan.size, plan.map { it.id }.toSet().size); assertTrue(plan.all { it.at > now })
         assertTrue(planCare(Settings(), emptyList(), now).isEmpty())
     }
+    @Test fun monthlyRepeatNeverDrifts() {
+        val c = cd("2030-01-31T09:00").copy(monthly = true)
+        fun day(m: Int, d: Int) = Instant.ofEpochMilli(compute(c, utc(2030, m, d)).target).atZone(ZoneId.of("UTC")).toLocalDate().toString()
+        assertEquals("2030-01-31", day(1, 10)); assertEquals("2030-02-28", day(2, 10)); assertEquals("2030-03-31", day(3, 5)); assertEquals("2030-04-30", day(4, 5))
+    }
     @Test fun badDateIsRejected() {
         val o = org.json.JSONObject("""{"id":"a","title":"t","type":"custom","targetAt":"tomorrow","dog":{"breed":"mutt","name":"n"}}""")
         assertTrue(runCatching { countdownFromJson(o) }.isFailure)

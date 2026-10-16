@@ -51,6 +51,7 @@ data class Countdown(
     val photos: List<String> = emptyList(), // file names inside the app's photo folder
     val sample: Boolean = false,
     val pinned: Boolean = false,    // stays at the top of Home
+    val monthly: Boolean = false,   // repeats every month (yearly is the other repeat)
 )
 
 data class Settings(
@@ -83,7 +84,7 @@ private fun JSONObject.optStr(k: String): String? = if (has(k) && !isNull(k)) ge
 
 fun Countdown.toJson(): JSONObject = JSONObject().apply {
     put("id", id); put("title", title); put("type", type); put("targetAt", targetAt); put("timeZone", timeZone)
-    put("allDay", allDay); put("recurrence", if (yearly) "yearly" else "none")
+    put("allDay", allDay); put("recurrence", if (yearly) "yearly" else if (monthly) "monthly" else "none")
     put("createdAt", java.time.Instant.ofEpochMilli(createdAt).toString())
     put("dog", JSONObject().put("breed", dog.breed).put("name", dog.name).apply {
         if (dog.furColor != null) put("colors", JSONObject().put("fur", dog.furColor))
@@ -134,7 +135,7 @@ private fun rawCountdownFromJson(o: JSONObject): Countdown {
     return Countdown(
         id = o.getString("id"), title = o.getString("title"), type = o.getString("type"),
         targetAt = o.getString("targetAt"), timeZone = o.optString("timeZone", java.util.TimeZone.getDefault().id),
-        allDay = o.optBoolean("allDay"), yearly = o.optString("recurrence") == "yearly", createdAt = created,
+        allDay = o.optBoolean("allDay"), yearly = o.optString("recurrence") == "yearly", monthly = o.optString("recurrence") == "monthly", createdAt = created,
         dog = Dog(dogO.getString("breed"), dogO.getString("name"), dogO.optJSONObject("colors")?.optStr("fur"), dogO.optStr("ears")),
         accent = o.optString("accent", "#E8A15C"), displayMode = DisplayMode.of(o.optStr("displayMode")), notes = o.optString("notes", ""),
         checklist = (0 until checks.length()).map { checks.getJSONObject(it).let { c -> CheckItem(c.optString("id", newId()), c.getString("text"), c.optBoolean("done")) } },

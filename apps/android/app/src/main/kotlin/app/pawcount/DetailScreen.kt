@@ -177,6 +177,7 @@ fun DetailScreen(vm: AppViewModel, id: String) {
                     if (c.type == "anniversary" && k.together != null) Chip("Together for ${"%,d".format(k.together)} days")
                     if (c.type == "gotcha" && k.together != null) Chip("Home together for ${"%,d".format(k.together)} days")
                     if (c.yearly) Chip("Repeats every year")
+                    if (c.monthly) Chip("Repeats every month")
                 }
                 H(c.title, 31, Modifier.padding(top = 12.dp), TextAlign.Center)
                 val w = whenText(c, k)
@@ -271,6 +272,7 @@ private fun WhenPanel(c: Countdown, k: Computed) {
         if (local != null) Kv("Your time", local)
         Kv("Time zone", tzLabel(c.timeZone))
         if (c.yearly) Kv("Repeats", "Every year · next is ${k.occYear}")
+        if (c.monthly) Kv("Repeats", "Every month")
     }
 }
 

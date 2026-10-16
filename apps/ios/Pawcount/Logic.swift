@@ -105,13 +105,18 @@ func compute(_ c: Countdown, now: Date = Date()) -> Computed {
     // Yearly repeats: walk forward until an occurrence whose day isn't over yet.
     var date = (base.y, base.mo, base.d)
     var prevEnd: Date? = nil
-    if c.yearly {
-        var y = base.y
-        for _ in 0..<400 {
-            date = occ(y)
+    if c.yearly || c.monthly {
+        for i in 0..<1200 {
+            // monthly: the i-th month after the first (31 Jan -> 28 Feb -> 31 Mar, never drifting)
+            if c.monthly {
+                let b = cal.date(from: DateComponents(year: base.y, month: base.mo, day: base.d)) ?? now
+                let m = cal.date(byAdding: .month, value: i, to: b) ?? b
+                let k = cal.dateComponents([.year, .month, .day], from: m)
+                date = (k.year ?? base.y, k.month ?? base.mo, k.day ?? base.d)
+            } else { date = occ(base.y + i) }
             let end = dayEnd(date)
             if end > now { break }
-            prevEnd = end; y += 1
+            prevEnd = end
         }
     }
     let target = instant(date)

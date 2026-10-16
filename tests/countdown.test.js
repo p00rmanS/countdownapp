@@ -110,4 +110,20 @@ test('samples cover every dog stage', () => {
   ['nap', 'curious', 'waiting', 'packing', 'zoomies', 'today', 'memory'].forEach((s) => assert.ok(stages.has(s), s));
 });
 
+console.log('monthly repeats');
+test('monthly repeat rolls to the next month and never drifts (31st -> Feb 28 -> Mar 31)', () => {
+  const c = mk({ targetAt: '2030-01-31T09:00', recurrence: 'monthly', createdAt: new Date('2030-01-01T00:00:00Z').toISOString() });
+  const day = (ms) => new Date(ms).toISOString().slice(0, 10);
+  assert.strictEqual(day(P.compute(c, Date.UTC(2030, 0, 10)).target), '2030-01-31');
+  assert.strictEqual(day(P.compute(c, Date.UTC(2030, 1, 10)).target), '2030-02-28');
+  assert.strictEqual(day(P.compute(c, Date.UTC(2030, 2, 5)).target), '2030-03-31');
+  assert.strictEqual(day(P.compute(c, Date.UTC(2030, 3, 5)).target), '2030-04-30');
+  assert.strictEqual(P.compute(c, Date.UTC(2030, 1, 10)).phase, 'upcoming');
+});
+test('monthly: the progress bar restarts after each occurrence', () => {
+  const c = mk({ targetAt: '2030-01-15T09:00', recurrence: 'monthly' });
+  const k = P.compute(c, Date.UTC(2030, 4, 16, 12));   // the day after the May occurrence
+  assert.ok(k.daysTotal >= 29 && k.daysTotal <= 32 && k.daysIn <= 3, k.daysTotal + '/' + k.daysIn);
+});
+
 console.log(`\n${passed} passed`);

@@ -64,11 +64,13 @@
       return [a, wallToInstant({ ...n, h: 0, mi: 0 }, tz)];
     };
     const occAt = (y) => ({ ...base, y, d: Math.min(base.d, dim(y, base.mo)) });
+    // monthly: the i-th month after the first one (31 Jan -> 28/29 Feb -> 31 Mar, never drifting)
+    const occMonth = (i) => { const t = base.mo - 1 + i, y = base.y + Math.floor(t / 12), mo = (t % 12) + 1; return { ...base, y, mo, d: Math.min(base.d, dim(y, mo)) }; };
 
     let occ = base, prevEnd = null;
-    if (c.recurrence === 'yearly') {
-      for (let y = base.y, i = 0; i < 400; i++, y++) {
-        occ = occAt(y);
+    if (c.recurrence === 'yearly' || c.recurrence === 'monthly') {
+      for (let i = 0; i < 1200; i++) {
+        occ = c.recurrence === 'monthly' ? occMonth(i) : occAt(base.y + i);
         const end = bounds(occ)[1];
         if (end > now) break;
         prevEnd = end;
@@ -105,7 +107,7 @@
     return {
       tz, target, start, total, remaining, leftPct, progress, phase, stage, parts, sleeps,
       daysCeil: Math.ceil(rem / DAY), weeks: Math.floor(parts.d / 7), weekDays: parts.d % 7,
-      daysTotal, daysIn, age, together, occYear: occ.y, excitement: Math.round(progress * 100), dayStart, dayEnd,
+      daysTotal, daysIn, age, together, occYear: occ.y, occMonth: occ.mo, excitement: Math.round(progress * 100), dayStart, dayEnd,
       daysSince: phase === 'past' ? Math.max(1, Math.floor((now - dayEnd) / DAY) + 1) : 0,
     };
   };
@@ -412,7 +414,7 @@
     if (P.EAR_TYPES && P.EAR_TYPES.some((e) => e[0] === d.ears)) dog.ears = d.ears;
     const c = {
       id: str(o.id, 64).replace(/[^\w-]/g, '') || P.uuid(), title, type, targetAt,
-      timeZone: validTz(str(o.timeZone, 64) || P.localTz()), allDay: !!o.allDay, recurrence: o.recurrence === 'yearly' ? 'yearly' : 'none',
+      timeZone: validTz(str(o.timeZone, 64) || P.localTz()), allDay: !!o.allDay, recurrence: o.recurrence === 'yearly' || o.recurrence === 'monthly' ? o.recurrence : 'none',
       createdAt: Number.isFinite(Date.parse(o.createdAt)) ? new Date(o.createdAt).toISOString() : new Date().toISOString(),
       dog, accent: HEX.test(o.accent || '') ? o.accent : P.TYPES[type].accent,
       displayMode: ['full', 'days', 'sleeps', 'weeks'].includes(o.displayMode) ? o.displayMode : 'full',

@@ -3,6 +3,15 @@ import XCTest
 
 /* Unit tests for Logic.swift. They mirror tests/countdown.test.js and the Android LogicTest so all platforms agree. */
 final class LogicTests: XCTestCase {
+    func testMonthlyRepeatNeverDrifts() {
+        var c = cd("2030-01-31T09:00"); c.monthly = true
+        func day(_ m: Int, _ d: Int) -> String {
+            var cal = Calendar(identifier: .gregorian); cal.timeZone = TimeZone(identifier: "UTC")!
+            let t = compute(c, now: utc(2030, m, d)).target; let k = cal.dateComponents([.year, .month, .day], from: t)
+            return String(format: "%04d-%02d-%02d", k.year!, k.month!, k.day!)
+        }
+        XCTAssertEqual(day(1, 10), "2030-01-31"); XCTAssertEqual(day(2, 10), "2030-02-28"); XCTAssertEqual(day(3, 5), "2030-03-31"); XCTAssertEqual(day(4, 5), "2030-04-30")
+    }
     func testCareCheckInIsOnePerDay() {
         var s = Settings(); s.careReminders = true; s.careTime = "18:00"
         let plan = planCare(s, [cd("2031-01-01T10:00")], now: now)

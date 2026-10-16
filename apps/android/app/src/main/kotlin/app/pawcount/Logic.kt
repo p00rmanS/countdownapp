@@ -67,13 +67,13 @@ fun compute(c: Countdown, now: Long = System.currentTimeMillis()): Computed {
     // Yearly repeats: walk forward until an occurrence whose day isn't over yet.
     var date = base.toLocalDate()
     var prevEnd: Long? = null
-    if (c.yearly) {
-        var y = base.year
-        for (i in 0 until 400) {
-            date = occ(y)
+    if (c.yearly || c.monthly) {
+        for (i in 0 until 1200) {
+            // monthly: the i-th month after the first (31 Jan -> 28 Feb -> 31 Mar, never drifting)
+            date = if (c.monthly) base.toLocalDate().plusMonths(i.toLong()) else occ(base.year + i)
             val end = dayEnd(date)
             if (end > now) break
-            prevEnd = end; y++
+            prevEnd = end
         }
     }
     val target = instant(date)

@@ -66,6 +66,7 @@ struct Countdown: Identifiable, Equatable {
     var photos: [String] = []       // file names in the app's photo folder
     var sample: Bool = false
     var pinned: Bool = false        // stays at the top of Home
+    var monthly: Bool = false       // repeats every month (yearly is the other repeat)
 }
 
 extension Countdown: Codable {
@@ -81,7 +82,8 @@ extension Countdown: Codable {
         targetAt = try c.decode(String.self, forKey: .targetAt)
         timeZone = try c.decodeIfPresent(String.self, forKey: .timeZone) ?? TimeZone.current.identifier
         allDay = try c.decodeIfPresent(Bool.self, forKey: .allDay) ?? false
-        yearly = (try c.decodeIfPresent(String.self, forKey: .recurrence)) == "yearly"
+        let rec = try c.decodeIfPresent(String.self, forKey: .recurrence)
+        yearly = rec == "yearly"; monthly = rec == "monthly"
         let iso = try c.decodeIfPresent(String.self, forKey: .createdAt)
         createdAt = iso.flatMap { isoParse($0) } ?? Date()
         dog = try c.decode(Dog.self, forKey: .dog)
@@ -130,7 +132,7 @@ extension Countdown: Codable {
         var c = e.container(keyedBy: K.self)
         try c.encode(id, forKey: .id); try c.encode(title, forKey: .title); try c.encode(type, forKey: .type)
         try c.encode(targetAt, forKey: .targetAt); try c.encode(timeZone, forKey: .timeZone); try c.encode(allDay, forKey: .allDay)
-        try c.encode(yearly ? "yearly" : "none", forKey: .recurrence)
+        try c.encode(yearly ? "yearly" : (monthly ? "monthly" : "none"), forKey: .recurrence)
         try c.encode(isoFormat(createdAt), forKey: .createdAt)
         try c.encode(dog, forKey: .dog); try c.encode(accent, forKey: .accent); try c.encode(displayMode.rawValue, forKey: .displayMode)
         try c.encode(notes, forKey: .notes); try c.encode(checklist, forKey: .checklist)

@@ -219,6 +219,7 @@
     if (c.type === 'anniversary' && k.together != null) facts.push(`Together for <b>${k.together.toLocaleString()}</b> days`);
     if (c.type === 'gotcha' && k.together != null) facts.push(`Home together for <b>${k.together.toLocaleString()}</b> days`);
     if (c.recurrence === 'yearly') facts.push('Repeats every year');
+    if (c.recurrence === 'monthly') facts.push('Repeats every month');
     const done = c.checklist.filter((x) => x.done).length;
     const earned = P.MILESTONES.filter((m) => (past || k.phase === 'today') ? true : k.daysCeil <= m && k.daysTotal >= m);
     return `<section class="detail" style="${styleVars(c)}">
@@ -246,7 +247,7 @@
           <dl class="kv"><div><dt>${w.sameTz ? 'Date' : esc((c.destination && c.destination.city) || w.destCity) + ' time'}</dt><dd>${esc(w.dest)}</dd></div>
           ${w.local ? `<div><dt>Your time</dt><dd>${esc(w.local)}</dd></div>` : ''}
           <div><dt>Time zone</dt><dd>${esc(P.tzLabel(k.tz))}</dd></div>
-          ${c.recurrence === 'yearly' ? `<div><dt>Repeats</dt><dd>Every year · next is ${k.occYear}</dd></div>` : ''}</dl></div>
+          ${c.recurrence === 'yearly' ? `<div><dt>Repeats</dt><dd>Every year · next is ${k.occYear}</dd></div>` : c.recurrence === 'monthly' ? `<div><dt>Repeats</dt><dd>Every month · next is ${esc(P.fmtInstant(k.target, k.tz, { allDay: true }))}</dd></div>` : ''}</dl></div>
         <div class="panel"><div class="panel-top"><h2 class="panel-h">${checklistLabel(c.type)}</h2><span class="muted small">${done}/${c.checklist.length}</span></div>
           <ul class="checks">${c.checklist.map((it, i) => `<li><button class="check ${it.done ? 'done' : ''}" role="checkbox" aria-checked="${it.done}" data-action="check" data-i="${i}"><span class="box">${icon('check')}</span><span class="txt">${esc(it.text)}</span></button><button class="x" data-action="del-check" data-i="${i}" aria-label="Remove ${esc(it.text)}">${icon('close')}</button></li>`).join('')}</ul>
           <form class="add-check" data-form="check"><input name="text" placeholder="Add something…" aria-label="Add to ${checklistLabel(c.type).toLowerCase()}" maxlength="80" autocomplete="off"><button class="btn btn-small" type="submit">Add</button></form></div>
@@ -468,7 +469,7 @@
     if (k.phase === 'today') return { ok: true, text: "That's today! 🎉" };
     const days = Math.ceil(k.remaining / 86400000);
     const tzNote = k.tz !== P.localTz() ? ` Counts to the moment in ${k.tz.split('/').pop().replace(/_/g, ' ')}.` : '';
-    return { ok: true, text: `${c.recurrence === 'yearly' && k.occYear !== +d.date.slice(0, 4) ? 'Next up is' : "That's"} in <b>${P.plural(days, 'day')}</b>${days >= 14 ? ` — about ${Math.round(days / 7)} weeks` : ''}.${tzNote}` };
+    return { ok: true, text: `${c.recurrence !== 'none' && new Intl.DateTimeFormat('en-CA', { timeZone: k.tz }).format(k.target) !== d.date ? 'Next up is' : "That's"} in <b>${P.plural(days, 'day')}</b>${days >= 14 ? ` — about ${Math.round(days / 7)} weeks` : ''}.${tzNote}` };
   }
   function stepValid() {
     const d = ui.draft;
@@ -503,10 +504,10 @@
     if (step === 1) {
       const n = whenNote();
       const tzs = TZS.includes(d.tz) ? TZS : [d.tz, ...TZS];
-      return `<div class="field-row"><label class="field"><span>${icon('clock')} Date</span><input type="date" data-bind="date" value="${d.date}" ${ui.flow === 'new' && d.recurrence !== 'yearly' ? `min="${todayStr()}"` : ''}></label>
+      return `<div class="field-row"><label class="field"><span>${icon('clock')} Date</span><input type="date" data-bind="date" value="${d.date}" ${ui.flow === 'new' && d.recurrence === 'none' ? `min="${todayStr()}"` : ''}></label>
         ${d.allDay ? '' : `<label class="field narrow"><span>Time</span><input type="time" data-bind="time" value="${d.time}"></label>`}</div>
         <div class="panel flush"><div class="set-row"><div><span class="set-t">All day</span><span class="muted small block">Counts down to midnight</span></div>${sw('allDay', d.allDay, 'All day', 'data-draft="1"')}</div>
-        <div class="set-row"><div><span class="set-t">${icon('repeat')} Repeat every year</span><span class="muted small block">Birthdays &amp; anniversaries roll over</span></div>${sw('recur', d.recurrence === 'yearly', 'Repeat every year', 'data-draft="1"')}</div></div>
+        <div class="set-row col"><span class="set-t">${icon('repeat')} Repeat</span><span class="muted small">Monthly is great for pills and flea &amp; tick treatment. Yearly for birthdays.</span>${seg('set-recur', [['none', 'Never'], ['monthly', 'Every month'], ['yearly', 'Every year']], d.recurrence, 'aria-label="Repeat"')}</div></div>
         <label class="field"><span>${icon('globe')} Time zone</span><select data-bind="tz">${tzs.map((z) => `<option value="${esc(z)}" ${z === d.tz ? 'selected' : ''}>${esc(z === P.localTz() ? 'My time zone — ' + z.replace(/_/g, ' ') : z.replace(/_/g, ' '))}</option>`).join('')}</select><small>Pick where the moment happens. Pawcount counts to it exactly, even across daylight-saving changes.</small></label>
         <p id="when-note" class="when-note ${n.ok ? '' : 'bad'}" role="status">${n.text}</p>`;
     }
@@ -766,7 +767,7 @@
       const k = P.compute(c);
       if (k.phase !== 'upcoming') return;
       if (P.MILESTONES.includes(k.daysCeil)) {
-        const key = `${c.id}:${k.occYear}:${k.daysCeil}`;
+        const key = `${c.id}:${k.occYear}${c.recurrence === 'monthly' ? '-' + k.occMonth : ''}:${k.daysCeil}`;
         if (!S.state.celebrated[key]) { S.state.celebrated[key] = 1; fresh.push({ c, k }); }
       }
     });
@@ -862,6 +863,7 @@
       const v = !S.state.settings[k]; S.set(k, v); el.classList.toggle('on', v); el.setAttribute('aria-checked', v);
       if (k === 'haptics' && v) P.haptic('purr'); if (k === 'sound' && v) P.sound('bark', true);
     },
+    'set-recur'(el) { ui.draft.recurrence = ['monthly', 'yearly'].includes(el.dataset.v) ? el.dataset.v : 'none'; P.haptic('tick'); rerenderFlowBody(); },
     'set-default-mode'(el) { S.set('displayMode', el.dataset.v); render({ keepScroll: true, noAnim: true }); },
     'set-parent'(el) { S.set('parentTitle', el.dataset.v === 'parent' ? 'parent' : el.dataset.v); render({ keepScroll: true, noAnim: true }); },
     'set-theme'(el) { S.set('theme', el.dataset.v); applySettings(); render({ keepScroll: true, noAnim: true }); },
