@@ -193,6 +193,7 @@ fun MemoriesScreen(vm: AppViewModel) {
 
 /* ------------------------------ Settings ------------------------------ */
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(vm: AppViewModel) {
     val data by vm.data.collectAsState()
