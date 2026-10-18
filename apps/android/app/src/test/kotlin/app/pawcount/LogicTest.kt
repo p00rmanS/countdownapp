@@ -83,6 +83,14 @@ class LogicTest {
         fun day(m: Int, d: Int) = Instant.ofEpochMilli(compute(c, utc(2030, m, d)).target).atZone(ZoneId.of("UTC")).toLocalDate().toString()
         assertEquals("2030-01-31", day(1, 10)); assertEquals("2030-02-28", day(2, 10)); assertEquals("2030-03-31", day(3, 5)); assertEquals("2030-04-30", day(4, 5))
     }
+    @Test fun weeklyRepeatAndDogAge() {
+        val c = cd("2030-01-05T09:00").copy(weekly = true)
+        fun day(m: Int, d: Int) = Instant.ofEpochMilli(compute(c, utc(2030, m, d)).target).atZone(ZoneId.of("UTC")).toLocalDate().toString()
+        assertEquals("2030-01-05", day(1, 3)); assertEquals("2030-01-12", day(1, 7)); assertEquals("2030-03-02", day(3, 1))
+        assertEquals("3 years 2 months old", dogAgeText("2027-04-10", LocalDate.of(2030, 6, 15)))
+        assertEquals("5 days old", dogAgeText("2030-06-10", LocalDate.of(2030, 6, 15)))
+        assertEquals(null, dogAgeText("2031-01-01", LocalDate.of(2030, 6, 15)))
+    }
     @Test fun badDateIsRejected() {
         val o = org.json.JSONObject("""{"id":"a","title":"t","type":"custom","targetAt":"tomorrow","dog":{"breed":"mutt","name":"n"}}""")
         assertTrue(runCatching { countdownFromJson(o) }.isFailure)

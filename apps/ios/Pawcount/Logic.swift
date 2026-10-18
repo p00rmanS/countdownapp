@@ -105,10 +105,15 @@ func compute(_ c: Countdown, now: Date = Date()) -> Computed {
     // Yearly repeats: walk forward until an occurrence whose day isn't over yet.
     var date = (base.y, base.mo, base.d)
     var prevEnd: Date? = nil
-    if c.yearly || c.monthly {
-        for i in 0..<1200 {
+    if c.yearly || c.monthly || c.weekly {
+        for i in 0..<5200 {
             // monthly: the i-th month after the first (31 Jan -> 28 Feb -> 31 Mar, never drifting)
-            if c.monthly {
+            if c.weekly {
+                let b = cal.date(from: DateComponents(year: base.y, month: base.mo, day: base.d)) ?? now
+                let w = cal.date(byAdding: .day, value: 7 * i, to: b) ?? b
+                let k = cal.dateComponents([.year, .month, .day], from: w)
+                date = (k.year ?? base.y, k.month ?? base.mo, k.day ?? base.d)
+            } else if c.monthly {
                 let b = cal.date(from: DateComponents(year: base.y, month: base.mo, day: base.d)) ?? now
                 let m = cal.date(byAdding: .month, value: i, to: b) ?? b
                 let k = cal.dateComponents([.year, .month, .day], from: m)
@@ -306,6 +311,26 @@ func defaultReminders(_ type: String) -> [Reminder] {
 }
 
 struct PlannedReminder { var id: String; var title: String; var body: String; var at: Date }
+
+func dogBirthdayDate(_ s: String) -> Date {
+    let f = DateFormatter(); f.calendar = Calendar(identifier: .gregorian); f.locale = Locale(identifier: "en_US_POSIX"); f.dateFormat = "yyyy-MM-dd"
+    return f.date(from: s) ?? Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date()
+}
+func dogBirthdayString(_ d: Date) -> String {
+    let f = DateFormatter(); f.calendar = Calendar(identifier: .gregorian); f.locale = Locale(identifier: "en_US_POSIX"); f.dateFormat = "yyyy-MM-dd"
+    return f.string(from: d)
+}
+
+/// "3 years 2 months old" from a YYYY-MM-DD birthday, or nil if it is not a past date
+func dogAgeText(_ birthday: String, today: Date = Date()) -> String? {
+    let f = DateFormatter(); f.calendar = Calendar(identifier: .gregorian); f.locale = Locale(identifier: "en_US_POSIX"); f.dateFormat = "yyyy-MM-dd"
+    guard birthday.count == 10, let b = f.date(from: birthday), b <= today else { return nil }
+    let p = Calendar.current.dateComponents([.year, .month, .day], from: b, to: today)
+    func n(_ v: Int, _ w: String) -> String { "\(v) \(w)\(v == 1 ? "" : "s")" }
+    if let y = p.year, y > 0 { return n(y, "year") + ((p.month ?? 0) > 0 ? " " + n(p.month!, "month") : "") + " old" }
+    if let m = p.month, m > 0 { return n(m, "month") + " old" }
+    return n(max(1, p.day ?? 0), "day") + " old"
+}
 
 /// the daily check-in nudge from the dog: one per day for the next week at the chosen time
 func planCare(_ settings: Settings, _ list: [Countdown], now: Date = Date()) -> [PlannedReminder] {

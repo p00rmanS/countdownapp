@@ -65,12 +65,13 @@
     };
     const occAt = (y) => ({ ...base, y, d: Math.min(base.d, dim(y, base.mo)) });
     // monthly: the i-th month after the first one (31 Jan -> 28/29 Feb -> 31 Mar, never drifting)
+    const occWeek = (i) => ({ ...base, ...addDays(base, 7 * i) });
     const occMonth = (i) => { const t = base.mo - 1 + i, y = base.y + Math.floor(t / 12), mo = (t % 12) + 1; return { ...base, y, mo, d: Math.min(base.d, dim(y, mo)) }; };
 
     let occ = base, prevEnd = null;
-    if (c.recurrence === 'yearly' || c.recurrence === 'monthly') {
-      for (let i = 0; i < 1200; i++) {
-        occ = c.recurrence === 'monthly' ? occMonth(i) : occAt(base.y + i);
+    if (c.recurrence === 'yearly' || c.recurrence === 'monthly' || c.recurrence === 'weekly') {
+      for (let i = 0; i < 5200; i++) {
+        occ = c.recurrence === 'weekly' ? occWeek(i) : c.recurrence === 'monthly' ? occMonth(i) : occAt(base.y + i);
         const end = bounds(occ)[1];
         if (end > now) break;
         prevEnd = end;
@@ -116,6 +117,16 @@
 
   const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
   P.plural = plural;
+  /** a dog's age from a "YYYY-MM-DD" birthday: { y, mo, d }, or null if it is not a past date */
+  P.dogAge = (iso, now = new Date()) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); if (!m) return null;
+    const b = new Date(+m[1], +m[2] - 1, +m[3]); if (isNaN(b) || b > now) return null;
+    let y = now.getFullYear() - b.getFullYear(), mo = now.getMonth() - b.getMonth(), d = now.getDate() - b.getDate();
+    if (d < 0) { mo--; d += new Date(now.getFullYear(), now.getMonth(), 0).getDate(); }
+    if (mo < 0) { y--; mo += 12; }
+    return { y, mo, d };
+  };
+  P.dogAgeText = (a) => (!a ? '' : a.y ? `${plural(a.y, 'year')}${a.mo ? ' ' + plural(a.mo, 'month') : ''} old` : a.mo ? `${plural(a.mo, 'month')} old` : `${plural(Math.max(1, a.d), 'day')} old`);
 
   P.spoken = (k) => {
     if (k.phase === 'today' && k.remaining <= 0) return "It's today";
@@ -414,7 +425,7 @@
     if (P.EAR_TYPES && P.EAR_TYPES.some((e) => e[0] === d.ears)) dog.ears = d.ears;
     const c = {
       id: str(o.id, 64).replace(/[^\w-]/g, '') || P.uuid(), title, type, targetAt,
-      timeZone: validTz(str(o.timeZone, 64) || P.localTz()), allDay: !!o.allDay, recurrence: o.recurrence === 'yearly' || o.recurrence === 'monthly' ? o.recurrence : 'none',
+      timeZone: validTz(str(o.timeZone, 64) || P.localTz()), allDay: !!o.allDay, recurrence: ['yearly', 'monthly', 'weekly'].includes(o.recurrence) ? o.recurrence : 'none',
       createdAt: Number.isFinite(Date.parse(o.createdAt)) ? new Date(o.createdAt).toISOString() : new Date().toISOString(),
       dog, accent: HEX.test(o.accent || '') ? o.accent : P.TYPES[type].accent,
       displayMode: ['full', 'days', 'sleeps', 'weeks'].includes(o.displayMode) ? o.displayMode : 'full',

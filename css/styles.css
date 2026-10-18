@@ -532,3 +532,4 @@ button, a, .dog-hit { -webkit-touch-callout: none; }
 .need .i { width: 14px; height: 14px; } .need i { width: 46px; height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .28); overflow: hidden; } .need b { display: block; height: 100%; width: 0; border-radius: 99px; background: #7BD88F; transition: width .6s var(--spring); }
 .need[data-need='water'] b { background: #6EC6FF; } .need.low b { background: #FF8A7A; } .need.low { animation: pulse 1.4s ease-in-out infinite; }
 .play-tray.static .needs { margin-top: 0; }
+.panel.profile-dog { display: grid; gap: 4px; margin-top: 12px; } .profile-dog .field { margin-top: 8px; } .dog-age { margin: 8px 0 4px; font-size: 16px; } .profile-dog .btn { justify-self: start; margin-top: 4px; }

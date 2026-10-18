@@ -67,6 +67,7 @@ struct Countdown: Identifiable, Equatable {
     var sample: Bool = false
     var pinned: Bool = false        // stays at the top of Home
     var monthly: Bool = false       // repeats every month (yearly is the other repeat)
+    var weekly: Bool = false        // repeats every week
 }
 
 extension Countdown: Codable {
@@ -83,7 +84,7 @@ extension Countdown: Codable {
         timeZone = try c.decodeIfPresent(String.self, forKey: .timeZone) ?? TimeZone.current.identifier
         allDay = try c.decodeIfPresent(Bool.self, forKey: .allDay) ?? false
         let rec = try c.decodeIfPresent(String.self, forKey: .recurrence)
-        yearly = rec == "yearly"; monthly = rec == "monthly"
+        yearly = rec == "yearly"; monthly = rec == "monthly"; weekly = rec == "weekly"
         let iso = try c.decodeIfPresent(String.self, forKey: .createdAt)
         createdAt = iso.flatMap { isoParse($0) } ?? Date()
         dog = try c.decode(Dog.self, forKey: .dog)
@@ -132,7 +133,7 @@ extension Countdown: Codable {
         var c = e.container(keyedBy: K.self)
         try c.encode(id, forKey: .id); try c.encode(title, forKey: .title); try c.encode(type, forKey: .type)
         try c.encode(targetAt, forKey: .targetAt); try c.encode(timeZone, forKey: .timeZone); try c.encode(allDay, forKey: .allDay)
-        try c.encode(yearly ? "yearly" : (monthly ? "monthly" : "none"), forKey: .recurrence)
+        try c.encode(yearly ? "yearly" : (monthly ? "monthly" : (weekly ? "weekly" : "none")), forKey: .recurrence)
         try c.encode(isoFormat(createdAt), forKey: .createdAt)
         try c.encode(dog, forKey: .dog); try c.encode(accent, forKey: .accent); try c.encode(displayMode.rawValue, forKey: .displayMode)
         try c.encode(notes, forKey: .notes); try c.encode(checklist, forKey: .checklist)
@@ -158,10 +159,12 @@ struct Settings: Equatable {
     var needsOn = true               // the dog gets hungry and thirsty
     var careReminders = false        // a daily check-in notification
     var careTime = "18:00"
+    var dogName = ""
+    var dogBirthday = ""             // YYYY-MM-DD
 }
 
 extension Settings: Codable {
-    private enum K: String, CodingKey { case displayMode, haptics, sound, motion, theme, notifications, profileName, profilePhoto, parentTitle, needsOn, careReminders, careTime }
+    private enum K: String, CodingKey { case displayMode, haptics, sound, motion, theme, notifications, profileName, profilePhoto, parentTitle, needsOn, careReminders, careTime, dogName, dogBirthday }
     init(from d: Decoder) throws {
         let c = try d.container(keyedBy: K.self)
         displayMode = DisplayMode(rawValue: (try c.decodeIfPresent(String.self, forKey: .displayMode)) ?? "") ?? .full
@@ -179,13 +182,16 @@ extension Settings: Codable {
         careReminders = try c.decodeIfPresent(Bool.self, forKey: .careReminders) ?? false
         let ct = try c.decodeIfPresent(String.self, forKey: .careTime) ?? "18:00"
         careTime = ["08:00", "12:00", "18:00", "21:00"].contains(ct) ? ct : "18:00"
+        dogName = String((try c.decodeIfPresent(String.self, forKey: .dogName) ?? "").prefix(30))
+        let db = try c.decodeIfPresent(String.self, forKey: .dogBirthday) ?? ""
+        dogBirthday = dogAgeText(db) != nil ? db : ""
     }
     func encode(to e: Encoder) throws {
         var c = e.container(keyedBy: K.self)
         try c.encode(displayMode.rawValue, forKey: .displayMode); try c.encode(haptics, forKey: .haptics); try c.encode(sound, forKey: .sound)
         try c.encode(reduceMotion, forKey: .motion); try c.encode(theme, forKey: .theme); try c.encode(notifications, forKey: .notifications)
         try c.encode(profileName, forKey: .profileName); try c.encode(profilePhoto, forKey: .profilePhoto); try c.encode(parentTitle, forKey: .parentTitle)
-        try c.encode(needsOn, forKey: .needsOn); try c.encode(careReminders, forKey: .careReminders); try c.encode(careTime, forKey: .careTime)
+        try c.encode(needsOn, forKey: .needsOn); try c.encode(careReminders, forKey: .careReminders); try c.encode(careTime, forKey: .careTime); try c.encode(dogName, forKey: .dogName); try c.encode(dogBirthday, forKey: .dogBirthday)
     }
 }
 

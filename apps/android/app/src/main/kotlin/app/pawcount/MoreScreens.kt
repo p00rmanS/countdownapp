@@ -244,6 +244,33 @@ fun SettingsScreen(vm: AppViewModel) {
             Divider()
             SettingCol("Reduce motion", "Swaps loops for still poses. The dog keeps their expression.") { Seg(listOf("system" to "System", "on" to "On", "off" to "Off"), s.reduceMotion, { m -> vm.settings { it.copy(reduceMotion = m) } }, label = "Reduce motion") }
         }
+        Group("My dog")
+        Panel {
+            var dogName by remember(s.dogName) { mutableStateOf(s.dogName) }
+            var showBday by remember { mutableStateOf(false) }
+            Field("Name", dogName, { dogName = it; vm.settings { st -> st.copy(dogName = it.trim()) } }, placeholder = "Scott", maxLen = 30)
+            PickerRow("Birthday or gotcha date", s.dogBirthday.ifEmpty { "Choose a date…" }) { showBday = true }
+            val ageText = dogAgeText(s.dogBirthday)
+            if (ageText != null) {
+                B("${s.dogName.ifBlank { "Your dog" }} is $ageText", Modifier.padding(top = 12.dp), 16, FontWeight.ExtraBold)
+                Box(Modifier.padding(top = 10.dp)) { SmallButton("Add the birthday as a countdown", {
+                    val name = s.dogName.ifBlank { "My dog" }; val title = "$name's birthday"
+                    if (data.countdowns.any { it.title == title }) vm.say("That birthday is already on your list")
+                    else {
+                        val c = Countdown(id = newId(), title = title, type = "birthday", targetAt = s.dogBirthday + "T00:00", timeZone = java.time.ZoneId.systemDefault().id, allDay = true, yearly = true,
+                            createdAt = System.currentTimeMillis(), dog = Dog("scott", name), accent = "#FF7DAA", displayMode = DisplayMode.FULL,
+                            person = Person(name, s.dogBirthday.take(4).toIntOrNull()), reminders = defaultReminders("birthday"))
+                        vm.upsert(c); vm.say("$name's birthday is on your list"); vm.push(Route.Detail(c.id))
+                    }
+                }, pc.surface) }
+            } else Muted("Add a date to see their age and make a birthday countdown.", Modifier.padding(top = 10.dp), size = 14)
+            if (showBday) {
+                val st = androidx.compose.material3.rememberDatePickerState(initialSelectedDateMillis = runCatching { java.time.LocalDate.parse(s.dogBirthday) }.getOrDefault(java.time.LocalDate.now().minusYears(1)).atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli())
+                androidx.compose.material3.DatePickerDialog({ showBday = false },
+                    confirmButton = { androidx.compose.material3.TextButton({ st.selectedDateMillis?.let { ms -> val d = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneOffset.UTC).toLocalDate(); if (!d.isAfter(java.time.LocalDate.now())) vm.settings { x -> x.copy(dogBirthday = d.toString()) } }; showBday = false }) { Text("OK") } },
+                    dismissButton = { androidx.compose.material3.TextButton({ showBday = false }) { Text("Cancel") } }) { androidx.compose.material3.DatePicker(st) }
+            }
+        }
         Group("Care")
         Panel(flush = true) {
             SettingSwitch("Hunger & thirst", "Your dog gets hungry and thirsty while you are away", s.needsOn) { on -> vm.settings { it.copy(needsOn = on) } }

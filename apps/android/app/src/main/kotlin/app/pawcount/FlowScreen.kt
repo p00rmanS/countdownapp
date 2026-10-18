@@ -73,7 +73,7 @@ import java.util.Locale
 data class Draft(
     val id: String? = null, val type: String = "intl_trip", val title: String = "", val titleAuto: Boolean = true,
     val date: LocalDate = LocalDate.now().plusDays(30), val time: LocalTime = LocalTime.of(9, 0), val allDay: Boolean = false,
-    val tz: String = ZoneId.systemDefault().id, val yearly: Boolean = false, val monthly: Boolean = false, val country: String = "",
+    val tz: String = ZoneId.systemDefault().id, val yearly: Boolean = false, val monthly: Boolean = false, val weekly: Boolean = false, val country: String = "",
     val personName: String = "", val birthYear: String = "", val breed: String = "scott", val breedTouched: Boolean = false,
     val dogName: String = "Scott", val nameTouched: Boolean = false, val fur: String = "#B98A62", val ears: String = "floppy",
     val accent: String = "#5DADE8", val accentTouched: Boolean = false, val mode: DisplayMode = DisplayMode.FULL,
@@ -84,7 +84,7 @@ data class Draft(
 private fun Draft.withType(meta: Meta, t: String): Draft {
     val info = meta.types.getValue(t)
     val b = if (breedTouched) breed else meta.suggestedBreed(t)
-    return copy(type = t, accent = if (accentTouched) accent else info.accent, yearly = info.repeats, monthly = false, allDay = t == "birthday" || t == "anniversary" || t == "holiday" || t == "gotcha",
+    return copy(type = t, accent = if (accentTouched) accent else info.accent, yearly = info.repeats, monthly = false, weekly = false, allDay = t == "birthday" || t == "anniversary" || t == "holiday" || t == "gotcha",
         breed = b, dogName = if (nameTouched) dogName else meta.breeds.getValue(b).name, reminders = defaultReminders(t), country = if (t == "intl_trip") country else "",
         title = if (titleAuto) "" else title)
 }
@@ -93,14 +93,14 @@ private fun Draft.toCountdown(): Countdown {
     val target = "${date}T${if (allDay) "00:00" else time.toString().take(5)}"
     val keep = createdAt != null && origTarget == "$target|$tz"
     val dog = if (breed == "mutt") Dog("mutt", dogName.trim().ifEmpty { "Lucky" }, fur, ears) else Dog(breed, dogName.trim())
-    return Countdown(id ?: newId(), title.trim(), type, target, tz, allDay, yearly && !monthly, if (keep) createdAt!! else System.currentTimeMillis(), dog, accent, mode, notes, checklist,
-        destination = null, monthly = monthly, person = if (type == "birthday" && (personName.isNotBlank() || birthYear.isNotBlank())) Person(personName.trim(), birthYear.toIntOrNull()) else null,
+    return Countdown(id ?: newId(), title.trim(), type, target, tz, allDay, yearly && !monthly && !weekly, if (keep) createdAt!! else System.currentTimeMillis(), dog, accent, mode, notes, checklist,
+        destination = null, monthly = monthly, weekly = weekly, person = if (type == "birthday" && (personName.isNotBlank() || birthYear.isNotBlank())) Person(personName.trim(), birthYear.toIntOrNull()) else null,
         reminders = reminders, archived = archived, photos = photos, sample = sample)
 }
 
 private fun draftOf(c: Countdown, meta: Meta) = Draft(
     id = c.id, type = c.type, title = c.title, titleAuto = false, date = LocalDate.parse(c.targetAt.take(10)), time = runCatching { LocalTime.parse(c.targetAt.substring(11, 16)) }.getOrDefault(LocalTime.of(9, 0)),
-    allDay = c.allDay, tz = c.timeZone, yearly = c.yearly, monthly = c.monthly, country = c.destination?.country ?: "", personName = c.person?.name ?: "", birthYear = c.person?.birthYear?.toString() ?: "",
+    allDay = c.allDay, tz = c.timeZone, yearly = c.yearly, monthly = c.monthly, weekly = c.weekly, country = c.destination?.country ?: "", personName = c.person?.name ?: "", birthYear = c.person?.birthYear?.toString() ?: "",
     breed = c.dog.breed, breedTouched = true, dogName = c.dog.name, nameTouched = true, fur = c.dog.furColor ?: "#B98A62", ears = c.dog.ears ?: "floppy", accent = c.accent, accentTouched = true,
     mode = c.displayMode, reminders = c.reminders, notes = c.notes, checklist = c.checklist, createdAt = c.createdAt, sample = c.sample, photos = c.photos, archived = c.archived, origTarget = "${c.targetAt}|${c.timeZone}",
 )
@@ -191,12 +191,16 @@ fun FlowScreen(vm: AppViewModel, editId: String?) {
                         }
                         Divider()
                         Row(Modifier.fillMaxWidth().heightIn(min = 64.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f)) { B("Repeat every week", size = 16, weight = FontWeight.ExtraBold); Muted("Walks, baths, weekly treats", size = 13) }
+                            PawSwitch(d.weekly, "Repeat every week") { d = d.copy(weekly = it, monthly = if (it) false else d.monthly, yearly = if (it) false else d.yearly) }
+                        }
+                        Row(Modifier.fillMaxWidth().heightIn(min = 64.dp), verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) { B("Repeat every month", size = 16, weight = FontWeight.ExtraBold); Muted("Pills, flea & tick treatment, grooming", size = 13) }
-                            PawSwitch(d.monthly, "Repeat every month") { d = d.copy(monthly = it, yearly = if (it) false else d.yearly) }
+                            PawSwitch(d.monthly, "Repeat every month") { d = d.copy(monthly = it, weekly = if (it) false else d.weekly, yearly = if (it) false else d.yearly) }
                         }
                         Row(Modifier.fillMaxWidth().heightIn(min = 64.dp), verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) { B("Repeat every year", size = 16, weight = FontWeight.ExtraBold); Muted("Birthdays & anniversaries roll over", size = 13) }
-                            PawSwitch(d.yearly, "Repeat every year") { d = d.copy(yearly = it, monthly = if (it) false else d.monthly) }
+                            PawSwitch(d.yearly, "Repeat every year") { d = d.copy(yearly = it, monthly = if (it) false else d.monthly, weekly = if (it) false else d.weekly) }
                         }
                     }
                     PickerRow("Time zone", tzLabel(d.tz)) { showTz = true }

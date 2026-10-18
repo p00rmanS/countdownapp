@@ -216,6 +216,27 @@ struct SettingsView: View {
                     col("Reduce motion", sub: "Swaps loops for still poses. The dog keeps their expression.") { Seg(options: [("system", "System"), ("on", "On"), ("off", "Off")], selected: s.reduceMotion, label: "Reduce motion") { m in store.setSettings { $0.reduceMotion = m } } }
                 }
 
+                group("My dog")
+                Panel {
+                    Field(label: "Name", text: Binding(get: { s.dogName }, set: { v in store.setSettings { $0.dogName = String(v.trimmingCharacters(in: .whitespaces).prefix(30)) } }), placeholder: "Scott", maxLen: 30)
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text("Birthday or gotcha date").font(PawFont.body(14, 800)).foregroundColor(pc.ink2)
+                        DatePicker("Birthday", selection: Binding(get: { dogBirthdayDate(s.dogBirthday) }, set: { v in store.setSettings { $0.dogBirthday = dogBirthdayString(v) } }), in: ...Date(), displayedComponents: .date).labelsHidden().tint(pc.kibble)
+                            .padding(.horizontal, 12).frame(maxWidth: .infinity, minHeight: 54, alignment: .leading).background(RoundedRectangle(cornerRadius: 18).fill(pc.surface))
+                            .overlay(RoundedRectangle(cornerRadius: 18).stroke(pc.line, lineWidth: 2))
+                    }.padding(.top, 14)
+                    if let age = dogAgeText(s.dogBirthday) {
+                        B("\(s.dogName.isEmpty ? "Your dog" : s.dogName) is \(age)", 16, weight: 800).padding(.top, 12)
+                        SmallButton(title: "Add the birthday as a countdown", tint: pc.surface) {
+                            let name = s.dogName.isEmpty ? "My dog" : s.dogName, title = "\(name)'s birthday"
+                            if store.data.countdowns.contains(where: { $0.title == title }) { store.say("That birthday is already on your list"); return }
+                            let c = Countdown(id: newId(), title: title, type: "birthday", targetAt: s.dogBirthday + "T00:00", timeZone: TimeZone.current.identifier, allDay: true, yearly: true,
+                                              createdAt: Date(), dog: Dog(breed: "scott", name: name), accent: "#FF7DAA", displayMode: .full, person: Person(name: name, birthYear: Int(s.dogBirthday.prefix(4))), reminders: defaultReminders("birthday"))
+                            store.upsert(c); store.say("\(name)'s birthday is on your list"); store.push(.detail(c.id))
+                        }.padding(.top, 10)
+                    } else { Muted("Add a date to see their age and make a birthday countdown.", 14).padding(.top, 10) }
+                }
+
                 group("Care")
                 Panel(flush: true) {
                     row("Hunger & thirst", "Your dog gets hungry and thirsty while you are away", s.needsOn) { on in store.setSettings { $0.needsOn = on } }

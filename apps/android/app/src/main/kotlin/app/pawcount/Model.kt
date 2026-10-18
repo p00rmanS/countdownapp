@@ -52,6 +52,7 @@ data class Countdown(
     val sample: Boolean = false,
     val pinned: Boolean = false,    // stays at the top of Home
     val monthly: Boolean = false,   // repeats every month (yearly is the other repeat)
+    val weekly: Boolean = false,    // repeats every week
 )
 
 data class Settings(
@@ -67,6 +68,8 @@ data class Settings(
     val needsOn: Boolean = true,          // the dog gets hungry and thirsty
     val careReminders: Boolean = false,   // a daily check-in notification
     val careTime: String = "18:00",
+    val dogName: String = "",
+    val dogBirthday: String = "",         // YYYY-MM-DD
 )
 
 data class AppData(
@@ -84,7 +87,7 @@ private fun JSONObject.optStr(k: String): String? = if (has(k) && !isNull(k)) ge
 
 fun Countdown.toJson(): JSONObject = JSONObject().apply {
     put("id", id); put("title", title); put("type", type); put("targetAt", targetAt); put("timeZone", timeZone)
-    put("allDay", allDay); put("recurrence", if (yearly) "yearly" else if (monthly) "monthly" else "none")
+    put("allDay", allDay); put("recurrence", if (yearly) "yearly" else if (monthly) "monthly" else if (weekly) "weekly" else "none")
     put("createdAt", java.time.Instant.ofEpochMilli(createdAt).toString())
     put("dog", JSONObject().put("breed", dog.breed).put("name", dog.name).apply {
         if (dog.furColor != null) put("colors", JSONObject().put("fur", dog.furColor))
@@ -135,7 +138,7 @@ private fun rawCountdownFromJson(o: JSONObject): Countdown {
     return Countdown(
         id = o.getString("id"), title = o.getString("title"), type = o.getString("type"),
         targetAt = o.getString("targetAt"), timeZone = o.optString("timeZone", java.util.TimeZone.getDefault().id),
-        allDay = o.optBoolean("allDay"), yearly = o.optString("recurrence") == "yearly", monthly = o.optString("recurrence") == "monthly", createdAt = created,
+        allDay = o.optBoolean("allDay"), yearly = o.optString("recurrence") == "yearly", monthly = o.optString("recurrence") == "monthly", weekly = o.optString("recurrence") == "weekly", createdAt = created,
         dog = Dog(dogO.getString("breed"), dogO.getString("name"), dogO.optJSONObject("colors")?.optStr("fur"), dogO.optStr("ears")),
         accent = o.optString("accent", "#E8A15C"), displayMode = DisplayMode.of(o.optStr("displayMode")), notes = o.optString("notes", ""),
         checklist = (0 until checks.length()).map { checks.getJSONObject(it).let { c -> CheckItem(c.optString("id", newId()), c.getString("text"), c.optBoolean("done")) } },
@@ -154,7 +157,7 @@ fun AppData.toJson(): JSONObject = JSONObject().apply {
     put("settings", JSONObject().apply {
         put("displayMode", settings.displayMode.key); put("haptics", settings.haptics); put("sound", settings.sound)
         put("motion", settings.reduceMotion); put("theme", settings.theme); put("notifications", settings.notifications)
-        put("profileName", settings.profileName); put("profilePhoto", settings.profilePhoto); put("parentTitle", settings.parentTitle); put("needsOn", settings.needsOn); put("careReminders", settings.careReminders); put("careTime", settings.careTime)
+        put("profileName", settings.profileName); put("profilePhoto", settings.profilePhoto); put("parentTitle", settings.parentTitle); put("needsOn", settings.needsOn); put("careReminders", settings.careReminders); put("careTime", settings.careTime); put("dogName", settings.dogName); put("dogBirthday", settings.dogBirthday)
     })
 }
 
@@ -174,6 +177,8 @@ fun appDataFromJson(raw: JSONObject): AppData {
             profileName = (s?.optString("profileName", "") ?: "").take(30), profilePhoto = (s?.optString("profilePhoto", "") ?: "").takeIf { SAFE_PHOTO.matches(it) } ?: "",
             parentTitle = (s?.optString("parentTitle", "") ?: "").takeIf { it in setOf("mama", "papa", "parent") } ?: "",
             needsOn = s?.optBoolean("needsOn", true) ?: true, careReminders = s?.optBoolean("careReminders") ?: false,
+            dogName = (s?.optString("dogName", "") ?: "").take(30),
+            dogBirthday = (s?.optString("dogBirthday", "") ?: "").takeIf { b -> runCatching { java.time.LocalDate.parse(b).let { !it.isAfter(java.time.LocalDate.now()) } }.getOrDefault(false) } ?: "",
             careTime = (s?.optString("careTime", "18:00") ?: "18:00").takeIf { it in setOf("08:00", "12:00", "18:00", "21:00") } ?: "18:00",
         ),
     )

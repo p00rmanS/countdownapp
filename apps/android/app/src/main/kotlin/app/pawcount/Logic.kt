@@ -67,10 +67,10 @@ fun compute(c: Countdown, now: Long = System.currentTimeMillis()): Computed {
     // Yearly repeats: walk forward until an occurrence whose day isn't over yet.
     var date = base.toLocalDate()
     var prevEnd: Long? = null
-    if (c.yearly || c.monthly) {
-        for (i in 0 until 1200) {
+    if (c.yearly || c.monthly || c.weekly) {
+        for (i in 0 until 5200) {
             // monthly: the i-th month after the first (31 Jan -> 28 Feb -> 31 Mar, never drifting)
-            date = if (c.monthly) base.toLocalDate().plusMonths(i.toLong()) else occ(base.year + i)
+            date = if (c.weekly) base.toLocalDate().plusWeeks(i.toLong()) else if (c.monthly) base.toLocalDate().plusMonths(i.toLong()) else occ(base.year + i)
             val end = dayEnd(date)
             if (end > now) break
             prevEnd = end
@@ -238,6 +238,19 @@ fun defaultReminders(type: String): List<Reminder> = buildList {
 }
 
 data class PlannedReminder(val id: Int, val title: String, val body: String, val at: Long)
+
+/** "3 years 2 months old" from a YYYY-MM-DD birthday, or null if it is not a past date */
+fun dogAgeText(birthday: String, today: java.time.LocalDate = java.time.LocalDate.now()): String? {
+    val b = runCatching { java.time.LocalDate.parse(birthday) }.getOrNull() ?: return null
+    if (b.isAfter(today)) return null
+    val p = java.time.Period.between(b, today)
+    fun n(v: Int, w: String) = "$v $w${if (v == 1) "" else "s"}"
+    return when {
+        p.years > 0 -> n(p.years, "year") + (if (p.months > 0) " " + n(p.months, "month") else "") + " old"
+        p.months > 0 -> n(p.months, "month") + " old"
+        else -> n(maxOf(1, p.days), "day") + " old"
+    }
+}
 
 /** the daily check-in nudge from the dog: one per day for the next week at the chosen time */
 fun planCare(settings: Settings, list: List<Countdown>, now: Long = System.currentTimeMillis()): List<PlannedReminder> {

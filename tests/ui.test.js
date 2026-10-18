@@ -167,6 +167,18 @@ test('monthly repeat: pick it in the flow, it shows on the countdown and survive
   A.actions['set-recur']({ dataset: { v: 'nonsense' } }); assert.strictEqual(A.ui.draft.recurrence, 'none');
   A.ui.draft = null; A.S.remove(c.id); go('#/');
 });
+test('My dog: name and birthday show an age and make a yearly birthday countdown', () => {
+  const y = new w.Date().getFullYear() - 2, bday = y + '-01-02';
+  A.S.set('dogName', 'Scott'); A.S.set('dogBirthday', bday);
+  const s = go('#/settings'); assert.ok(s.includes('data-dog-name') && s.includes('Scott</b> is 2 years') && s.includes('dog-bday-add'));
+  const before = A.S.state.countdowns.length; A.actions['dog-bday-add']();
+  assert.strictEqual(A.S.state.countdowns.length, before + 1);
+  const c = A.S.state.countdowns[A.S.state.countdowns.length - 1]; assert.ok(c.title === "Scott's birthday" && c.recurrence === 'yearly' && c.allDay && c.type === 'birthday');
+  A.actions['dog-bday-add'](); assert.strictEqual(A.S.state.countdowns.length, before + 1);   // no duplicates
+  A.S.remove(c.id); A.S.importJSON(JSON.stringify({ data: { countdowns: [], settings: { dogBirthday: '2999-01-01', dogName: 'x'.repeat(99) } } }));
+  assert.strictEqual(A.S.state.settings.dogBirthday, ''); assert.strictEqual(A.S.state.settings.dogName.length, 30);
+  A.S.state.settings.dogName = ''; A.S.loadSamples();
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

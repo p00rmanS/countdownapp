@@ -126,4 +126,21 @@ test('monthly: the progress bar restarts after each occurrence', () => {
   assert.ok(k.daysTotal >= 29 && k.daysTotal <= 32 && k.daysIn <= 3, k.daysTotal + '/' + k.daysIn);
 });
 
+test('weekly repeat: next Saturday after each one passes, and the bar restarts', () => {
+  const c = mk({ targetAt: '2030-01-05T09:00', recurrence: 'weekly', createdAt: new Date('2030-01-01T00:00:00Z').toISOString() });
+  const day = (ms) => new Date(ms).toISOString().slice(0, 10);
+  assert.strictEqual(day(P.compute(c, Date.UTC(2030, 0, 3)).target), '2030-01-05');
+  assert.strictEqual(day(P.compute(c, Date.UTC(2030, 0, 7)).target), '2030-01-12');
+  assert.strictEqual(day(P.compute(c, Date.UTC(2030, 2, 1)).target), '2030-03-02');
+  const k = P.compute(c, Date.UTC(2030, 0, 13)); assert.ok(k.daysTotal >= 6 && k.daysTotal <= 7 && k.daysIn <= 2, k.daysTotal + '/' + k.daysIn);
+});
+test('dog age from a birthday', () => {
+  const at = new Date(2030, 5, 15);
+  assert.strictEqual(P.dogAgeText(P.dogAge('2027-04-10', at)), '3 years 2 months old');
+  assert.strictEqual(P.dogAgeText(P.dogAge('2029-12-15', at)), '6 months old');
+  assert.strictEqual(P.dogAgeText(P.dogAge('2030-06-10', at)), '5 days old');
+  assert.strictEqual(P.dogAgeText(P.dogAge('2031-01-01', at)), '');   // future
+  assert.strictEqual(P.dogAge('nope', at), null);
+});
+
 console.log(`\n${passed} passed`);

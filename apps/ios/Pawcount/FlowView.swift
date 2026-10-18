@@ -16,6 +16,7 @@ struct Draft {
     var tz = TimeZone.current.identifier
     var yearly = false
     var monthly = false
+    var weekly = false
     var country = ""
     var personName = ""
     var birthYear = ""
@@ -40,7 +41,7 @@ struct Draft {
     mutating func setType(_ meta: Meta, _ t: String) {
         let info = meta.types[t]!
         let b = breedTouched ? breed : meta.suggestedBreed(t)
-        type = t; if !accentTouched { accent = info.accent }; yearly = info.repeats; monthly = false
+        type = t; if !accentTouched { accent = info.accent }; yearly = info.repeats; monthly = false; weekly = false
         allDay = t == "birthday" || t == "anniversary" || t == "holiday" || t == "gotcha"
         breed = b; if !nameTouched { dogName = meta.breeds[b]?.name ?? dogName }
         reminders = defaultReminders(t); if t != "intl_trip" { country = "" }
@@ -56,9 +57,9 @@ struct Draft {
         let keep = createdAt != nil && origTarget == "\(target)|\(tz)"
         let dog = breed == "mutt" ? Dog(breed: "mutt", name: dogName.trimmingCharacters(in: .whitespaces).isEmpty ? "Lucky" : dogName, furColor: fur, ears: ears) : Dog(breed: breed, name: dogName.trimmingCharacters(in: .whitespaces))
         let person = type == "birthday" && (!personName.isEmpty || !birthYear.isEmpty) ? Person(name: personName.trimmingCharacters(in: .whitespaces), birthYear: Int(birthYear)) : nil
-        return Countdown(id: id ?? newId(), title: title.trimmingCharacters(in: .whitespaces), type: type, targetAt: target, timeZone: tz, allDay: allDay, yearly: yearly && !monthly,
+        return Countdown(id: id ?? newId(), title: title.trimmingCharacters(in: .whitespaces), type: type, targetAt: target, timeZone: tz, allDay: allDay, yearly: yearly && !monthly && !weekly,
                          createdAt: keep ? createdAt! : Date(), dog: dog, accent: accent, displayMode: mode, notes: notes, checklist: checklist, destination: nil, person: person,
-                         reminders: reminders, archived: archived, photos: photos, sample: sample, monthly: monthly)
+                         reminders: reminders, archived: archived, photos: photos, sample: sample, monthly: monthly, weekly: weekly)
     }
 
     static func from(_ c: Countdown) -> Draft {
@@ -67,7 +68,7 @@ struct Draft {
         d.id = c.id; d.type = c.type; d.title = c.title; d.titleAuto = false
         d.date = Calendar.current.date(from: DateComponents(year: w.y, month: w.mo, day: w.d)) ?? Date()
         d.time = Calendar.current.date(from: DateComponents(hour: w.h, minute: w.mi)) ?? Date()
-        d.allDay = c.allDay; d.tz = c.timeZone; d.yearly = c.yearly; d.monthly = c.monthly; d.country = c.destination?.country ?? ""
+        d.allDay = c.allDay; d.tz = c.timeZone; d.yearly = c.yearly; d.monthly = c.monthly; d.weekly = c.weekly; d.country = c.destination?.country ?? ""
         d.personName = c.person?.name ?? ""; d.birthYear = c.person?.birthYear.map(String.init) ?? ""
         d.breed = c.dog.breed; d.breedTouched = true; d.dogName = c.dog.name; d.nameTouched = true
         d.fur = c.dog.furColor ?? "#B98A62"; d.ears = c.dog.ears ?? "floppy"; d.accent = c.accent; d.accentTouched = true
@@ -199,7 +200,7 @@ struct FlowView: View {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 7) {
                     Text("Date").font(PawFont.body(14, 800)).foregroundColor(pc.ink2)
-                    DatePicker("Date", selection: $d.date, in: (editing || d.yearly || d.monthly ? Date.distantPast : Calendar.current.startOfDay(for: Date()))..., displayedComponents: .date).labelsHidden().tint(accent)
+                    DatePicker("Date", selection: $d.date, in: (editing || d.yearly || d.monthly || d.weekly ? Date.distantPast : Calendar.current.startOfDay(for: Date()))..., displayedComponents: .date).labelsHidden().tint(accent)
                         .padding(.horizontal, 12).frame(maxWidth: .infinity, minHeight: 54, alignment: .leading).background(RoundedRectangle(cornerRadius: 18).fill(pc.surface))
                         .overlay(RoundedRectangle(cornerRadius: 18).stroke(pc.line, lineWidth: 2))
                 }
@@ -215,9 +216,11 @@ struct FlowView: View {
             Panel(flush: true) {
                 HStack { VStack(alignment: .leading, spacing: 1) { B("All day", 16, weight: 800); Muted("Counts down to midnight", 13) }; Spacer(); PawSwitch(on: d.allDay, label: "All day") { d.allDay = $0 } }.frame(minHeight: 64)
                 Divider2()
-                HStack { VStack(alignment: .leading, spacing: 1) { B("Repeat every month", 16, weight: 800); Muted("Pills, flea & tick treatment, grooming", 13) }; Spacer(); PawSwitch(on: d.monthly, label: "Repeat every month") { d.monthly = $0; if $0 { d.yearly = false } } }.frame(minHeight: 64)
+                HStack { VStack(alignment: .leading, spacing: 1) { B("Repeat every week", 16, weight: 800); Muted("Walks, baths, weekly treats", 13) }; Spacer(); PawSwitch(on: d.weekly, label: "Repeat every week") { d.weekly = $0; if $0 { d.yearly = false; d.monthly = false } } }.frame(minHeight: 64)
                 Divider2()
-                HStack { VStack(alignment: .leading, spacing: 1) { B("Repeat every year", 16, weight: 800); Muted("Birthdays & anniversaries roll over", 13) }; Spacer(); PawSwitch(on: d.yearly, label: "Repeat every year") { d.yearly = $0; if $0 { d.monthly = false } } }.frame(minHeight: 64)
+                HStack { VStack(alignment: .leading, spacing: 1) { B("Repeat every month", 16, weight: 800); Muted("Pills, flea & tick treatment, grooming", 13) }; Spacer(); PawSwitch(on: d.monthly, label: "Repeat every month") { d.monthly = $0; if $0 { d.yearly = false; d.weekly = false } } }.frame(minHeight: 64)
+                Divider2()
+                HStack { VStack(alignment: .leading, spacing: 1) { B("Repeat every year", 16, weight: 800); Muted("Birthdays & anniversaries roll over", 13) }; Spacer(); PawSwitch(on: d.yearly, label: "Repeat every year") { d.yearly = $0; if $0 { d.monthly = false; d.weekly = false } } }.frame(minHeight: 64)
             }
             PickerRow(label: "Time zone", value: tzLabel(d.tz)) { showTz = true }
             Muted("Pick where the moment happens. Pawcount counts to it exactly, even across daylight-saving changes.", 13).padding(.top, 6)

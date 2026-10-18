@@ -220,6 +220,7 @@
     if (c.type === 'gotcha' && k.together != null) facts.push(`Home together for <b>${k.together.toLocaleString()}</b> days`);
     if (c.recurrence === 'yearly') facts.push('Repeats every year');
     if (c.recurrence === 'monthly') facts.push('Repeats every month');
+    if (c.recurrence === 'weekly') facts.push('Repeats every week');
     const done = c.checklist.filter((x) => x.done).length;
     const earned = P.MILESTONES.filter((m) => (past || k.phase === 'today') ? true : k.daysCeil <= m && k.daysTotal >= m);
     return `<section class="detail" style="${styleVars(c)}">
@@ -247,7 +248,7 @@
           <dl class="kv"><div><dt>${w.sameTz ? 'Date' : esc((c.destination && c.destination.city) || w.destCity) + ' time'}</dt><dd>${esc(w.dest)}</dd></div>
           ${w.local ? `<div><dt>Your time</dt><dd>${esc(w.local)}</dd></div>` : ''}
           <div><dt>Time zone</dt><dd>${esc(P.tzLabel(k.tz))}</dd></div>
-          ${c.recurrence === 'yearly' ? `<div><dt>Repeats</dt><dd>Every year · next is ${k.occYear}</dd></div>` : c.recurrence === 'monthly' ? `<div><dt>Repeats</dt><dd>Every month · next is ${esc(P.fmtInstant(k.target, k.tz, { allDay: true }))}</dd></div>` : ''}</dl></div>
+          ${c.recurrence === 'yearly' ? `<div><dt>Repeats</dt><dd>Every year · next is ${k.occYear}</dd></div>` : c.recurrence === 'weekly' ? `<div><dt>Repeats</dt><dd>Every week · next is ${esc(P.fmtInstant(k.target, k.tz, { allDay: true }))}</dd></div>` : c.recurrence === 'monthly' ? `<div><dt>Repeats</dt><dd>Every month · next is ${esc(P.fmtInstant(k.target, k.tz, { allDay: true }))}</dd></div>` : ''}</dl></div>
         <div class="panel"><div class="panel-top"><h2 class="panel-h">${checklistLabel(c.type)}</h2><span class="muted small">${done}/${c.checklist.length}</span></div>
           <ul class="checks">${c.checklist.map((it, i) => `<li><button class="check ${it.done ? 'done' : ''}" role="checkbox" aria-checked="${it.done}" data-action="check" data-i="${i}"><span class="box">${icon('check')}</span><span class="txt">${esc(it.text)}</span></button><button class="x" data-action="del-check" data-i="${i}" aria-label="Remove ${esc(it.text)}">${icon('close')}</button></li>`).join('')}</ul>
           <form class="add-check" data-form="check"><input name="text" placeholder="Add something…" aria-label="Add to ${checklistLabel(c.type).toLowerCase()}" maxlength="80" autocomplete="off"><button class="btn btn-small" type="submit">Add</button></form></div>
@@ -318,6 +319,11 @@
           <div class="field"><span>What does your dog call you?</span>${seg('set-parent', [['mama', 'Mama'], ['papa', 'Papa'], ['parent', 'Fur parent']], st.parentTitle || 'parent', 'aria-label="What your dog calls you"')}</div>
           ${/^data:image\//.test(st.profilePhoto || '') ? `<button class="btn btn-small btn-ghost" data-action="profile-photo-clear">Remove photo</button>` : ''}</div>
         <input type="file" accept="image/*" hidden data-profile-input>
+      </div>
+      <div class="panel profile-dog">
+        <label class="field"><span>${icon('paw')} My dog</span><input data-dog-name maxlength="30" placeholder="Name" value="${esc(st.dogName || '')}"></label>
+        <label class="field"><span>${icon('cake')} Birthday or gotcha date</span><input type="date" data-dog-bday max="${todayStr()}" value="${esc(st.dogBirthday || '')}"></label>
+        ${P.dogAge(st.dogBirthday) ? `<p class="dog-age" role="status"><b>${esc(st.dogName || 'Your dog')}</b> is ${esc(P.dogAgeText(P.dogAge(st.dogBirthday)))}</p><button class="btn btn-small" data-action="dog-bday-add">Add the birthday as a countdown</button>` : '<p class="muted small">Add a date to see their age and make a birthday countdown.</p>'}
       </div>
       <p class="muted small">Stays on this device and in your backup. Sign-in with Google or Apple, so your profile follows you between phones, is planned.</p>
 
@@ -507,7 +513,7 @@
       return `<div class="field-row"><label class="field"><span>${icon('clock')} Date</span><input type="date" data-bind="date" value="${d.date}" ${ui.flow === 'new' && d.recurrence === 'none' ? `min="${todayStr()}"` : ''}></label>
         ${d.allDay ? '' : `<label class="field narrow"><span>Time</span><input type="time" data-bind="time" value="${d.time}"></label>`}</div>
         <div class="panel flush"><div class="set-row"><div><span class="set-t">All day</span><span class="muted small block">Counts down to midnight</span></div>${sw('allDay', d.allDay, 'All day', 'data-draft="1"')}</div>
-        <div class="set-row col"><span class="set-t">${icon('repeat')} Repeat</span><span class="muted small">Monthly is great for pills and flea &amp; tick treatment. Yearly for birthdays.</span>${seg('set-recur', [['none', 'Never'], ['monthly', 'Every month'], ['yearly', 'Every year']], d.recurrence, 'aria-label="Repeat"')}</div></div>
+        <div class="set-row col"><span class="set-t">${icon('repeat')} Repeat</span><span class="muted small">Weekly for walks and baths, monthly for pills and flea &amp; tick treatment, yearly for birthdays.</span>${seg('set-recur', [['none', 'Never'], ['weekly', 'Weekly'], ['monthly', 'Monthly'], ['yearly', 'Yearly']], d.recurrence, 'aria-label="Repeat"')}</div></div>
         <label class="field"><span>${icon('globe')} Time zone</span><select data-bind="tz">${tzs.map((z) => `<option value="${esc(z)}" ${z === d.tz ? 'selected' : ''}>${esc(z === P.localTz() ? 'My time zone — ' + z.replace(/_/g, ' ') : z.replace(/_/g, ' '))}</option>`).join('')}</select><small>Pick where the moment happens. Pawcount counts to it exactly, even across daylight-saving changes.</small></label>
         <p id="when-note" class="when-note ${n.ok ? '' : 'bad'}" role="status">${n.text}</p>`;
     }
@@ -863,7 +869,13 @@
       const v = !S.state.settings[k]; S.set(k, v); el.classList.toggle('on', v); el.setAttribute('aria-checked', v);
       if (k === 'haptics' && v) P.haptic('purr'); if (k === 'sound' && v) P.sound('bark', true);
     },
-    'set-recur'(el) { ui.draft.recurrence = ['monthly', 'yearly'].includes(el.dataset.v) ? el.dataset.v : 'none'; P.haptic('tick'); rerenderFlowBody(); },
+    'set-recur'(el) { ui.draft.recurrence = ['weekly', 'monthly', 'yearly'].includes(el.dataset.v) ? el.dataset.v : 'none'; P.haptic('tick'); rerenderFlowBody(); },
+    'dog-bday-add'() {
+      const st = S.state.settings, name = (st.dogName || 'My dog').trim(), title = `${name}'s birthday`;
+      if (S.state.countdowns.some((x) => x.title === title)) { toast('That birthday is already on your list'); return; }
+      const c = P.cleanCountdown({ title, type: 'birthday', targetAt: st.dogBirthday + 'T00:00', allDay: true, recurrence: 'yearly', dog: { breed: 'scott', name }, person: { name, birthYear: +st.dogBirthday.slice(0, 4) }, createdAt: new Date().toISOString() });
+      if (!c) return; S.upsert(c); toast(`${name}'s birthday is on your list`); location.hash = '#/c/' + c.id;
+    },
     'set-default-mode'(el) { S.set('displayMode', el.dataset.v); render({ keepScroll: true, noAnim: true }); },
     'set-parent'(el) { S.set('parentTitle', el.dataset.v === 'parent' ? 'parent' : el.dataset.v); render({ keepScroll: true, noAnim: true }); },
     'set-theme'(el) { S.set('theme', el.dataset.v); applySettings(); render({ keepScroll: true, noAnim: true }); },
@@ -933,6 +945,7 @@
 
   document.addEventListener('input', (e) => {
     const t = e.target;
+    if (t.matches('[data-dog-name]')) { S.state.settings.dogName = t.value.trim().slice(0, 30); S.save(); return; }
     if (t.matches('[data-profile-name]')) { S.state.settings.profileName = t.value.trim().slice(0, 30); S.save(); return; }
     if (t.dataset.bind) {
       setDraft(t.dataset.bind, t.value);
@@ -945,6 +958,7 @@
     if (t.matches('[data-notes]')) { const c = S.get(route().id); c.notes = t.value; S.commit(); }
     if (t.matches('[data-bind="date"],[data-bind="time"]')) flowLight();
     if (t.matches('[data-photo-input]')) addPhotos(t);
+    if (t.matches('[data-dog-bday]')) { S.state.settings.dogBirthday = P.dogAge(t.value) ? t.value : ''; S.save(); render({ keepScroll: true, noAnim: true }); return; }
     if (t.matches('[data-profile-input]')) {
       const f = t.files[0]; t.value = ''; if (!f) return;
       shrink(f, 192).then((url) => { if (!url) return toast('Could not read that photo'); if (!S.set('profilePhoto', url)) toast('Storage is full'); render({ keepScroll: true, noAnim: true }); P.haptic('success'); });

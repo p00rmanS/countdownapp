@@ -12,6 +12,17 @@ final class LogicTests: XCTestCase {
         }
         XCTAssertEqual(day(1, 10), "2030-01-31"); XCTAssertEqual(day(2, 10), "2030-02-28"); XCTAssertEqual(day(3, 5), "2030-03-31"); XCTAssertEqual(day(4, 5), "2030-04-30")
     }
+    func testWeeklyRepeatAndDogAge() {
+        var c = cd("2030-01-05T09:00"); c.weekly = true
+        func day(_ m: Int, _ d: Int) -> String {
+            var cal = Calendar(identifier: .gregorian); cal.timeZone = TimeZone(identifier: "UTC")!
+            let k = cal.dateComponents([.year, .month, .day], from: compute(c, now: utc(2030, m, d)).target)
+            return String(format: "%04d-%02d-%02d", k.year!, k.month!, k.day!)
+        }
+        XCTAssertEqual(day(1, 3), "2030-01-05"); XCTAssertEqual(day(1, 7), "2030-01-12"); XCTAssertEqual(day(3, 1), "2030-03-02")
+        XCTAssertEqual(dogAgeText("2027-04-10", today: utc(2030, 6, 15)), "3 years 2 months old")
+        XCTAssertNil(dogAgeText("2031-01-01", today: utc(2030, 6, 15)))
+    }
     func testCareCheckInIsOnePerDay() {
         var s = Settings(); s.careReminders = true; s.careTime = "18:00"
         let plan = planCare(s, [cd("2031-01-01T10:00")], now: now)

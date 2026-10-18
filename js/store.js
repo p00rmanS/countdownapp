@@ -13,7 +13,7 @@
     countdowns: [],
     celebrated: {},
     lastNotified: '',
-    settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'scott', profileName: '', profilePhoto: '', parentTitle: '', needsOn: true, careReminders: false, careTime: '18:00' },
+    settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'scott', profileName: '', profilePhoto: '', parentTitle: '', needsOn: true, careReminders: false, careTime: '18:00', dogName: '', dogBirthday: '' },
     careDays: [],
   });
   // settings come from storage / backups: keep only values of the right type
@@ -24,7 +24,8 @@
     if (!['system', 'light', 'dark'].includes(out.theme)) out.theme = 'system';
     if (!['system', 'on', 'off'].includes(out.motion)) out.motion = 'system';
     if (!/^[a-z]+$/.test(out.icon)) out.icon = 'scott';
-    out.profileName = out.profileName.slice(0, 30);
+    out.profileName = out.profileName.slice(0, 30); out.dogName = out.dogName.slice(0, 30);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(out.dogBirthday) || !P.dogAge(out.dogBirthday)) out.dogBirthday = '';
     if (!['08:00', '12:00', '18:00', '21:00'].includes(out.careTime)) out.careTime = '18:00';
     if (!['', 'mama', 'papa', 'parent'].includes(out.parentTitle)) out.parentTitle = '';
     if (out.profilePhoto && !P.PHOTO_RE.test(out.profilePhoto) && !/^[\w.-]{1,80}$/.test(out.profilePhoto)) out.profilePhoto = '';
