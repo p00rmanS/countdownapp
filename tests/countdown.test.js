@@ -143,4 +143,16 @@ test('dog age from a birthday', () => {
   assert.strictEqual(P.dogAge('nope', at), null);
 });
 
+test('repeats whose first date is long ago are fast and land on the right day', () => {
+  const t0 = Date.now(), at = Date.UTC(2026, 9, 19, 12);
+  const wk = P.compute(mk({ targetAt: '2005-01-04T09:00', recurrence: 'weekly', timeZone: 'UTC' }), at);          // a Tuesday
+  assert.strictEqual(new Date(wk.target).getUTCDay(), 2); assert.ok(wk.target > at && wk.target - at <= 7 * 864e5);
+  const mo = P.compute(mk({ targetAt: '1999-01-31T09:00', recurrence: 'monthly', timeZone: 'UTC' }), at);
+  assert.strictEqual(new Date(mo.target).toISOString().slice(0, 10), '2026-10-31');
+  const yr = P.compute(mk({ targetAt: '1920-02-29T09:00', recurrence: 'yearly', timeZone: 'UTC' }), at);
+  assert.strictEqual(new Date(yr.target).toISOString().slice(0, 10), '2027-02-28');
+  for (let i = 0; i < 40; i++) P.compute(mk({ targetAt: '2005-01-04T09:00', recurrence: 'weekly' }), at);
+  assert.ok(Date.now() - t0 < 1500, 'too slow: ' + (Date.now() - t0) + ' ms');
+});
+
 console.log(`\n${passed} passed`);

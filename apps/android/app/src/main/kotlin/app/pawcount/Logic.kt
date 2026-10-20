@@ -68,7 +68,9 @@ fun compute(c: Countdown, now: Long = System.currentTimeMillis()): Computed {
     var date = base.toLocalDate()
     var prevEnd: Long? = null
     if (c.yearly || c.monthly || c.weekly) {
-        for (i in 0 until 5200) {
+        val gap = now - base.toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli()
+        val period = if (c.weekly) 7 * DAY else if (c.monthly) 31 * DAY else 366 * DAY   // rounded so we never overshoot
+        for (i in (if (gap > 0) max(0L, gap / period - 2).toInt() else 0) until 5200) {
             // monthly: the i-th month after the first (31 Jan -> 28 Feb -> 31 Mar, never drifting)
             date = if (c.weekly) base.toLocalDate().plusWeeks(i.toLong()) else if (c.monthly) base.toLocalDate().plusMonths(i.toLong()) else occ(base.year + i)
             val end = dayEnd(date)

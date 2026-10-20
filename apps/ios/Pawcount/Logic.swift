@@ -106,7 +106,9 @@ func compute(_ c: Countdown, now: Date = Date()) -> Computed {
     var date = (base.y, base.mo, base.d)
     var prevEnd: Date? = nil
     if c.yearly || c.monthly || c.weekly {
-        for i in 0..<5200 {
+        let gap = now.timeIntervalSince(cal.date(from: DateComponents(year: base.y, month: base.mo, day: base.d)) ?? now)
+        let period = c.weekly ? 7 * DAY : (c.monthly ? 31 * DAY : 366 * DAY)   // rounded so we never overshoot
+        for i in (gap > 0 ? min(5199, max(0, Int(gap / period) - 2)) : 0)..<5200 {
             // monthly: the i-th month after the first (31 Jan -> 28 Feb -> 31 Mar, never drifting)
             if c.weekly {
                 let b = cal.date(from: DateComponents(year: base.y, month: base.mo, day: base.d)) ?? now

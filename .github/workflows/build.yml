@@ -14,6 +14,8 @@ jobs:
         with: { node-version: 22 }
       - run: npm install
       - run: npm test
+      # stress test: odd dates and time zones, every dog and scene, and a click on every button
+      - run: npm run fuzz
       # the shared art must be in sync with the web source
       - run: node tools/export-native.js && git diff --exit-code native/assets
 

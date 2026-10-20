@@ -7,7 +7,8 @@
     "start": "python serve.py 5173",
     "build": "node scripts/build-www.js",
     "test": "node tests/countdown.test.js && node tests/ui.test.js",
-    "export:native": "node tools/export-native.js"
+    "export:native": "node tools/export-native.js",
+    "fuzz": "node tools/fuzz.js && node tools/fuzz-ui.js"
   },
   "devDependencies": {
     "jsdom": "^29.1.1"

@@ -70,7 +70,9 @@
 
     let occ = base, prevEnd = null;
     if (c.recurrence === 'yearly' || c.recurrence === 'monthly' || c.recurrence === 'weekly') {
-      for (let i = 0; i < 5200; i++) {
+      // jump close to now instead of stepping through every week/month/year since the first date (periods are rounded so we never overshoot)
+      const gap = now - wallToInstant({ ...base, h: 0, mi: 0 }, tz), period = c.recurrence === 'weekly' ? 7 * DAY : c.recurrence === 'monthly' ? 31 * DAY : 366 * DAY;
+      for (let i = gap > 0 ? Math.max(0, Math.floor(gap / period) - 2) : 0; i < 5200; i++) {
         occ = c.recurrence === 'weekly' ? occWeek(i) : c.recurrence === 'monthly' ? occMonth(i) : occAt(base.y + i);
         const end = bounds(occ)[1];
         if (end > now) break;
