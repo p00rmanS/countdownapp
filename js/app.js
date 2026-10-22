@@ -391,17 +391,23 @@
     } else if (step === 1) {
       inner = `<h1 class="w-title sm">Pick your first companion</h1><p class="w-sub">Every breed has its own personality. You can mix and match later.</p>
         <div class="w-pick" role="radiogroup" aria-label="First companion">${dogs.map((b) => `<button class="pick ${ui.welcomeBreed === b ? 'on' : ''}" role="radio" aria-checked="${ui.welcomeBreed === b}" data-action="w-breed" data-v="${b}"><div class="pick-dog">${mk(b, ui.welcomeBreed === b ? 'curious' : 'waiting', { label: P.BREEDS[b].label })}</div><b>${esc(P.BREEDS[b].name)}</b><span class="small muted">${esc(P.BREEDS[b].label)}</span><span class="small vibe">${esc(P.BREEDS[b].vibe)}</span></button>`).join('')}</div>`;
+    } else if (step === 2) {
+      const st = S.state.settings, nm = P.BREEDS[ui.welcomeBreed].name;
+      inner = `<div class="w-bell">${mk(ui.welcomeBreed, 'curious', { label: nm })}</div>
+        <h1 class="w-title sm">Who is ${esc(nm)}'s person?</h1><p class="w-sub">So ${esc(nm)} knows what to call you. You can change this any time in Settings.</p>
+        <div class="w-form"><label class="field"><span>Your name</span><input data-profile-name maxlength="30" autocomplete="given-name" placeholder="Your name" value="${esc(st.profileName || '')}"></label>
+          <div class="field"><span>${esc(nm)} calls you</span>${seg('set-parent', [['mama', 'Mama'], ['papa', 'Papa'], ['parent', 'Fur parent']], st.parentTitle || 'parent', 'aria-label="What your dog calls you"')}</div></div>`;
     } else {
       inner = `<div class="w-bell">${mk(ui.welcomeBreed, 'waiting', { bell: true, label: `${P.BREEDS[ui.welcomeBreed].name} wearing a little bell` })}</div>
         <h1 class="w-title sm">${esc(P.BREEDS[ui.welcomeBreed].name)} will ring the bell</h1><p class="w-sub">Allow reminders so ${esc(P.BREEDS[ui.welcomeBreed].name)} can tap you on the shoulder at 100, 50, 30, 7 and 1 days — and the morning of. One a day, tops.</p>`;
     }
-    const cta = step === 0 ? ['w-next', "Let's go"] : step === 1 ? ['w-next', `Choose ${P.BREEDS[ui.welcomeBreed].name}`] : ['w-bell', 'Allow reminders'];
+    const cta = step === 0 ? ['w-next', "Let's go"] : step === 1 ? ['w-next', `Choose ${P.BREEDS[ui.welcomeBreed].name}`] : step === 2 ? ['w-next', 'Continue'] : ['w-bell', 'Allow reminders'];
     return `<section class="welcome">
-      <div class="w-top"><ol class="trail small" aria-label="Step ${step + 1} of 3">${[0, 1, 2].map((i) => `<li class="${i <= step ? 'on' : ''}">${icon('paw')}</li>`).join('')}</ol>${step < 2 ? `<button class="link-btn" data-action="w-skip">Skip</button>` : '<span></span>'}</div>
+      <div class="w-top"><ol class="trail small" aria-label="Step ${step + 1} of 4">${[0, 1, 2, 3].map((i) => `<li class="${i <= step ? 'on' : ''}">${icon('paw')}</li>`).join('')}</ol>${step < 3 ? `<button class="link-btn" data-action="w-skip">Skip</button>` : '<span></span>'}</div>
       <div class="w-body step-${step}">${inner}</div>
       <div class="w-cta">
         <button class="btn btn-primary btn-xl" data-action="${cta[0]}">${cta[1]}</button>
-        ${step === 2 ? `<button class="btn btn-ghost" data-action="w-later">Maybe later</button>` : step === 0 ? `<button class="btn btn-ghost" data-action="samples">Peek at sample adventures</button>` : ''}
+        ${step === 3 ? `<button class="btn btn-ghost" data-action="w-later">Maybe later</button>` : step === 0 ? `<button class="btn btn-ghost" data-action="samples">Peek at sample adventures</button>` : ''}
       </div></section>`;
   }
 
@@ -877,7 +883,7 @@
       if (!c) return; S.upsert(c); toast(`${name}'s birthday is on your list`); location.hash = '#/c/' + c.id;
     },
     'set-default-mode'(el) { S.set('displayMode', el.dataset.v); render({ keepScroll: true, noAnim: true }); },
-    'set-parent'(el) { S.set('parentTitle', el.dataset.v === 'parent' ? 'parent' : el.dataset.v); render({ keepScroll: true, noAnim: true }); },
+    'set-parent'(el) { S.set('parentTitle', el.dataset.v === 'parent' ? 'parent' : el.dataset.v); render({ keepScroll: true, noAnim: true }); P.haptic('tick'); },
     'set-theme'(el) { S.set('theme', el.dataset.v); applySettings(); render({ keepScroll: true, noAnim: true }); },
     'set-motion'(el) { S.set('motion', el.dataset.v); applySettings(); render({ keepScroll: true, noAnim: true }); },
     'set-icon'(el) { S.set('icon', el.dataset.v); applySettings(); render({ keepScroll: true, noAnim: true }); toast(`${P.BREEDS[el.dataset.v].name} is your new icon (shown in the browser tab here)`); },
@@ -899,7 +905,7 @@
     /* welcome */
     'w-next'() { if (ui.welcome === 1) ui.welcomeBreedChosen = ui.welcomeBreed; ui.welcome++; render({ noAnim: true }); view.classList.add('enter'); },
     'w-breed'(el) { ui.welcomeBreed = el.dataset.v; ui.welcomeBreedChosen = el.dataset.v; render({ noAnim: true }); P.haptic('tick'); },
-    'w-skip'() { ui.welcome = 2; render({ noAnim: true }); },
+    'w-skip'() { ui.welcome = 3; render({ noAnim: true }); },
     async 'w-bell'() { P.sound('jingle'); await enableNotifications(true); finishWelcome(); },
     'w-later'() { finishWelcome(); },
 

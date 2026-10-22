@@ -36,9 +36,9 @@ struct WelcomeView: View {
         let meta = store.art.meta
         VStack(spacing: 0) {
             HStack {
-                HStack(spacing: 8) { ForEach(0..<3, id: \.self) { PawIcon(name: "paw", color: $0 <= page ? pc.kibble : pc.ink.opacity(0.2), size: 22) } }
+                HStack(spacing: 8) { ForEach(0..<4, id: \.self) { PawIcon(name: "paw", color: $0 <= page ? pc.kibble : pc.ink.opacity(0.2), size: 22) } }
                 Spacer()
-                if page < 2 { Button { page = 2 } label: { Text("Skip").font(PawFont.body(16, 800)).foregroundColor(pc.ink2).padding(10) }.buttonStyle(.plain) }
+                if page < 3 { Button { page = 3 } label: { Text("Skip").font(PawFont.body(16, 800)).foregroundColor(pc.ink2).padding(10) }.buttonStyle(.plain) }
             }.frame(minHeight: 48).padding(.horizontal, 22).padding(.top, 8)
 
             ScrollView(showsIndicators: false) {
@@ -73,6 +73,16 @@ struct WelcomeView: View {
                                 }
                             }
                         }.padding(.top, 18)
+                    case 2:
+                        let b = store.welcomeBreed, dogName = meta.breeds[b]?.name ?? "your dog"
+                        DogOnly(dog: mutt(b), stage: .curious).frame(width: 200).padding(.top, 30)
+                        H("Who is \(dogName)'s person?", 31, align: .center).padding(.top, 8)
+                        B("So \(dogName) knows what to call you. You can change this any time in Settings.", 16, weight: 700, align: .center, color: pc.ink2).padding(.top, 10)
+                        VStack(alignment: .leading, spacing: 0) {
+                            Field(label: "Your name", text: Binding(get: { store.settings.profileName }, set: { v in store.setSettings { $0.profileName = String(v.trimmingCharacters(in: .whitespaces).prefix(30)) } }), placeholder: "Your name", maxLen: 30)
+                            Muted("\(dogName) calls you", 14).padding(.top, 16).padding(.bottom, 7)
+                            Seg(options: [("mama", "Mama"), ("papa", "Papa"), ("parent", "Fur parent")], selected: store.settings.parentTitle.isEmpty ? "parent" : store.settings.parentTitle, label: "What your dog calls you") { v in store.setSettings { $0.parentTitle = v } }
+                        }.padding(.top, 8)
                     default:
                         let b = store.welcomeBreed
                         DogOnly(dog: mutt(b), stage: .waiting, bell: true).frame(width: 230).padding(.top, 30)
@@ -89,6 +99,8 @@ struct WelcomeView: View {
                     GhostButton("Peek at sample adventures") { store.loadSamples(); store.goHome() }
                 case 1:
                     PrimaryButton("Choose \(meta.breeds[store.welcomeBreed]?.name ?? "")") { store.welcomeBreedChosen = true; page = 2 }
+                case 2:
+                    PrimaryButton("Continue") { page = 3 }
                 default:
                     PrimaryButton("Allow reminders") {
                         Sounds.play(store.settings.sound, "jingle")

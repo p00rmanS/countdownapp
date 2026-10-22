@@ -87,8 +87,8 @@ fun WelcomeScreen(vm: AppViewModel) {
     }
     Column(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(pc.kibble.copy(alpha = 0.28f), pc.bg), endY = 900f)).windowInsetsPadding(WindowInsets.statusBars).padding(horizontal = 22.dp)) {
         Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) { repeat(3) { Icon("paw", if (it <= page) pc.kibble else pc.ink.copy(alpha = 0.2f), 22.dp) } }
-            if (page < 2) Text("Skip", Modifier.clickable(role = Role.Button) { page = 2 }.padding(10.dp), style = T.body(16, FontWeight.ExtraBold).copy(color = pc.ink2))
+            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) { repeat(4) { Icon("paw", if (it <= page) pc.kibble else pc.ink.copy(alpha = 0.2f), 22.dp) } }
+            if (page < 3) Text("Skip", Modifier.clickable(role = Role.Button) { page = 3 }.padding(10.dp), style = T.body(16, FontWeight.ExtraBold).copy(color = pc.ink2))
         }
         Column(Modifier.weight(1f).fillMaxWidth(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             when (page) {
@@ -113,6 +113,19 @@ fun WelcomeScreen(vm: AppViewModel) {
                             } } } }
                     }
                 }
+                2 -> {
+                    val b = vm.welcomeBreed; val dogName = meta.breeds.getValue(b).name
+                    val st = vm.data.collectAsState().value.settings
+                    var yourName by remember { mutableStateOf(st.profileName) }
+                    DogOnly(vm, Dog(b, dogName, if (b == "mutt") "#B98A62" else null, if (b == "mutt") "floppy" else null), Stage.CURIOUS, Modifier.fillMaxWidth(0.5f))
+                    H("Who is $dogName's person?", 31, Modifier.padding(top = 8.dp), TextAlign.Center)
+                    B("So $dogName knows what to call you. You can change this any time in Settings.", Modifier.padding(top = 10.dp), 16, FontWeight.Bold, TextAlign.Center, color = pc.ink2)
+                    Column(Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                        Field("Your name", yourName, { yourName = it; vm.settings { s -> s.copy(profileName = it.trim()) } }, placeholder = "Your name", maxLen = 30)
+                        Muted("$dogName calls you", Modifier.padding(top = 16.dp, bottom = 7.dp), size = 14)
+                        Seg(listOf("mama" to "Mama", "papa" to "Papa", "parent" to "Fur parent"), st.parentTitle.ifEmpty { "parent" }, { v -> vm.settings { s -> s.copy(parentTitle = v) } }, label = "What your dog calls you")
+                    }
+                }
                 else -> {
                     val b = vm.welcomeBreed
                     DogOnly(vm, Dog(b, meta.breeds.getValue(b).name, if (b == "mutt") "#B98A62" else null, if (b == "mutt") "floppy" else null), Stage.WAITING, Modifier.fillMaxWidth(0.62f), bell = true)
@@ -125,6 +138,7 @@ fun WelcomeScreen(vm: AppViewModel) {
             when (page) {
                 0 -> { PrimaryButton("Let's go", { page = 1 }, Modifier.fillMaxWidth()); GhostButton("Peek at sample adventures", { vm.loadSamples(); vm.goHome() }) }
                 1 -> PrimaryButton("Choose ${meta.breeds.getValue(vm.welcomeBreed).name}", { vm.welcomeBreedChosen = true; page = 2 }, Modifier.fillMaxWidth())
+                2 -> PrimaryButton("Continue", { page = 3 }, Modifier.fillMaxWidth())
                 else -> {
                     PrimaryButton("Allow reminders", { Sounds.play(vm.data.value.settings.sound, "jingle"); if (Build.VERSION.SDK_INT >= 33) askNotify.launch(Manifest.permission.POST_NOTIFICATIONS) else { vm.settings { it.copy(notifications = true) }; finishWelcome(vm) } }, Modifier.fillMaxWidth())
                     GhostButton("Maybe later", { finishWelcome(vm) })

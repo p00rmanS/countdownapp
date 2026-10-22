@@ -533,3 +533,4 @@ button, a, .dog-hit { -webkit-touch-callout: none; }
 .need[data-need='water'] b { background: #6EC6FF; } .need.low b { background: #FF8A7A; } .need.low { animation: pulse 1.4s ease-in-out infinite; }
 .play-tray.static .needs { margin-top: 0; }
 .panel.profile-dog { display: grid; gap: 4px; margin-top: 12px; } .profile-dog .field { margin-top: 8px; } .dog-age { margin: 8px 0 4px; font-size: 16px; } .profile-dog .btn { justify-self: start; margin-top: 4px; }
+.w-form { width: 100%; max-width: 360px; margin: 18px auto 0; text-align: left; } .w-form .field { margin-top: 12px; }

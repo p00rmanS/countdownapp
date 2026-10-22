@@ -38,6 +38,24 @@ Tap it to bark, hold to pet, shake the phone to make it sneeze. On top of that:
 | Long-press shortcuts / Siri | ✅ New · Memories | ✅ "How long until my next countdown" | – |
 | Memories with photos, backup export / import | ✅ | ✅ | ✅ |
 
+### For fur parents
+Made for people who love their dogs. Scott (a fluffy black pup) is the default companion, and every dog can be played with:
+
+| | |
+|---|---|
+| **Play** | Treat, Feed, Water, Ball and Tickle, each with its own reaction and over a hundred things the dog says (`{who}` becomes Mama, Papa or your name) |
+| **Needs** | Hunger and thirst run down while you are away; a sleeping dog wakes when you play with him. Switch the needs off in Settings > Care |
+| **Care streak** | Days in a row you cared for your dog, on Home and in Settings |
+| **Daily check-in** | A nudge from your dog at a time you pick (Android and iPhone) |
+| **My dog** | Name, birthday or gotcha date, age, and a one-tap yearly birthday countdown |
+| **Profile** | Your name and photo, and what your dog calls you (Mama / Papa / Fur parent), asked on first launch |
+| **Event types** | Trip, vacation, birthday, anniversary, holiday, **gotcha day**, **vet & grooming**, custom |
+| **Repeats** | Never, weekly (walks, baths), monthly (pills, flea & tick), yearly (birthdays) |
+| **Organising** | Pin a countdown to the top of Home; duplicate a countdown |
+
+Plans for the next steps: [docs/SIGNIN_PLAN.md](docs/SIGNIN_PLAN.md) (Google / Apple sign-in) and [docs/FOR_TWO_PLAN.md](docs/FOR_TWO_PLAN.md)
+(shared countdowns that stay in sync, which needs the project's first server).
+
 Sharing needs no account or server: a shared link *is* the countdown. Live two-way sync (seeing your partner's paw prints) would
 need a server and is not built.
 
@@ -45,7 +63,8 @@ need a server and is not built.
 ```bash
 npm install
 npm start              # web app on http://localhost:5173  (python serve.py --lan to open it on a phone)
-npm test               # web: 21 maths tests + 24 screen/interaction tests
+npm test               # web: date-maths tests + screen and interaction tests
+npm run fuzz          # stress test: odd dates and time zones, every dog and scene, a click on every button
 ```
 **Android** (JDK 21 + Android SDK): `cd apps/android && ./gradlew :app:testDebugUnitTest :app:assembleDebug`
 **iPhone** (Mac + Xcode): `brew install xcodegen && cd apps/ios && xcodegen generate && open Pawcount.xcodeproj`

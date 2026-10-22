@@ -179,6 +179,13 @@ test('My dog: name and birthday show an age and make a yearly birthday countdown
   assert.strictEqual(A.S.state.settings.dogBirthday, ''); assert.strictEqual(A.S.state.settings.dogName.length, 30);
   A.S.state.settings.dogName = ''; A.S.loadSamples();
 });
+test('welcome asks who the person is (name + Mama/Papa) before the reminders step', () => {
+  A.ui.welcome = 2; go('#/welcome'); const h = doc.querySelector('#view').innerHTML;
+  assert.ok(h.includes('data-profile-name') && h.includes('data-action="set-parent"') && h.includes('Step 3 of 4'));
+  A.actions['set-parent']({ dataset: { v: 'papa' } }); assert.strictEqual(A.P.callName(), 'Papa'); A.S.set('parentTitle', '');
+  A.ui.welcome = 3; go('#/welcome'); assert.ok(doc.querySelector('#view').innerHTML.includes('ring the bell') && doc.querySelector('[data-action="w-bell"]'));
+  A.ui.welcome = 0; go('#/');
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);
