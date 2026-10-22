@@ -106,7 +106,7 @@ extension Countdown: Codable {
     /// untrusted data (shared links, backup files): only known-good shapes survive. Throws if it is not a usable countdown.
     private mutating func sanitize() throws {
         let types: Set<String> = ["intl_trip", "vacation", "birthday", "anniversary", "holiday", "gotcha", "vet", "custom"]
-        let breeds: Set<String> = ["scott", "golden", "corgi", "shiba", "dachshund", "husky", "mutt"]
+        let breeds: Set<String> = ["scott", "golden", "corgi", "shiba", "dachshund", "husky", "bulldog", "labrador", "poodle", "beagle", "pug", "shepherd", "chihuahua", "rottweiler", "doberman", "pomeranian", "collie", "frenchie", "yorkie", "shihtzu", "boxer", "cocker", "dalmatian", "samoyed", "mutt"]
         let ears: Set<String> = ["floppy", "pointy", "tall", "long"]
         let hex = try! NSRegularExpression(pattern: "^#[0-9A-Fa-f]{6}$")
         let wall = try! NSRegularExpression(pattern: "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2})?$")

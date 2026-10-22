@@ -39,7 +39,7 @@ Tap it to bark, hold to pet, shake the phone to make it sneeze. On top of that:
 | Memories with photos, backup export / import | ✅ | ✅ | ✅ |
 
 ### For fur parents
-Made for people who love their dogs. Scott (a fluffy black pup) is the default companion, and every dog can be played with:
+Made for people who love their dogs. Scott (a fluffy black pup) is the default companion, with 25 breeds to choose from (American Bulldog, Dachshund, Pug, Beagle, Poodle, Labrador, German Shepherd, Border Collie and more), and every dog can be played with:
 
 | | |
 |---|---|

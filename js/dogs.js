@@ -18,13 +18,33 @@
     golden: { name: 'Sunny', label: 'Golden Retriever', vibe: 'Pure joy, zoomies', best: 'Vacations & beach trips', fur: '#E2A558', dark: '#C4803A', light: '#F8DFAA', paw: '#E2A558', ears: 'floppy', face: 'plain', tail: 'normal' },
     corgi: { name: 'Biscuit', label: 'Corgi', vibe: 'Dramatic & bossy', best: 'Birthdays', fur: '#EE9B45', dark: '#D8802C', light: '#FFF4E2', paw: '#FFF4E2', ears: 'tall', face: 'blaze', tail: 'stub' },
     shiba: { name: 'Miso', label: 'Shiba Inu', vibe: 'Cool, secretly thrilled', best: 'International travel', fur: '#DE8A45', dark: '#C0712F', light: '#FFF1DC', paw: '#FFF1DC', ears: 'pointy', face: 'shiba', tail: 'curl' },
-    dachshund: { name: 'Noodle', label: 'Dachshund', vibe: 'Snuggly & patient', best: 'Anniversaries & date nights', fur: '#8A5236', dark: '#5E3622', light: '#C28A5E', paw: '#6E4129', ears: 'long', face: 'tan', tail: 'thin' },
+    dachshund: { name: 'Noodle', label: 'Dachshund', vibe: 'Snuggly & patient', best: 'Anniversaries & date nights', fur: '#8A5236', dark: '#5E3622', light: '#C28A5E', paw: '#6E4129', ears: 'long', face: 'tan', tail: 'thin', build: 'long' },
     husky: { name: 'Blizzard', label: 'Husky', vibe: 'Loud, talks back', best: 'Ski trips & adventures', fur: '#6F7B90', dark: '#4A5568', light: '#F8F8F6', paw: '#F8F8F6', ears: 'pointy', face: 'mask', tail: 'bushy' },
     scott: { name: 'Scott', label: 'Fluffy Black Pup', vibe: 'Sweet soul, fluffy chaos', best: 'Anything with Scott', fur: '#2A2630', dark: '#17141B', light: '#F4EEE4', paw: '#2A2630', ears: 'fluffy', face: 'scott', tail: 'plume' },
+    bulldog: { name: 'Duke', label: 'American Bulldog', vibe: "Gentle tank, huge heart", best: 'Anything with them', fur: '#F5F0E8', dark: '#A86B3C', light: '#FFFFFF', paw: '#F5F0E8', ears: 'rose', face: 'patch', tail: 'normal' },
+    labrador: { name: 'Maple', label: 'Labrador', vibe: "Eager, eats everything", best: 'Anything with them', fur: '#E4C28A', dark: '#C79B58', light: '#F6E7C7', paw: '#E4C28A', ears: 'floppy', face: 'plain', tail: 'normal' },
+    poodle: { name: 'Bijou', label: 'Poodle', vibe: "Fancy and very clever", best: 'Anything with them', fur: '#F3E3CB', dark: '#E0C9A6', light: '#FFF6E8', paw: '#F3E3CB', ears: 'fluffy', face: 'plain', tail: 'plume' },
+    beagle: { name: 'Hazel', label: 'Beagle', vibe: "Nose first, questions later", best: 'Anything with them', fur: '#C88B4E', dark: '#6B4426', light: '#FFFFFF', paw: '#FFFFFF', ears: 'long', face: 'blaze', tail: 'normal' },
+    pug: { name: 'Waffle', label: 'Pug', vibe: "Snorts, snacks and snuggles", best: 'Anything with them', fur: '#E6C99B', dark: '#3C312D', light: '#F4E4C6', paw: '#E6C99B', ears: 'rose', face: 'pug', tail: 'curl' },
+    shepherd: { name: 'Rex', label: 'German Shepherd', vibe: "Loyal and watchful", best: 'Anything with them', fur: '#B98A52', dark: '#2A2018', light: '#D8B27E', paw: '#B98A52', ears: 'tall', face: 'darkmuzzle', tail: 'bushy' },
+    chihuahua: { name: 'Pepper', label: 'Chihuahua', vibe: "Tiny, mighty, dramatic", best: 'Anything with them', fur: '#DDAA6C', dark: '#B9864A', light: '#F8E6C9', paw: '#DDAA6C', ears: 'tall', face: 'plain', tail: 'thin' },
+    rottweiler: { name: 'Tank', label: 'Rottweiler', vibe: "A big softie", best: 'Anything with them', fur: '#2A2220', dark: '#15100F', light: '#B5703A', paw: '#2A2220', ears: 'floppy', face: 'blacktan', tail: 'stub' },
+    doberman: { name: 'Duchess', label: 'Doberman', vibe: "Sleek and sensitive", best: 'Anything with them', fur: '#2B2422', dark: '#17110F', light: '#C27C3E', paw: '#2B2422', ears: 'pointy', face: 'blacktan', tail: 'stub' },
+    pomeranian: { name: 'Ember', label: 'Pomeranian', vibe: "Small fluff, big opinions", best: 'Anything with them', fur: '#EE9A48', dark: '#D0782A', light: '#FBE3C0', paw: '#EE9A48', ears: 'pointy', face: 'plain', tail: 'bushy' },
+    collie: { name: 'Tilly', label: 'Border Collie', vibe: "Brilliant and always busy", best: 'Anything with them', fur: '#2B2B34', dark: '#1B1B22', light: '#FFFFFF', paw: '#FFFFFF', ears: 'floppy', face: 'collie', tail: 'bushy' },
+    frenchie: { name: 'Gizmo', label: 'French Bulldog', vibe: "Bat ears, big personality", best: 'Anything with them', fur: '#D4B48A', dark: '#8F6C45', light: '#F3E6D2', paw: '#D4B48A', ears: 'tall', face: 'pug', tail: 'stub' },
+    yorkie: { name: 'Pixie', label: 'Yorkshire Terrier', vibe: "Tiny and fearless", best: 'Anything with them', fur: '#66758A', dark: '#3C485A', light: '#D9A35E', paw: '#66758A', ears: 'pointy', face: 'tan', tail: 'thin' },
+    shihtzu: { name: 'Mochi', label: 'Shih Tzu', vibe: "Fluffy royalty", best: 'Anything with them', fur: '#F2EADF', dark: '#C9AE86', light: '#FFFFFF', paw: '#F2EADF', ears: 'fluffy', face: 'plain', tail: 'plume' },
+    boxer: { name: 'Rocky', label: 'Boxer', vibe: "Goofy, bouncy, loyal", best: 'Anything with them', fur: '#C98443', dark: '#7A4A22', light: '#FFFFFF', paw: '#FFFFFF', ears: 'floppy', face: 'blaze', tail: 'stub' },
+    cocker: { name: 'Cooper', label: 'Cocker Spaniel', vibe: "Soft ears, soft heart", best: 'Anything with them', fur: '#C9873F', dark: '#8F5A24', light: '#F6E0BB', paw: '#C9873F', ears: 'long', face: 'plain', tail: 'normal' },
+    dalmatian: { name: 'Domino', label: 'Dalmatian', vibe: "Spotted and spirited", best: 'Anything with them', fur: '#F7F4EF', dark: '#2A2A2A', light: '#FFFFFF', paw: '#F7F4EF', ears: 'floppy', face: 'spots', tail: 'thin' },
+    samoyed: { name: 'Cloud', label: 'Samoyed', vibe: "A smiling fluffball", best: 'Anything with them', fur: '#F5F3EE', dark: '#DAD3C8', light: '#FFFFFF', paw: '#F5F3EE', ears: 'pointy', face: 'plain', tail: 'bushy' },
     mutt: { name: 'Lucky', label: 'Mutt', vibe: 'Your colours, your ears', best: 'Anything', fur: '#B98A62', dark: '#8A5F3F', light: '#F0DDC4', paw: '#F0DDC4', ears: 'floppy', face: 'plain', tail: 'normal' },
   };
   P.BREEDS = BREEDS;
-  P.BREED_ORDER = ['scott', 'golden', 'corgi', 'shiba', 'dachshund', 'husky', 'mutt'];
+  P.BREED_ORDER = ["scott", "golden", "corgi", "shiba", "dachshund", "husky", "bulldog", "labrador", "poodle", "beagle", "pug", "shepherd", "chihuahua", "rottweiler", "doberman", "pomeranian", "collie", "frenchie", "yorkie", "shihtzu", "boxer", "cocker", "dalmatian", "samoyed", "mutt"];
+  // the breeds that also exist as an app icon on the phones
+  P.ICON_BREEDS = ['scott', 'golden', 'corgi', 'shiba', 'dachshund', 'husky', 'mutt'];
   P.MUTT_FURS = ['#B98A62', '#8A5F3F', '#E2A558', '#4A3B35', '#9A9A9A', '#E8D2B0', '#C46B3C'];
   P.EAR_TYPES = [['floppy', 'Floppy'], ['pointy', 'Pointy'], ['tall', 'Big'], ['long', 'Long']];
 
@@ -47,6 +67,7 @@
       floppy: `<path d="M80 66C54 58 34 84 40 124c4 20 26 24 36 6 8-14 12-38 4-64z" fill="${c.dark}"/>`,
       pointy: `<path d="M66 76 58 18Q96 24 110 62z" fill="${c.dark}"/><path d="M71 66 67 36Q86 40 97 60z" fill="${c.inner}"/>`,
       tall: `<path d="M62 80 40 4Q96 14 112 62z" fill="${c.dark}"/><path d="M67 68 55 28Q82 36 98 60z" fill="${c.inner}"/>`,
+      rose: `<path d="M78 64C56 56 42 76 50 98c12-2 26-10 34-24z" fill="${c.dark}"/><path d="M70 74C62 74 56 82 58 92 66 90 74 84 78 78z" fill="${c.inner}" opacity=".7"/>`,
       fluffy: `<path d="M82 64C54 50 26 74 30 112c-8 8-4 22 6 26-2 10 6 20 16 16 4 8 18 8 22-2 12-6 12-22 6-32 6-22 4-40 2-56z" fill="${c.dark}"/><path d="M44 120c4-14 6-26 14-38M56 140c2-14 4-26 10-40" stroke="${c.fur}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".55"/>`,
       long: `<path d="M78 66C44 56 24 100 30 156c4 28 32 28 38 2 6-30 18-62 10-92z" fill="${c.dark}"/>`,
     };
@@ -85,6 +106,24 @@
         return `<ellipse cx="84" cy="124" rx="27" ry="23" fill="${c.light}"/><ellipse cx="156" cy="124" rx="27" ry="23" fill="${c.light}"/><ellipse cx="120" cy="131" rx="28" ry="22" fill="${c.light}"/><circle cx="96" cy="81" r="5.5" fill="${c.light}"/><circle cx="144" cy="81" r="5.5" fill="${c.light}"/>`;
       case 'mask':
         return `<path d="M120 58C112 78 104 88 84 98 66 108 62 134 88 148c18 10 46 10 64 0 26-14 22-40 4-50-20-10-28-20-36-40z" fill="${c.light}"/><ellipse cx="98" cy="84" rx="8" ry="4.5" fill="${c.fur}"/><ellipse cx="142" cy="84" rx="8" ry="4.5" fill="${c.fur}"/>`;
+      case 'patch':
+        // American Bulldog: broad muzzle, one dark patch over an eye, heavy jowls
+        return `<ellipse cx="98" cy="98" rx="21" ry="18" fill="${c.dark}"/><ellipse cx="120" cy="128" rx="36" ry="26" fill="${c.light}"/><path d="M90 134Q120 156 150 134" stroke="#000" stroke-opacity=".14" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+      case 'darkmuzzle':
+        // German Shepherd: dark mask and muzzle, tan eyebrows
+        return `<ellipse cx="120" cy="127" rx="33" ry="25" fill="#5B4E49"/><path d="M84 96C90 80 106 80 120 90 134 80 150 80 156 96 148 112 92 112 84 96z" fill="${c.dark}" opacity=".55"/><ellipse cx="97" cy="81" rx="6" ry="4" fill="${c.light}"/><ellipse cx="143" cy="81" rx="6" ry="4" fill="${c.light}"/>`;
+      case 'pug':
+        // Pug / French Bulldog: flat dark muzzle and forehead wrinkles
+        return `<ellipse cx="120" cy="126" rx="32" ry="24" fill="#5B4E49"/><path d="M100 70q20-8 40 0M104 79q16-6 32 0" stroke="${c.dark}" stroke-opacity=".45" stroke-width="3.4" fill="none" stroke-linecap="round"/><ellipse cx="97" cy="101" rx="14" ry="12" fill="${c.dark}" opacity=".25"/><ellipse cx="143" cy="101" rx="14" ry="12" fill="${c.dark}" opacity=".25"/>`;
+      case 'blacktan':
+        // Rottweiler / Doberman: black with tan cheeks and eyebrows; soft eye patches so the eyes read
+        return `<ellipse cx="98" cy="100" rx="15" ry="14" fill="#3A3541"/><ellipse cx="142" cy="100" rx="15" ry="14" fill="#3A3541"/><ellipse cx="120" cy="128" rx="34" ry="24" fill="${c.light}"/><ellipse cx="96" cy="80" rx="7" ry="4.5" fill="${c.light}"/><ellipse cx="144" cy="80" rx="7" ry="4.5" fill="${c.light}"/>`;
+      case 'collie':
+        // Border Collie: white blaze and muzzle on a black face
+        return `<ellipse cx="98" cy="100" rx="15" ry="14" fill="#3A3A46"/><ellipse cx="142" cy="100" rx="15" ry="14" fill="#3A3A46"/><ellipse cx="120" cy="130" rx="38" ry="26" fill="${c.light}"/><path d="M120 52C112 76 108 96 103 120h34c-5-24-9-44-17-68z" fill="${c.light}"/>`;
+      case 'spots':
+        // Dalmatian: black spots and a clean muzzle
+        return `<ellipse cx="120" cy="128" rx="31" ry="23" fill="${c.light}"/>${[[84, 76, 8], [152, 84, 7], [112, 64, 5], [134, 68, 6], [88, 104, 4.5], [156, 112, 5], [122, 82, 3.5]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c.dark}"/>`).join('')}`;
       case 'scott':
         // charcoal muzzle + soft eye patches so the dark eyes read on black fur, a cream beard, and a few wispy brow hairs
         return `<ellipse cx="120" cy="126" rx="33" ry="24" fill="#4B4452"/><ellipse cx="98" cy="100" rx="15" ry="14" fill="#3A3541"/><ellipse cx="142" cy="100" rx="15" ry="14" fill="#3A3541"/><path d="M100 134Q120 168 140 134Q130 146 120 147Q110 146 100 134z" fill="${c.light}"/><ellipse cx="120" cy="143" rx="11" ry="7" fill="${c.light}"/><path d="M92 70C96 56 104 52 112 54M128 54C136 52 144 56 148 70" stroke="${c.fur}" stroke-width="7" fill="none" stroke-linecap="round"/>`;
@@ -146,6 +185,7 @@
     const body = `
       <ellipse class="shadow" cx="120" cy="223" rx="66" ry="8" fill="#000" opacity=".15"/>
       ${tail(c)}
+      ${c.build === 'long' ? `<ellipse cx="170" cy="198" rx="50" ry="27" fill="${c.fur}"/><rect x="184" y="200" width="18" height="24" rx="9" fill="${c.fur}"/><ellipse cx="193" cy="222" rx="13" ry="7" fill="${c.paw}"/>` : ''}
       <ellipse cx="76" cy="203" rx="27" ry="20" fill="${c.fur}"/><ellipse cx="164" cy="203" rx="27" ry="20" fill="${c.fur}"/>
       <g class="torso"><ellipse cx="120" cy="178" rx="47" ry="49" fill="${c.fur}"/>${c.face === 'scott' ? `<path d="M120 146C100 150 94 166 100 178 108 188 132 188 140 178 146 166 140 150 120 146z" fill="${c.light}"/>` : `<ellipse cx="120" cy="184" rx="29" ry="37" fill="${c.light}"/>`}</g>
       <rect x="100" y="172" width="19" height="44" rx="9.5" fill="${c.fur}"/><rect x="121" y="172" width="19" height="44" rx="9.5" fill="${c.fur}"/>
@@ -181,6 +221,7 @@
     const c = palette(dog), memory = stage === 'memory';
     const earSvg = {
       floppy: `<path d="M98 150C128 148 134 188 112 206 100 198 94 176 98 150z" fill="${c.dark}"/>`,
+      rose: `<path d="M98 148C118 146 130 160 124 176 110 174 100 164 98 148z" fill="${c.dark}"/>`,
       fluffy: `<path d="M98 148C132 146 140 184 114 208 106 214 94 206 92 192 88 176 90 158 98 148z" fill="${c.dark}"/>`,
       long: `<path d="M98 152C132 150 138 192 108 214 94 200 90 176 98 152z" fill="${c.dark}"/>`,
       pointy: `<path d="M82 156 84 118Q108 128 114 160z" fill="${c.dark}"/><path d="M88 152 90 130Q102 136 106 152z" fill="${c.inner}"/>`,
@@ -207,7 +248,7 @@
       <g class="nap-head">
         <circle cx="88" cy="184" r="37" fill="${c.fur}"/>
         ${faceBits}
-        <ellipse cx="58" cy="197" rx="25" ry="17" fill="${c.face === 'scott' ? '#4B4452' : c.light}"/>${c.face === 'scott' ? `<ellipse cx="60" cy="209" rx="13" ry="6" fill="${c.light}"/>` : ''}
+        <ellipse cx="58" cy="197" rx="25" ry="17" fill="${c.face === 'scott' ? '#4B4452' : c.face === 'darkmuzzle' || c.face === 'pug' ? '#5B4E49' : c.light}"/>${c.face === 'scott' ? `<ellipse cx="60" cy="209" rx="13" ry="6" fill="${c.light}"/>` : ''}
         <ellipse cx="37" cy="192" rx="7.5" ry="5.8" fill="${INK}"/><ellipse cx="35" cy="190" rx="2.6" ry="1.3" fill="#fff" opacity=".5"/>
         ${c.face === 'scott' ? `<circle cx="70" cy="153" r="11" fill="${c.fur}"/><circle cx="86" cy="148" r="12" fill="${c.fur}"/><circle cx="103" cy="152" r="11" fill="${c.fur}"/><circle cx="55" cy="164" r="9" fill="${c.fur}"/>` : ''}
         ${eye}
@@ -237,4 +278,5 @@
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><rect width="240" height="240" rx="56" fill="${bg || '#FFF1DC'}"/><g transform="translate(120 128) scale(.98) translate(-120 -108)">${inner}</g></svg>`;
   };
   P.dogIconURI = (breed) => 'data:image/svg+xml,' + encodeURIComponent(P.dogIconSVG(breed));
+  if (P.BREED_BEST) P.BREED_ORDER.forEach((b) => { if (!P.BREED_BEST[b]) P.BREED_BEST[b] = []; });
 })();

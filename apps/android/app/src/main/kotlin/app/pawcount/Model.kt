@@ -103,7 +103,7 @@ fun Countdown.toJson(): JSONObject = JSONObject().apply {
 
 /* ---------- untrusted data (shared links, backup files): only known-good shapes survive ---------- */
 private val TYPE_KEYS = setOf("intl_trip", "vacation", "birthday", "anniversary", "holiday", "gotcha", "vet", "custom")
-private val BREED_KEYS = setOf("scott", "golden", "corgi", "shiba", "dachshund", "husky", "mutt")
+private val BREED_KEYS = setOf("scott", "golden", "corgi", "shiba", "dachshund", "husky", "bulldog", "labrador", "poodle", "beagle", "pug", "shepherd", "chihuahua", "rottweiler", "doberman", "pomeranian", "collie", "frenchie", "yorkie", "shihtzu", "boxer", "cocker", "dalmatian", "samoyed", "mutt")
 private val EAR_KEYS = setOf("floppy", "pointy", "tall", "long")
 private val HEX6 = Regex("^#[0-9A-Fa-f]{6}$")
 private val WALL = Regex("^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2})?$")

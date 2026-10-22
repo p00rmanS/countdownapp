@@ -349,7 +349,7 @@
 
       ${installPanel()}
       <h2 class="group-h">App icon</h2>
-      <div class="panel"><div class="icon-picker" role="radiogroup" aria-label="App icon">${P.BREED_ORDER.map((b) => `<button class="icon-opt ${st.icon === b ? 'on' : ''}" role="radio" aria-checked="${st.icon === b}" data-action="set-icon" data-v="${b}" aria-label="${esc(P.BREEDS[b].label)} icon"><span class="ic">${P.dogIconSVG(b)}</span><span class="small">${esc(P.BREEDS[b].name)}</span>${st.icon === b ? `<span class="tick">${icon('check')}</span>` : ''}</button>`).join('')}</div></div>
+      <div class="panel"><div class="icon-picker" role="radiogroup" aria-label="App icon">${P.ICON_BREEDS.map((b) => `<button class="icon-opt ${st.icon === b ? 'on' : ''}" role="radio" aria-checked="${st.icon === b}" data-action="set-icon" data-v="${b}" aria-label="${esc(P.BREEDS[b].label)} icon"><span class="ic">${P.dogIconSVG(b)}</span><span class="small">${esc(P.BREEDS[b].name)}</span>${st.icon === b ? `<span class="tick">${icon('check')}</span>` : ''}</button>`).join('')}</div></div>
 
       <h2 class="group-h">Your data</h2>
       <div class="panel flush">
@@ -385,7 +385,7 @@
     const mk = (b, stage = 'waiting', extra = {}) => P.dogSVG({ breed: b, name: P.BREEDS[b].name, ...(b === 'mutt' ? { ears: 'floppy' } : {}) }, stage, { type: 'custom', accent: '#E8A15C', ...extra });
     let inner;
     if (step === 0) {
-      inner = `<div class="w-pack" aria-hidden="true">${dogs.map((b, i) => `<div class="w-dog d${i}" style="--i:${i}">${mk(b, ['waiting', 'curious', 'waiting', 'packing', 'curious', 'waiting'][i])}</div>`).join('')}</div>
+      inner = `<div class="w-pack" aria-hidden="true">${dogs.slice(0, 6).map((b, i) => `<div class="w-dog d${i}" style="--i:${i}">${mk(b, ['waiting', 'curious', 'waiting', 'packing', 'curious', 'waiting'][i])}</div>`).join('')}</div>
         <h1 class="w-title">Countdowns with a dog who <em>can't wait</em> either.</h1>
         <p class="w-sub">Every trip, birthday and big day gets a companion that gets more excited as it gets closer.</p>`;
     } else if (step === 1) {

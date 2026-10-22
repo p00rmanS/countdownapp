@@ -94,7 +94,7 @@ fun WelcomeScreen(vm: AppViewModel) {
             when (page) {
                 0 -> {
                     Row(Modifier.fillMaxWidth().padding(bottom = 24.dp), horizontalArrangement = Arrangement.Center) {
-                        meta.breedOrder.forEachIndexed { i, b -> DogOnly(vm, Dog(b, meta.breeds.getValue(b).name, if (b == "mutt") "#B98A62" else null, if (b == "mutt") "floppy" else null), if (i % 3 == 0) Stage.PACKING else if (i % 2 == 0) Stage.WAITING else Stage.CURIOUS,
+                        meta.breedOrder.take(6).forEachIndexed { i, b -> DogOnly(vm, Dog(b, meta.breeds.getValue(b).name, if (b == "mutt") "#B98A62" else null, if (b == "mutt") "floppy" else null), if (i % 3 == 0) Stage.PACKING else if (i % 2 == 0) Stage.WAITING else Stage.CURIOUS,
                             Modifier.weight(1f).padding(top = if (i % 2 == 0) 0.dp else 22.dp)) }
                     }
                     H("Countdowns with a dog who can't wait either.", 38, align = TextAlign.Center)

@@ -46,7 +46,7 @@ struct WelcomeView: View {
                     switch page {
                     case 0:
                         HStack(alignment: .bottom, spacing: 0) {
-                            ForEach(Array(meta.breedOrder.enumerated()), id: \.offset) { i, b in
+                            ForEach(Array(meta.breedOrder.prefix(6).enumerated()), id: \.offset) { i, b in
                                 DogOnly(dog: mutt(b), stage: i % 3 == 0 ? .packing : (i % 2 == 0 ? .waiting : .curious)).frame(maxWidth: .infinity).padding(.bottom, i % 2 == 0 ? 22 : 0)
                             }
                         }.padding(.bottom, 24).padding(.top, 40)
