@@ -29,18 +29,19 @@ private var paletteCounter = 0
 
 final class Palette {
     let fur: RGB, dark: RGB, light: RGB, paw: RGB, accent: RGB
+    let girl: Bool
     let id: Int
-    init(fur: RGB, dark: RGB, light: RGB, paw: RGB, accent: RGB) {
-        self.fur = fur; self.dark = dark; self.light = light; self.paw = paw; self.accent = accent
+    init(fur: RGB, dark: RGB, light: RGB, paw: RGB, accent: RGB, girl: Bool = false) {
+        self.girl = girl; self.fur = fur; self.dark = dark; self.light = light; self.paw = paw; self.accent = accent
         paletteCounter += 1; id = paletteCounter
     }
 }
 
 func dogPalette(_ meta: Meta, _ dog: Dog, accent: RGB) -> Palette {
     let b = meta.breeds[dog.breed] ?? meta.breeds["mutt"]!
-    if dog.breed != "mutt" { return Palette(fur: parseHex(b.fur), dark: parseHex(b.dark), light: parseHex(b.light), paw: parseHex(b.paw), accent: accent) }
+    if dog.breed != "mutt" { return Palette(fur: parseHex(b.fur), dark: parseHex(b.dark), light: parseHex(b.light), paw: parseHex(b.paw), accent: accent, girl: dog.sex == "girl") }
     let fur = parseHex(dog.furColor ?? b.fur)       // a mutt derives its other shades from the coat colour the user picked
-    return Palette(fur: fur, dark: fur.mixed(.black, 0.2), light: fur.mixed(.white, 0.62), paw: fur.mixed(.white, 0.55), accent: accent)
+    return Palette(fur: fur, dark: fur.mixed(.black, 0.2), light: fur.mixed(.white, 0.62), paw: fur.mixed(.white, 0.55), accent: accent, girl: dog.sex == "girl")
 }
 
 func resolveColor(_ token: String, _ p: Palette) -> RGB {
@@ -187,6 +188,7 @@ private func visible(_ n: Node, _ s: DrawState) -> Bool {
     if n.has("mouth-closed") { return !s.mouthOpen }
     if n.has("eye") { return !s.eyesShut }
     if n.has("eye-shut") { return s.eyesShut }
+    if n.has("bow") { return s.palette.girl }
     return !n.hidden
 }
 

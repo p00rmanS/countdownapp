@@ -75,7 +75,7 @@ data class Draft(
     val date: LocalDate = LocalDate.now().plusDays(30), val time: LocalTime = LocalTime.of(9, 0), val allDay: Boolean = false,
     val tz: String = ZoneId.systemDefault().id, val yearly: Boolean = false, val monthly: Boolean = false, val weekly: Boolean = false, val country: String = "",
     val personName: String = "", val birthYear: String = "", val breed: String = "scott", val breedTouched: Boolean = false,
-    val dogName: String = "Scott", val nameTouched: Boolean = false, val fur: String = "#B98A62", val ears: String = "floppy",
+    val dogName: String = "Scott", val sex: String = "", val nameTouched: Boolean = false, val fur: String = "#B98A62", val ears: String = "floppy",
     val accent: String = "#5DADE8", val accentTouched: Boolean = false, val mode: DisplayMode = DisplayMode.FULL,
     val reminders: List<Reminder> = defaultReminders("intl_trip"), val notes: String = "", val checklist: List<CheckItem> = emptyList(),
     val createdAt: Long? = null, val sample: Boolean = false, val photos: List<String> = emptyList(), val archived: Boolean = false, val origTarget: String? = null,
@@ -92,7 +92,7 @@ private fun Draft.withType(meta: Meta, t: String): Draft {
 private fun Draft.toCountdown(): Countdown {
     val target = "${date}T${if (allDay) "00:00" else time.toString().take(5)}"
     val keep = createdAt != null && origTarget == "$target|$tz"
-    val dog = if (breed == "mutt") Dog("mutt", dogName.trim().ifEmpty { "Lucky" }, fur, ears) else Dog(breed, dogName.trim())
+    val dog = if (breed == "mutt") Dog("mutt", dogName.trim().ifEmpty { "Lucky" }, fur, ears, sex) else Dog(breed, dogName.trim(), sex = sex)
     return Countdown(id ?: newId(), title.trim(), type, target, tz, allDay, yearly && !monthly && !weekly, if (keep) createdAt!! else System.currentTimeMillis(), dog, accent, mode, notes, checklist,
         destination = null, monthly = monthly, weekly = weekly, person = if (type == "birthday" && (personName.isNotBlank() || birthYear.isNotBlank())) Person(personName.trim(), birthYear.toIntOrNull()) else null,
         reminders = reminders, archived = archived, photos = photos, sample = sample)
@@ -101,7 +101,7 @@ private fun Draft.toCountdown(): Countdown {
 private fun draftOf(c: Countdown, meta: Meta) = Draft(
     id = c.id, type = c.type, title = c.title, titleAuto = false, date = LocalDate.parse(c.targetAt.take(10)), time = runCatching { LocalTime.parse(c.targetAt.substring(11, 16)) }.getOrDefault(LocalTime.of(9, 0)),
     allDay = c.allDay, tz = c.timeZone, yearly = c.yearly, monthly = c.monthly, weekly = c.weekly, country = c.destination?.country ?: "", personName = c.person?.name ?: "", birthYear = c.person?.birthYear?.toString() ?: "",
-    breed = c.dog.breed, breedTouched = true, dogName = c.dog.name, nameTouched = true, fur = c.dog.furColor ?: "#B98A62", ears = c.dog.ears ?: "floppy", accent = c.accent, accentTouched = true,
+    breed = c.dog.breed, breedTouched = true, dogName = c.dog.name, sex = c.dog.sex, nameTouched = true, fur = c.dog.furColor ?: "#B98A62", ears = c.dog.ears ?: "floppy", accent = c.accent, accentTouched = true,
     mode = c.displayMode, reminders = c.reminders, notes = c.notes, checklist = c.checklist, createdAt = c.createdAt, sample = c.sample, photos = c.photos, archived = c.archived, origTarget = "${c.targetAt}|${c.timeZone}",
 )
 
@@ -223,8 +223,10 @@ fun FlowScreen(vm: AppViewModel, editId: String?) {
                             }
                         }
                     }
+                    var breedQuery by remember { mutableStateOf("") }
+                    Field("", breedQuery, { breedQuery = it }, placeholder = "Search breeds: bully, dachshund, pug…", accent = accent, maxLen = 30)
                     LazyRow(Modifier.padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        items(meta.breedOrder) { b ->
+                        items(meta.breedOrder.filter { b -> breedQuery.isBlank() || meta.breeds.getValue(b).let { x -> "${x.name} ${x.label} ${x.vibe}".contains(breedQuery.trim(), ignoreCase = true) } }) { b ->
                             val B = meta.breeds.getValue(b); val on = d.breed == b; val sug = d.type in (meta.breedBest[b] ?: emptyList())
                             Box {
                                 Column(Modifier.width(138.dp).shadow(if (on) 8.dp else 3.dp, RoundedCornerShape(24.dp)).clip(RoundedCornerShape(24.dp)).background(pc.surface).border(3.dp, if (on) accent else Color.Transparent, RoundedCornerShape(24.dp))
@@ -237,6 +239,8 @@ fun FlowScreen(vm: AppViewModel, editId: String?) {
                         }
                     }
                     Field("Dog's name", d.dogName, { d = d.copy(dogName = it, nameTouched = true) }, accent = accent, maxLen = 18)
+                    Muted("Girl or boy?", Modifier.padding(top = 16.dp, bottom = 7.dp), size = 14)
+                    Seg(listOf("girl" to "Girl (with a bow)", "boy" to "Boy", "" to "Skip"), d.sex, { v -> d = d.copy(sex = v) }, label = "Girl or boy")
                     if (d.breed == "mutt") Panel {
                         PanelTitle("Customize ${d.dogName.ifBlank { "Lucky" }}")
                         Muted("Coat colour", size = 14)

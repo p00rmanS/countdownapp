@@ -21,7 +21,8 @@
     dachshund: { name: 'Noodle', label: 'Dachshund', vibe: 'Snuggly & patient', best: 'Anniversaries & date nights', fur: '#8A5236', dark: '#5E3622', light: '#C28A5E', paw: '#6E4129', ears: 'long', face: 'tan', tail: 'thin', build: 'long' },
     husky: { name: 'Blizzard', label: 'Husky', vibe: 'Loud, talks back', best: 'Ski trips & adventures', fur: '#6F7B90', dark: '#4A5568', light: '#F8F8F6', paw: '#F8F8F6', ears: 'pointy', face: 'mask', tail: 'bushy' },
     scott: { name: 'Scott', label: 'Fluffy Black Pup', vibe: 'Sweet soul, fluffy chaos', best: 'Anything with Scott', fur: '#2A2630', dark: '#17141B', light: '#F4EEE4', paw: '#2A2630', ears: 'fluffy', face: 'scott', tail: 'plume' },
-    bulldog: { name: 'Duke', label: 'American Bulldog', vibe: "Gentle tank, huge heart", best: 'Anything with them', fur: '#F5F0E8', dark: '#A86B3C', light: '#FFFFFF', paw: '#F5F0E8', ears: 'rose', face: 'patch', tail: 'normal' },
+    bulldog: { name: 'Duke', label: 'American Bulldog', vibe: "Gentle tank, huge heart", best: 'Anything with them', fur: '#F5F0E8', dark: '#A86B3C', light: '#FFFFFF', paw: '#F5F0E8', ears: 'rose', face: 'patch', tail: 'normal', build: 'stocky' },
+    bully: { name: 'Hugo', label: 'American Bully', vibe: 'Muscles outside, marshmallow inside', best: 'Anything with them', fur: '#8E96A3', dark: '#5C6573', light: '#F4F4F4', paw: '#F4F4F4', ears: 'rose', face: 'blaze', tail: 'normal', build: 'stocky' },
     labrador: { name: 'Maple', label: 'Labrador', vibe: "Eager, eats everything", best: 'Anything with them', fur: '#E4C28A', dark: '#C79B58', light: '#F6E7C7', paw: '#E4C28A', ears: 'floppy', face: 'plain', tail: 'normal' },
     poodle: { name: 'Bijou', label: 'Poodle', vibe: "Fancy and very clever", best: 'Anything with them', fur: '#F3E3CB', dark: '#E0C9A6', light: '#FFF6E8', paw: '#F3E3CB', ears: 'fluffy', face: 'plain', tail: 'plume' },
     beagle: { name: 'Hazel', label: 'Beagle', vibe: "Nose first, questions later", best: 'Anything with them', fur: '#C88B4E', dark: '#6B4426', light: '#FFFFFF', paw: '#FFFFFF', ears: 'long', face: 'blaze', tail: 'normal' },
@@ -32,7 +33,7 @@
     doberman: { name: 'Duchess', label: 'Doberman', vibe: "Sleek and sensitive", best: 'Anything with them', fur: '#2B2422', dark: '#17110F', light: '#C27C3E', paw: '#2B2422', ears: 'pointy', face: 'blacktan', tail: 'stub' },
     pomeranian: { name: 'Ember', label: 'Pomeranian', vibe: "Small fluff, big opinions", best: 'Anything with them', fur: '#EE9A48', dark: '#D0782A', light: '#FBE3C0', paw: '#EE9A48', ears: 'pointy', face: 'plain', tail: 'bushy' },
     collie: { name: 'Tilly', label: 'Border Collie', vibe: "Brilliant and always busy", best: 'Anything with them', fur: '#2B2B34', dark: '#1B1B22', light: '#FFFFFF', paw: '#FFFFFF', ears: 'floppy', face: 'collie', tail: 'bushy' },
-    frenchie: { name: 'Gizmo', label: 'French Bulldog', vibe: "Bat ears, big personality", best: 'Anything with them', fur: '#D4B48A', dark: '#8F6C45', light: '#F3E6D2', paw: '#D4B48A', ears: 'tall', face: 'pug', tail: 'stub' },
+    frenchie: { name: 'Gizmo', label: 'French Bulldog', vibe: "Bat ears, big personality", best: 'Anything with them', fur: '#D4B48A', dark: '#8F6C45', light: '#F3E6D2', paw: '#D4B48A', ears: 'tall', face: 'pug', tail: 'stub', build: 'stocky' },
     yorkie: { name: 'Pixie', label: 'Yorkshire Terrier', vibe: "Tiny and fearless", best: 'Anything with them', fur: '#66758A', dark: '#3C485A', light: '#D9A35E', paw: '#66758A', ears: 'pointy', face: 'tan', tail: 'thin' },
     shihtzu: { name: 'Mochi', label: 'Shih Tzu', vibe: "Fluffy royalty", best: 'Anything with them', fur: '#F2EADF', dark: '#C9AE86', light: '#FFFFFF', paw: '#F2EADF', ears: 'fluffy', face: 'plain', tail: 'plume' },
     boxer: { name: 'Rocky', label: 'Boxer', vibe: "Goofy, bouncy, loyal", best: 'Anything with them', fur: '#C98443', dark: '#7A4A22', light: '#FFFFFF', paw: '#FFFFFF', ears: 'floppy', face: 'blaze', tail: 'stub' },
@@ -42,7 +43,7 @@
     mutt: { name: 'Lucky', label: 'Mutt', vibe: 'Your colours, your ears', best: 'Anything', fur: '#B98A62', dark: '#8A5F3F', light: '#F0DDC4', paw: '#F0DDC4', ears: 'floppy', face: 'plain', tail: 'normal' },
   };
   P.BREEDS = BREEDS;
-  P.BREED_ORDER = ["scott", "golden", "corgi", "shiba", "dachshund", "husky", "bulldog", "labrador", "poodle", "beagle", "pug", "shepherd", "chihuahua", "rottweiler", "doberman", "pomeranian", "collie", "frenchie", "yorkie", "shihtzu", "boxer", "cocker", "dalmatian", "samoyed", "mutt"];
+  P.BREED_ORDER = ["scott", "golden", "corgi", "shiba", "dachshund", "husky", "bulldog", "bully", "labrador", "poodle", "beagle", "pug", "shepherd", "chihuahua", "rottweiler", "doberman", "pomeranian", "collie", "frenchie", "yorkie", "shihtzu", "boxer", "cocker", "dalmatian", "samoyed", "mutt"];
   // the breeds that also exist as an app icon on the phones
   P.ICON_BREEDS = ['scott', 'golden', 'corgi', 'shiba', 'dachshund', 'husky', 'mutt'];
   P.MUTT_FURS = ['#B98A62', '#8A5F3F', '#E2A558', '#4A3B35', '#9A9A9A', '#E8D2B0', '#C46B3C'];
@@ -60,6 +61,12 @@
     }
     return c;
   }
+
+  /* girls wear a little pink bow. In the native export the bow is always present but hidden, and the apps show it for girl dogs */
+  const bow = (dog, x, y, k) => {
+    if (!(P.tokenMode || (dog && dog.sex === 'girl'))) return '';
+    return `<g class="bow"${P.tokenMode ? ' style="display:none"' : ''} transform="translate(${x} ${y}) scale(${k})"><path d="M0 0-22-13Q-28-1-18 11z" fill="#FF7DAA"/><path d="M0 0 22-13Q28-1 18 11z" fill="#FF7DAA"/><path d="M-20-8Q-14-2-17 6M20-8Q14-2 17 6" stroke="#E5457A" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="0" cy="0" r="6" fill="#E5457A"/></g>`;
+  };
 
   /* ---------- parts ---------- */
   function ear(type, c, side) {
@@ -187,6 +194,7 @@
       ${tail(c)}
       ${c.build === 'long' ? `<ellipse cx="170" cy="198" rx="50" ry="27" fill="${c.fur}"/><rect x="184" y="200" width="18" height="24" rx="9" fill="${c.fur}"/><ellipse cx="193" cy="222" rx="13" ry="7" fill="${c.paw}"/>` : ''}
       <ellipse cx="76" cy="203" rx="27" ry="20" fill="${c.fur}"/><ellipse cx="164" cy="203" rx="27" ry="20" fill="${c.fur}"/>
+      ${c.build === 'stocky' ? `<ellipse cx="120" cy="186" rx="60" ry="44" fill="${c.fur}"/><ellipse cx="72" cy="206" rx="22" ry="18" fill="${c.fur}"/><ellipse cx="168" cy="206" rx="22" ry="18" fill="${c.fur}"/>` : ''}
       <g class="torso"><ellipse cx="120" cy="178" rx="47" ry="49" fill="${c.fur}"/>${c.face === 'scott' ? `<path d="M120 146C100 150 94 166 100 178 108 188 132 188 140 178 146 166 140 150 120 146z" fill="${c.light}"/>` : `<ellipse cx="120" cy="184" rx="29" ry="37" fill="${c.light}"/>`}</g>
       <rect x="100" y="172" width="19" height="44" rx="9.5" fill="${c.fur}"/><rect x="121" y="172" width="19" height="44" rx="9.5" fill="${c.fur}"/>
       <ellipse cx="109.5" cy="215" rx="13" ry="8" fill="${c.paw}"/><ellipse cx="130.5" cy="215" rx="13" ry="8" fill="${c.paw}"/>
@@ -211,6 +219,7 @@
         <ellipse cx="120" cy="104" rx="58" ry="50" fill="${c.fur}"/>
         <g clip-path="url(#${id})">${faceLayers(c)}</g>
         ${blush}${eyes}${brows}${nose}${mouthClosed}${mouthOpen}
+        ${bow(dog, 86, 58, 1)}
         ${hp}
       </g>`;
     return body + head;
@@ -254,6 +263,7 @@
         ${eye}
         <ellipse cx="94" cy="199" rx="8" ry="5" fill="#F6B7B0" opacity=".65"/>
         <g class="ear ear-l t-${c.ears}">${earSvg}</g>
+        ${bow(dog, 74, 152, 0.8)}
       </g>
       <ellipse cx="52" cy="219" rx="19" ry="8" fill="${c.paw}"/>
       ${memory

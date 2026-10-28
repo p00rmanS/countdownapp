@@ -423,6 +423,7 @@
     const type = P.TYPES[o.type] ? o.type : 'custom';
     const d = o.dog && typeof o.dog === 'object' ? o.dog : {};
     const dog = { breed: P.BREEDS && P.BREEDS[d.breed] ? d.breed : 'mutt', name: str(d.name, 30).trim() || 'Buddy' };
+    if (d.sex === 'girl' || d.sex === 'boy') dog.sex = d.sex;
     if (d.colors && HEX.test(d.colors.fur || '')) dog.colors = { fur: d.colors.fur };
     if (P.EAR_TYPES && P.EAR_TYPES.some((e) => e[0] === d.ears)) dog.ears = d.ears;
     const c = {

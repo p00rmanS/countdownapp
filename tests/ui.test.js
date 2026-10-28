@@ -186,6 +186,21 @@ test('welcome asks who the person is (name + Mama/Papa) before the reminders ste
   A.ui.welcome = 3; go('#/welcome'); assert.ok(doc.querySelector('#view').innerHTML.includes('ring the bell') && doc.querySelector('[data-action="w-bell"]'));
   A.ui.welcome = 0; go('#/');
 });
+test('Twinkle the American Bully (girl) and Toby the Dachshund: search finds them, a girl wears a bow, and it survives import', () => {
+  go('#/new'); A.ui.step = 2; A.render();
+  const search = doc.querySelector('[data-breed-search]'); assert.ok(search && doc.querySelector('[data-action="set-sex"]'));
+  const visible = () => [...doc.querySelectorAll('.breed:not([hidden])')].map((b) => b.dataset.v);
+  search.value = 'bully'; search.dispatchEvent(new w.Event('input', { bubbles: true })); assert.deepStrictEqual([...visible()], ['bully']);
+  search.value = 'dach'; search.dispatchEvent(new w.Event('input', { bubbles: true })); assert.deepStrictEqual([...visible()], ['dachshund']);
+  search.value = ''; search.dispatchEvent(new w.Event('input', { bubbles: true })); assert.ok(visible().length >= 20);
+  const mk = (breed, name, sex) => A.P.cleanCountdown({ title: name + "'s day", type: 'custom', targetAt: '2031-05-05T10:00', dog: { breed, name, sex } });
+  const twinkle = mk('bully', 'Twinkle', 'girl'), toby = mk('dachshund', 'Toby', 'boy');
+  assert.strictEqual(twinkle.dog.sex, 'girl'); assert.strictEqual(toby.dog.breed, 'dachshund'); assert.strictEqual(mk('bully', 'X', 'robot').dog.sex, undefined);
+  A.S.upsert(twinkle); A.S.upsert(toby);
+  assert.ok(go('#/c/' + twinkle.id).includes('class="bow"')); assert.ok(!go('#/c/' + toby.id).includes('class="bow"'));
+  const back = A.S.exportJSON(); A.S.importJSON(back); assert.strictEqual(A.S.get(twinkle.id).dog.sex, 'girl');
+  A.S.remove(twinkle.id); A.S.remove(toby.id); A.ui.draft = null; go('#/');
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

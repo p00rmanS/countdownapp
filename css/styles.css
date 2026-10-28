@@ -534,3 +534,8 @@ button, a, .dog-hit { -webkit-touch-callout: none; }
 .play-tray.static .needs { margin-top: 0; }
 .panel.profile-dog { display: grid; gap: 4px; margin-top: 12px; } .profile-dog .field { margin-top: 8px; } .dog-age { margin: 8px 0 4px; font-size: 16px; } .profile-dog .btn { justify-self: start; margin-top: 4px; }
 .w-form { width: 100%; max-width: 360px; margin: 18px auto 0; text-align: left; } .w-form .field { margin-top: 12px; }
+
+.breed[hidden], .pick[hidden] { display: none !important; }
+.breed-search-wrap { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; padding: 0 14px; min-height: 48px; border-radius: 16px; background: var(--surface); border: 2px solid var(--line); color: var(--ink-2); }
+.breed-search-wrap .i { width: 20px; height: 20px; } .breed-search { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; color: var(--ink); outline: 0; }
+.w-body .breed-search-wrap { margin: 8px auto 12px; max-width: 360px; }

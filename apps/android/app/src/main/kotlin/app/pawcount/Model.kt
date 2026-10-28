@@ -20,6 +20,7 @@ data class Dog(
     val name: String,
     val furColor: String? = null,   // mutt only: "#RRGGBB"
     val ears: String? = null,       // mutt only: floppy | pointy | tall | long
+    val sex: String = "",           // "girl" (wears a bow) | "boy" | ""
 ) {
     /** key of the exported drawing: "golden" or "mutt-floppy" */
     val variant: String get() = if (breed == "mutt") "mutt-${ears ?: "floppy"}" else breed
@@ -92,6 +93,7 @@ fun Countdown.toJson(): JSONObject = JSONObject().apply {
     put("dog", JSONObject().put("breed", dog.breed).put("name", dog.name).apply {
         if (dog.furColor != null) put("colors", JSONObject().put("fur", dog.furColor))
         if (dog.ears != null) put("ears", dog.ears)
+        if (dog.sex.isNotEmpty()) put("sex", dog.sex)
     })
     put("accent", accent); put("displayMode", displayMode.key); put("notes", notes)
     put("checklist", JSONArray(checklist.map { JSONObject().put("id", it.id).put("text", it.text).put("done", it.done) }))
@@ -139,7 +141,7 @@ private fun rawCountdownFromJson(o: JSONObject): Countdown {
         id = o.getString("id"), title = o.getString("title"), type = o.getString("type"),
         targetAt = o.getString("targetAt"), timeZone = o.optString("timeZone", java.util.TimeZone.getDefault().id),
         allDay = o.optBoolean("allDay"), yearly = o.optString("recurrence") == "yearly", monthly = o.optString("recurrence") == "monthly", weekly = o.optString("recurrence") == "weekly", createdAt = created,
-        dog = Dog(dogO.getString("breed"), dogO.getString("name"), dogO.optJSONObject("colors")?.optStr("fur"), dogO.optStr("ears")),
+        dog = Dog(dogO.getString("breed"), dogO.getString("name"), dogO.optJSONObject("colors")?.optStr("fur"), dogO.optStr("ears"), dogO.optString("sex", "").takeIf { it == "girl" || it == "boy" } ?: ""),
         accent = o.optString("accent", "#E8A15C"), displayMode = DisplayMode.of(o.optStr("displayMode")), notes = o.optString("notes", ""),
         checklist = (0 until checks.length()).map { checks.getJSONObject(it).let { c -> CheckItem(c.optString("id", newId()), c.getString("text"), c.optBoolean("done")) } },
         destination = o.optJSONObject("destination")?.let { Destination(it.getString("country"), it.optStr("city"), it.optString("flag", "")) },

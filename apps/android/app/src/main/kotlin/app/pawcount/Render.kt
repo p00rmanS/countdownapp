@@ -30,7 +30,7 @@ import kotlin.math.min
 
 private var paletteCounter = 0
 
-class Palette(val fur: Int, val dark: Int, val light: Int, val paw: Int, val accent: Int) {
+class Palette(val fur: Int, val dark: Int, val light: Int, val paw: Int, val accent: Int, val girl: Boolean = false) {
     val id = ++paletteCounter
 }
 
@@ -47,9 +47,9 @@ fun mixColors(a: Int, b: Int, t: Float): Int {
 
 fun dogPalette(meta: Meta, dog: Dog, accent: Int): Palette {
     val b = meta.breeds[dog.breed] ?: meta.breeds.getValue("mutt")
-    if (dog.breed != "mutt") return Palette(parseHex(b.fur), parseHex(b.dark), parseHex(b.light), parseHex(b.paw), accent)
+    if (dog.breed != "mutt") return Palette(parseHex(b.fur), parseHex(b.dark), parseHex(b.light), parseHex(b.paw), accent, dog.sex == "girl")
     val fur = parseHex(dog.furColor ?: b.fur)   // a mutt derives its other shades from the coat colour the user picked
-    return Palette(fur, mixColors(fur, Color.BLACK, 0.2f), mixColors(fur, Color.WHITE, 0.62f), mixColors(fur, Color.WHITE, 0.55f), accent)
+    return Palette(fur, mixColors(fur, Color.BLACK, 0.2f), mixColors(fur, Color.WHITE, 0.62f), mixColors(fur, Color.WHITE, 0.55f), accent, dog.sex == "girl")
 }
 
 fun resolveColor(token: String, p: Palette): Int {
@@ -178,6 +178,7 @@ private fun visible(n: Node, s: DrawState): Boolean = when {
     n.has("mouth-closed") -> !s.mouthOpen
     n.has("eye") -> !s.eyesShut
     n.has("eye-shut") -> s.eyesShut
+    n.has("bow") -> s.palette.girl
     else -> !n.hidden
 }
 

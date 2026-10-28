@@ -390,6 +390,7 @@
         <p class="w-sub">Every trip, birthday and big day gets a companion that gets more excited as it gets closer.</p>`;
     } else if (step === 1) {
       inner = `<h1 class="w-title sm">Pick your first companion</h1><p class="w-sub">Every breed has its own personality. You can mix and match later.</p>
+        <label class="breed-search-wrap"><span class="sr-only">Search breeds</span>${icon('search')}<input class="breed-search" data-breed-search type="search" placeholder="Search breeds…" autocomplete="off"></label>
         <div class="w-pick" role="radiogroup" aria-label="First companion">${dogs.map((b) => `<button class="pick ${ui.welcomeBreed === b ? 'on' : ''}" role="radio" aria-checked="${ui.welcomeBreed === b}" data-action="w-breed" data-v="${b}"><div class="pick-dog">${mk(b, ui.welcomeBreed === b ? 'curious' : 'waiting', { label: P.BREEDS[b].label })}</div><b>${esc(P.BREEDS[b].name)}</b><span class="small muted">${esc(P.BREEDS[b].label)}</span><span class="small vibe">${esc(P.BREEDS[b].vibe)}</span></button>`).join('')}</div>`;
     } else if (step === 2) {
       const st = S.state.settings, nm = P.BREEDS[ui.welcomeBreed].name;
@@ -422,7 +423,7 @@
     const dr = {
       id: null, type: '', title: '', titleAuto: true, date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
       time: '09:00', allDay: false, tz: P.localTz(), recurrence: 'none', country: '', personName: '', birthYear: '',
-      breed: breed || '', breedTouched: !!breed, dogName: '', nameTouched: false, fur: '#B98A62', ears: 'floppy', accent: '', accentTouched: false,
+      breed: breed || '', breedTouched: !!breed, dogName: '', nameTouched: false, sex: '', fur: '#B98A62', ears: 'floppy', accent: '', accentTouched: false,
       displayMode: S.state.settings.displayMode, notifications: null, notes: '', checklist: [], createdAt: null, sample: false, memoryPhotos: [],
     };
     applyType(dr, type);
@@ -444,7 +445,7 @@
     return {
       id: c.id, type: c.type, title: c.title, titleAuto: false, date, time: time || '09:00', allDay: c.allDay, tz: c.timeZone, recurrence: c.recurrence,
       country: c.destination ? c.destination.country : '', personName: c.person ? c.person.name : '', birthYear: c.person && c.person.birthYear ? c.person.birthYear : '',
-      breed: c.dog.breed, breedTouched: true, dogName: c.dog.name, nameTouched: true, fur: (c.dog.colors && c.dog.colors.fur) || '#B98A62', ears: c.dog.ears || 'floppy',
+      breed: c.dog.breed, breedTouched: true, dogName: c.dog.name, nameTouched: true, sex: c.dog.sex || '', fur: (c.dog.colors && c.dog.colors.fur) || '#B98A62', ears: c.dog.ears || 'floppy',
       accent: accentOf(c), accentTouched: true, displayMode: c.displayMode, notifications: c.notifications.map((n) => ({ ...n })), notes: c.notes || '', checklist: c.checklist || [],
       createdAt: c.createdAt, sample: !!c.sample, memoryPhotos: c.memoryPhotos || [], origTarget: c.targetAt + '|' + c.timeZone,
     };
@@ -455,6 +456,7 @@
     const keepCreated = d.createdAt && d.origTarget === targetAt + '|' + d.tz;
     const dog = { breed: d.breed, name: d.dogName.trim() || P.BREEDS[d.breed].name };
     if (d.breed === 'mutt') { dog.colors = { fur: d.fur }; dog.ears = d.ears; }
+    if (d.sex) dog.sex = d.sex;
     const c = {
       id: d.id || P.uuid(), title: d.title.trim(), type: d.type, targetAt, timeZone: d.tz, allDay: d.allDay, recurrence: d.recurrence,
       createdAt: keepCreated ? d.createdAt : new Date().toISOString(), dog, accent: d.accent, displayMode: d.displayMode, notes: d.notes,
@@ -527,8 +529,10 @@
       const mut = d.breed === 'mutt';
       return `<div class="dog-preview" id="dog-preview">${previewScene()}</div>
         <div class="mood-row" role="radiogroup" aria-label="Preview mood">${['nap', 'curious', 'waiting', 'packing', 'zoomies', 'today'].map((s) => `<button class="mood ${ui.preview === s ? 'on' : ''}" role="radio" aria-checked="${ui.preview === s}" data-action="mood" data-v="${s}">${icon(P.STAGES[s].icon)}${P.STAGES[s].label.replace("It's today!", 'Party')}</button>`).join('')}</div>
+        <label class="breed-search-wrap"><span class="sr-only">Search breeds</span>${icon('search')}<input class="breed-search" data-breed-search type="search" placeholder="Search breeds: bully, dachshund, pug…" autocomplete="off"></label>
         <div class="breed-scroll" role="radiogroup" aria-label="Dog breed">${P.BREED_ORDER.map((b) => { const B = P.BREEDS[b], sug = P.BREED_BEST[b].includes(d.type); return `<button class="breed ${d.breed === b ? 'on' : ''}" role="radio" aria-checked="${d.breed === b}" data-action="breed-pick" data-v="${b}"><span class="b-ic">${P.dogIconSVG(b)}</span><b>${esc(B.name)}</b><span class="small">${esc(B.label)}</span><span class="small muted">${esc(B.vibe)}</span>${sug ? '<span class="sug">Great match</span>' : ''}</button>`; }).join('')}</div>
         <label class="field"><span>Dog's name</span><input data-bind="dogName" value="${esc(d.dogName)}" maxlength="18" autocomplete="off"></label>
+        <div class="field"><span>Girl or boy?</span>${seg('set-sex', [['girl', 'Girl (with a bow)'], ['boy', 'Boy'], ['', 'Skip']], d.sex || '', 'aria-label="Girl or boy"')}</div>
         ${mut ? `<div class="panel"><h2 class="panel-h">Customize ${esc(d.dogName || 'Lucky')}</h2><p class="muted small">Coat colour</p><div class="swatches" role="radiogroup" aria-label="Coat colour">${P.MUTT_FURS.map((f) => `<button class="swatch ${d.fur === f ? 'on' : ''}" role="radio" aria-checked="${d.fur === f}" style="--s:${f}" data-action="fur-pick" data-v="${f}" aria-label="Coat ${f}">${d.fur === f ? icon('check') : ''}</button>`).join('')}</div><p class="muted small">Ears</p>${seg('ear-pick', P.EAR_TYPES, d.ears, 'aria-label="Ear style"')}</div>` : ''}`;
     }
     if (step === 3) {
@@ -883,6 +887,7 @@
       if (!c) return; S.upsert(c); toast(`${name}'s birthday is on your list`); location.hash = '#/c/' + c.id;
     },
     'set-default-mode'(el) { S.set('displayMode', el.dataset.v); render({ keepScroll: true, noAnim: true }); },
+    'set-sex'(el) { ui.draft.sex = el.dataset.v === 'girl' || el.dataset.v === 'boy' ? el.dataset.v : ''; P.haptic('tick'); rerenderFlowBody(); },
     'set-parent'(el) { S.set('parentTitle', el.dataset.v === 'parent' ? 'parent' : el.dataset.v); render({ keepScroll: true, noAnim: true }); P.haptic('tick'); },
     'set-theme'(el) { S.set('theme', el.dataset.v); applySettings(); render({ keepScroll: true, noAnim: true }); },
     'set-motion'(el) { S.set('motion', el.dataset.v); applySettings(); render({ keepScroll: true, noAnim: true }); },
@@ -951,6 +956,7 @@
 
   document.addEventListener('input', (e) => {
     const t = e.target;
+    if (t.matches('[data-breed-search]')) { const q = t.value.trim().toLowerCase(); $$('.breed, .pick').forEach((b) => { b.hidden = !!q && !b.textContent.toLowerCase().includes(q); }); const first = $('.breed:not([hidden])'); if (first && q) first.scrollIntoView({ block: 'nearest', inline: 'start' }); return; }
     if (t.matches('[data-dog-name]')) { S.state.settings.dogName = t.value.trim().slice(0, 30); S.save(); return; }
     if (t.matches('[data-profile-name]')) { S.state.settings.profileName = t.value.trim().slice(0, 30); S.save(); return; }
     if (t.dataset.bind) {

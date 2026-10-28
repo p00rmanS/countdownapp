@@ -17,13 +17,14 @@ struct Dog: Equatable {
     var name: String
     var furColor: String? = nil   // mutt only: "#RRGGBB"
     var ears: String? = nil       // mutt only: floppy | pointy | tall | long
+    var sex: String = ""           // "girl" (wears a bow) | "boy" | ""
 
     /// key of the exported drawing: "golden" or "mutt-floppy"
     var variant: String { breed == "mutt" ? "mutt-\(ears ?? "floppy")" : breed }
 }
 
 extension Dog: Codable {
-    private enum K: String, CodingKey { case breed, name, colors, ears }
+    private enum K: String, CodingKey { case breed, name, colors, ears, sex }
     private struct Colors: Codable { var fur: String? }
     init(from d: Decoder) throws {
         let c = try d.container(keyedBy: K.self)
@@ -31,12 +32,15 @@ extension Dog: Codable {
         name = try c.decode(String.self, forKey: .name)
         furColor = try c.decodeIfPresent(Colors.self, forKey: .colors)?.fur
         ears = try c.decodeIfPresent(String.self, forKey: .ears)
+        let sx = try c.decodeIfPresent(String.self, forKey: .sex) ?? ""
+        sex = (sx == "girl" || sx == "boy") ? sx : ""
     }
     func encode(to e: Encoder) throws {
         var c = e.container(keyedBy: K.self)
         try c.encode(breed, forKey: .breed); try c.encode(name, forKey: .name)
         if let f = furColor { try c.encode(Colors(fur: f), forKey: .colors) }
         try c.encodeIfPresent(ears, forKey: .ears)
+        if !sex.isEmpty { try c.encode(sex, forKey: .sex) }
     }
 }
 

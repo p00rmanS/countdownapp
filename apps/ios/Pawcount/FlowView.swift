@@ -23,6 +23,7 @@ struct Draft {
     var breed = "scott"
     var breedTouched = false
     var dogName = "Scott"
+    var sex = ""
     var nameTouched = false
     var fur = "#B98A62"
     var ears = "floppy"
@@ -55,7 +56,7 @@ struct Draft {
         let (y, m, d) = ymd, (h, mi) = hm
         let target = String(format: "%04d-%02d-%02dT%@", y, m, d, allDay ? "00:00" : String(format: "%02d:%02d", h, mi))
         let keep = createdAt != nil && origTarget == "\(target)|\(tz)"
-        let dog = breed == "mutt" ? Dog(breed: "mutt", name: dogName.trimmingCharacters(in: .whitespaces).isEmpty ? "Lucky" : dogName, furColor: fur, ears: ears) : Dog(breed: breed, name: dogName.trimmingCharacters(in: .whitespaces))
+        let dog = breed == "mutt" ? Dog(breed: "mutt", name: dogName.trimmingCharacters(in: .whitespaces).isEmpty ? "Lucky" : dogName, furColor: fur, ears: ears, sex: sex) : Dog(breed: breed, name: dogName.trimmingCharacters(in: .whitespaces), sex: sex)
         let person = type == "birthday" && (!personName.isEmpty || !birthYear.isEmpty) ? Person(name: personName.trimmingCharacters(in: .whitespaces), birthYear: Int(birthYear)) : nil
         return Countdown(id: id ?? newId(), title: title.trimmingCharacters(in: .whitespaces), type: type, targetAt: target, timeZone: tz, allDay: allDay, yearly: yearly && !monthly && !weekly,
                          createdAt: keep ? createdAt! : Date(), dog: dog, accent: accent, displayMode: mode, notes: notes, checklist: checklist, destination: nil, person: person,
@@ -70,7 +71,7 @@ struct Draft {
         d.time = Calendar.current.date(from: DateComponents(hour: w.h, minute: w.mi)) ?? Date()
         d.allDay = c.allDay; d.tz = c.timeZone; d.yearly = c.yearly; d.monthly = c.monthly; d.weekly = c.weekly; d.country = c.destination?.country ?? ""
         d.personName = c.person?.name ?? ""; d.birthYear = c.person?.birthYear.map(String.init) ?? ""
-        d.breed = c.dog.breed; d.breedTouched = true; d.dogName = c.dog.name; d.nameTouched = true
+        d.breed = c.dog.breed; d.breedTouched = true; d.dogName = c.dog.name; d.sex = c.dog.sex; d.nameTouched = true
         d.fur = c.dog.furColor ?? "#B98A62"; d.ears = c.dog.ears ?? "floppy"; d.accent = c.accent; d.accentTouched = true
         d.mode = c.displayMode; d.reminders = c.reminders; d.notes = c.notes; d.checklist = c.checklist; d.createdAt = c.createdAt
         d.sample = c.sample; d.photos = c.photos; d.archived = c.archived; d.origTarget = "\(c.targetAt)|\(c.timeZone)"
@@ -82,6 +83,7 @@ private let STEPS = ["What?", "When?", "Which dog?", "Style", "Done!"]
 private let HEADS = ["What are you counting down to?", "When is the big moment?", "Choose their dog", "Make it yours", ""]
 
 struct FlowView: View {
+    @State var breedQuery = ""
     @EnvironmentObject var store: AppStore
     @Environment(\.paw) var pc
     let editId: String?
@@ -245,9 +247,10 @@ struct FlowView: View {
                     }
                 }.padding(.vertical, 12)
             }
+            Field(label: "", text: $breedQuery, placeholder: "Search breeds: bully, dachshund, pug…", maxLen: 30, accent: accent)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    ForEach(meta.breedOrder, id: \.self) { b in
+                    ForEach(meta.breedOrder.filter { b in breedQuery.trimmingCharacters(in: .whitespaces).isEmpty || (meta.breeds[b].map { "\($0.name) \($0.label) \($0.vibe)".localizedCaseInsensitiveContains(breedQuery.trimmingCharacters(in: .whitespaces)) } ?? false) }, id: \.self) { b in
                         let br = meta.breeds[b]!, on = d.breed == b, sug = (meta.breedBest[b] ?? []).contains(d.type)
                         Button { d.breed = b; d.breedTouched = true; if !d.nameTouched { d.dogName = br.name }; Haptics.play(store.settings.haptics, "tick") } label: {
                             VStack(spacing: 1) {
@@ -262,6 +265,8 @@ struct FlowView: View {
                 }.padding(.vertical, 12).padding(.horizontal, 2)
             }
             Field(label: "Dog's name", text: Binding(get: { d.dogName }, set: { d.dogName = $0; d.nameTouched = true }), maxLen: 18, accent: accent)
+            Muted("Girl or boy?", 14).padding(.top, 16).padding(.bottom, 7)
+            Seg(options: [("girl", "Girl (with a bow)"), ("boy", "Boy"), ("", "Skip")], selected: d.sex, label: "Girl or boy") { v in d.sex = v }
             if d.breed == "mutt" {
                 Panel {
                     PanelTitle("Customize \(d.dogName.isEmpty ? "Lucky" : d.dogName)")
