@@ -560,3 +560,12 @@ button, a, .dog-hit { -webkit-touch-callout: none; }
 .try-soon .btn[aria-disabled='true'] { opacity: .6; pointer-events: none; }
 .try-open body { overflow: hidden; }
 @media (max-width: 760px) { .try-grid { grid-template-columns: 1fr; } .try-card { padding: 24px 18px 20px; } }
+
+/* care log */
+.carelog .log-facts { display: flex; gap: 10px; margin: 10px 0 14px; } .log-facts > div { flex: 1; display: grid; gap: 2px; padding: 12px; border-radius: 18px; background: var(--surface); text-align: center; box-shadow: var(--shadow-1); } .log-facts b { font-family: var(--display); font-size: 18px; } .log-facts span { font-size: 12px; color: var(--ink-2); font-weight: 700; }
+.wchart-wrap { color: var(--kibble); } .wchart { width: 100%; height: auto; display: block; }
+.log-filter { margin: 4px 0 12px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; } .log-filter .chip { flex: none; cursor: pointer; }
+.log-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.log-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-1); }
+.log-ic { width: 40px; height: 40px; flex: none; border-radius: 14px; display: grid; place-items: center; background: var(--accent-soft, rgba(232, 161, 92, .18)); color: var(--ink); } .log-ic .i { width: 22px; height: 22px; }
+.log-body { flex: 1; min-width: 0; display: grid; gap: 1px; } .log-body b { font-family: var(--display); font-weight: 600; } .log-body span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

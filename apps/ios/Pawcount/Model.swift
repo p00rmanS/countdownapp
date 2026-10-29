@@ -110,7 +110,7 @@ extension Countdown: Codable {
     /// untrusted data (shared links, backup files): only known-good shapes survive. Throws if it is not a usable countdown.
     private mutating func sanitize() throws {
         let types: Set<String> = ["intl_trip", "vacation", "birthday", "anniversary", "holiday", "gotcha", "vet", "custom"]
-        let breeds: Set<String> = ["scott", "golden", "corgi", "shiba", "dachshund", "husky", "bulldog", "labrador", "poodle", "beagle", "pug", "shepherd", "chihuahua", "rottweiler", "doberman", "pomeranian", "collie", "frenchie", "yorkie", "shihtzu", "boxer", "cocker", "dalmatian", "samoyed", "mutt"]
+        let breeds: Set<String> = ["scott", "golden", "corgi", "shiba", "dachshund", "husky", "bulldog", "bully", "labrador", "poodle", "beagle", "pug", "shepherd", "chihuahua", "rottweiler", "doberman", "pomeranian", "collie", "frenchie", "yorkie", "shihtzu", "boxer", "cocker", "dalmatian", "samoyed", "greatdane", "stbernard", "bernese", "aussie", "malamute", "akita", "chow", "schnauzer", "westie", "basset", "greyhound", "jackrussell", "cavalier", "goldendoodle", "mutt"]
         let ears: Set<String> = ["floppy", "pointy", "tall", "long"]
         let hex = try! NSRegularExpression(pattern: "^#[0-9A-Fa-f]{6}$")
         let wall = try! NSRegularExpression(pattern: "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2})?$")
@@ -165,10 +165,11 @@ struct Settings: Equatable {
     var careTime = "18:00"
     var dogName = ""
     var dogBirthday = ""             // YYYY-MM-DD
+    var weightUnit = "kg"            // kg | lb
 }
 
 extension Settings: Codable {
-    private enum K: String, CodingKey { case displayMode, haptics, sound, motion, theme, notifications, profileName, profilePhoto, parentTitle, needsOn, careReminders, careTime, dogName, dogBirthday }
+    private enum K: String, CodingKey { case displayMode, haptics, sound, motion, theme, notifications, profileName, profilePhoto, parentTitle, needsOn, careReminders, careTime, dogName, dogBirthday, weightUnit }
     init(from d: Decoder) throws {
         let c = try d.container(keyedBy: K.self)
         displayMode = DisplayMode(rawValue: (try c.decodeIfPresent(String.self, forKey: .displayMode)) ?? "") ?? .full
@@ -189,13 +190,47 @@ extension Settings: Codable {
         dogName = String((try c.decodeIfPresent(String.self, forKey: .dogName) ?? "").prefix(30))
         let db = try c.decodeIfPresent(String.self, forKey: .dogBirthday) ?? ""
         dogBirthday = dogAgeText(db) != nil ? db : ""
+        weightUnit = (try c.decodeIfPresent(String.self, forKey: .weightUnit)) == "lb" ? "lb" : "kg"
     }
     func encode(to e: Encoder) throws {
         var c = e.container(keyedBy: K.self)
         try c.encode(displayMode.rawValue, forKey: .displayMode); try c.encode(haptics, forKey: .haptics); try c.encode(sound, forKey: .sound)
         try c.encode(reduceMotion, forKey: .motion); try c.encode(theme, forKey: .theme); try c.encode(notifications, forKey: .notifications)
         try c.encode(profileName, forKey: .profileName); try c.encode(profilePhoto, forKey: .profilePhoto); try c.encode(parentTitle, forKey: .parentTitle)
-        try c.encode(needsOn, forKey: .needsOn); try c.encode(careReminders, forKey: .careReminders); try c.encode(careTime, forKey: .careTime); try c.encode(dogName, forKey: .dogName); try c.encode(dogBirthday, forKey: .dogBirthday)
+        try c.encode(needsOn, forKey: .needsOn); try c.encode(careReminders, forKey: .careReminders); try c.encode(careTime, forKey: .careTime); try c.encode(dogName, forKey: .dogName); try c.encode(dogBirthday, forKey: .dogBirthday); try c.encode(weightUnit, forKey: .weightUnit)
+    }
+}
+
+/// one entry in the care log: vet | vaccine | weight | meds | note. Weight is always stored in kg.
+struct LogEntry: Identifiable, Equatable, Codable {
+    var id: String
+    var kind: String
+    var date: String
+    var note: String
+    var weightKg: Double?
+    private enum K: String, CodingKey { case id, kind, date, note, weight }
+    init(id: String, kind: String, date: String, note: String, weightKg: Double? = nil) { self.id = id; self.kind = kind; self.date = date; self.note = note; self.weightKg = weightKg }
+    init(from d: Decoder) throws {
+        let c = try d.container(keyedBy: K.self)
+        let k = try c.decode(String.self, forKey: .kind)
+        guard ["vet", "vaccine", "weight", "meds", "note"].contains(k) else { throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "bad kind")) }
+        let dt = try c.decode(String.self, forKey: .date)
+        guard dt.range(of: "^\\d{4}-\\d{2}-\\d{2}$", options: .regularExpression) != nil else { throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "bad date")) }
+        var w: Double? = nil
+        if k == "weight" {
+            let raw = try c.decodeIfPresent(Double.self, forKey: .weight) ?? 0
+            guard raw > 0 && raw < 500 else { throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "bad weight")) }
+            w = (raw * 10).rounded() / 10
+        }
+        let rid = String((try c.decodeIfPresent(String.self, forKey: .id) ?? "").filter { $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" }.prefix(64))
+        id = rid.isEmpty ? UUID().uuidString : rid
+        kind = k; date = dt; weightKg = w
+        note = String((try c.decodeIfPresent(String.self, forKey: .note) ?? "").prefix(200))
+    }
+    func encode(to e: Encoder) throws {
+        var c = e.container(keyedBy: K.self)
+        try c.encode(id, forKey: .id); try c.encode(kind, forKey: .kind); try c.encode(date, forKey: .date); try c.encode(note, forKey: .note)
+        try c.encodeIfPresent(weightKg, forKey: .weight)
     }
 }
 
@@ -204,10 +239,11 @@ struct AppData: Equatable {
     var countdowns: [Countdown] = []
     var celebrated: Set<String> = []
     var settings = Settings()
+    var log: [LogEntry] = []
 }
 
 extension AppData: Codable {
-    private enum K: String, CodingKey { case onboarded, countdowns, celebrated, settings, data }
+    private enum K: String, CodingKey { case onboarded, countdowns, celebrated, settings, data, log }
     init(from d: Decoder) throws {
         var c = try d.container(keyedBy: K.self)
         if c.contains(.data) { c = try c.nestedContainer(keyedBy: K.self, forKey: .data) }   // backup wrapper
@@ -215,12 +251,16 @@ extension AppData: Codable {
         countdowns = try c.decode([Countdown].self, forKey: .countdowns)
         celebrated = Set((try c.decodeIfPresent([String: Int].self, forKey: .celebrated) ?? [:]).keys)
         settings = try c.decodeIfPresent(Settings.self, forKey: .settings) ?? Settings()
+        // bad entries are dropped one by one, never the whole log
+        struct Lenient: Decodable { let value: LogEntry?; init(from d: Decoder) throws { value = try? LogEntry(from: d) } }
+        log = Array(((try? c.decodeIfPresent([Lenient].self, forKey: .log)) ?? []).compactMap { $0.value }.suffix(500))
     }
     func encode(to e: Encoder) throws {
         var c = e.container(keyedBy: K.self)
         try c.encode(onboarded, forKey: .onboarded); try c.encode(countdowns, forKey: .countdowns)
         try c.encode(Dictionary(uniqueKeysWithValues: celebrated.map { ($0, 1) }), forKey: .celebrated)
         try c.encode(settings, forKey: .settings)
+        try c.encode(log, forKey: .log)
     }
 }
 

@@ -147,7 +147,7 @@ class Art(ctx: Context) {
     private fun read(path: String) = assets.open(path).bufferedReader().use { it.readText() }
     val meta = Meta(JSONObject(read("assets/meta.json")))
     val anim = AnimTable(JSONObject(read("assets/anim.json")))
-    private val dogsJson = JSONObject(read("assets/dogs.json"))
+    private val dogFiles = HashMap<String, JSONObject?>()   // one file per breed variant, loaded the first time it is drawn
     private val scenesJson = JSONObject(read("assets/scenes.json"))
     private val cache = HashMap<String, Node?>()
 
@@ -161,8 +161,10 @@ class Art(ctx: Context) {
             stage == Stage.PACKING || stage == Stage.TODAY -> "$variant/${stage.key}/$type"
             else -> "$variant/${stage.key}"
         }
-        return node(dogsJson, key)
+        return dogFile(variant)?.let { node(it, key) }
     }
-    fun icon(variant: String): Node? = node(dogsJson, "$variant/icon")
+    fun icon(variant: String): Node? = dogFile(variant)?.let { node(it, "$variant/icon") }
+    @Synchronized
+    private fun dogFile(variant: String): JSONObject? = dogFiles.getOrPut(variant) { runCatching { JSONObject(read("assets/dog-$variant.json")) }.getOrNull() }
     fun scene(type: String, door: Boolean): Node? = node(scenesJson, if (door) "$type/door" else type)
 }

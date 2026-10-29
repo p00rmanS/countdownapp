@@ -13,8 +13,9 @@
     countdowns: [],
     celebrated: {},
     lastNotified: '',
-    settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'scott', profileName: '', profilePhoto: '', parentTitle: '', needsOn: true, careReminders: false, careTime: '18:00', dogName: '', dogBirthday: '' },
+    settings: { displayMode: 'full', haptics: true, sound: false, motion: 'system', theme: 'system', notifications: false, icon: 'scott', profileName: '', profilePhoto: '', parentTitle: '', needsOn: true, careReminders: false, careTime: '18:00', dogName: '', dogBirthday: '', weightUnit: 'kg' },
     careDays: [],
+    log: [],
   });
   // settings come from storage / backups: keep only values of the right type
   function sanitizeSettings(s) {
@@ -27,11 +28,19 @@
     out.profileName = out.profileName.slice(0, 30); out.dogName = out.dogName.slice(0, 30);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(out.dogBirthday) || !P.dogAge(out.dogBirthday)) out.dogBirthday = '';
     if (!['08:00', '12:00', '18:00', '21:00'].includes(out.careTime)) out.careTime = '18:00';
+    if (!['kg', 'lb'].includes(out.weightUnit)) out.weightUnit = 'kg';
     if (!['', 'mama', 'papa', 'parent'].includes(out.parentTitle)) out.parentTitle = '';
     if (out.profilePhoto && !P.PHOTO_RE.test(out.profilePhoto) && !/^[\w.-]{1,80}$/.test(out.profilePhoto)) out.profilePhoto = '';
     return out;
   }
   const cleanDays = (a) => (Array.isArray(a) ? a.filter((d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(-400) : []);
+  /** the care log: vet visits, vaccines, weight, medicine and notes. Only known-good shapes are kept. */
+  const LOG_KINDS = ['vet', 'vaccine', 'weight', 'meds', 'note'];
+  const cleanLog = (a) => (Array.isArray(a) ? a : []).filter((e) => e && typeof e === 'object' && LOG_KINDS.includes(e.kind) && /^\d{4}-\d{2}-\d{2}$/.test(e.date || '')).slice(-500).map((e) => {
+    const o = { id: String(e.id || '').replace(/[^\w-]/g, '').slice(0, 64) || P.uuid(), kind: e.kind, date: e.date, note: typeof e.note === 'string' ? e.note.slice(0, 200) : '' };
+    if (e.kind === 'weight' && Number.isFinite(e.weight) && e.weight > 0 && e.weight < 500) o.weight = Math.round(e.weight * 10) / 10;   // always stored in kg
+    return o;
+  }).filter((o) => o.kind !== 'weight' || o.weight);
   let state = defaults();
   const subs = [];
   let memoryOnly = false;
@@ -42,7 +51,7 @@
       if (raw) {
         const d = JSON.parse(raw);
         const base = defaults();
-        state = { ...base, ...d, countdowns: Array.isArray(d.countdowns) ? d.countdowns.map(P.cleanCountdown).filter(Boolean) : [], settings: sanitizeSettings({ ...base.settings, ...(d.settings || {}) }), careDays: cleanDays(d.careDays) };
+        state = { ...base, ...d, countdowns: Array.isArray(d.countdowns) ? d.countdowns.map(P.cleanCountdown).filter(Boolean) : [], settings: sanitizeSettings({ ...base.settings, ...(d.settings || {}) }), careDays: cleanDays(d.careDays), log: cleanLog(d.log) };
       }
     } catch (e) { memoryOnly = true; }
   }
@@ -78,7 +87,7 @@
       const d = j.data || j;
       if (!Array.isArray(d.countdowns)) throw new Error('Not a Pawcount backup');
       const base = defaults();
-      state = { ...base, ...d, countdowns: d.countdowns.map(P.cleanCountdown).filter(Boolean), settings: sanitizeSettings({ ...base.settings, ...(d.settings || {}) }), careDays: cleanDays(d.careDays) };
+      state = { ...base, ...d, countdowns: d.countdowns.map(P.cleanCountdown).filter(Boolean), settings: sanitizeSettings({ ...base.settings, ...(d.settings || {}) }), careDays: cleanDays(d.careDays), log: cleanLog(d.log) };
       return this.commit();
     },
   };

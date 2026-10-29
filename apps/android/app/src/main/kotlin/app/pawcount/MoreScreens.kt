@@ -265,6 +265,9 @@ fun SettingsScreen(vm: AppViewModel) {
             var showBday by remember { mutableStateOf(false) }
             Field("Name", dogName, { dogName = it; vm.settings { st -> st.copy(dogName = it.trim()) } }, placeholder = "Scott", maxLen = 30)
             PickerRow("Birthday or gotcha date", s.dogBirthday.ifEmpty { "Choose a date…" }) { showBday = true }
+            Box(Modifier.padding(top = 14.dp)) { SmallButton("Open the care log", { vm.push(Route.Log) }, pc.surface) }
+            Muted("Weight unit", Modifier.padding(top = 14.dp, bottom = 7.dp), size = 14)
+            Seg(listOf("kg" to "Kilograms", "lb" to "Pounds"), s.weightUnit, { v -> vm.settings { it.copy(weightUnit = v) } }, label = "Weight unit")
             val ageText = dogAgeText(s.dogBirthday)
             if (ageText != null) {
                 B("${s.dogName.ifBlank { "Your dog" }} is $ageText", Modifier.padding(top = 12.dp), 16, FontWeight.ExtraBold)

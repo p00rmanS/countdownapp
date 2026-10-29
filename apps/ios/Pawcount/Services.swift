@@ -16,7 +16,7 @@ import WidgetKit
 */
 
 enum Route: Hashable {
-    case welcome, home, memories, settings
+    case welcome, home, memories, settings, log
     case detail(String)
     case flow(String?)
 }

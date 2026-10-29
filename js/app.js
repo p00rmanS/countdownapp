@@ -304,6 +304,33 @@
     const st = S.state.settings;
     return /^data:image\//.test(st.profilePhoto || '') ? `<img class="avatar" width="${px}" height="${px}" src="${st.profilePhoto}" alt="">` : `<span class="avatar" style="width:${px}px;height:${px}px">${P.dogIconSVG(st.icon || 'scott')}</span>`;
   }
+  /* =============================== CARE LOG =============================== */
+  const LOG_KEYS = ['vet', 'vaccine', 'weight', 'meds', 'note'];
+  const LOG = { vet: ['cross', 'Vet visit'], vaccine: ['shield', 'Vaccine'], weight: ['scale', 'Weight'], meds: ['pill', 'Medicine'], note: ['edit', 'Note'] };
+  const KG_PER_LB = 0.45359237;
+  const showWeight = (kg) => { const lb = S.state.settings.weightUnit === 'lb'; const v = lb ? kg / KG_PER_LB : kg; return `${(Math.round(v * 10) / 10).toLocaleString()} ${lb ? 'lb' : 'kg'}`; };
+  const fmtDay = (iso) => new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)));
+  function weightChart(ws) {
+    if (ws.length < 2) return '';
+    const W = 300, H = 90, pad = 10, lo = Math.min(...ws.map((e) => e.weight)), hi = Math.max(...ws.map((e) => e.weight)), span = hi - lo || 1;
+    const pts = ws.map((e, i) => [pad + (i * (W - 2 * pad)) / (ws.length - 1), H - pad - ((e.weight - lo) / span) * (H - 2 * pad)]);
+    return `<svg class="wchart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weight over time, from ${esc(showWeight(ws[0].weight))} to ${esc(showWeight(ws[ws.length - 1].weight))}"><polyline points="${pts.map((p) => p.map((n) => n.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${pts.map((p) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="currentColor"/>`).join('')}</svg>`;
+  }
+  function viewLog() {
+    const st = S.state.settings, name = st.dogName || 'your dog', all = (S.state.log || []).slice().sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+    const f = ui.logFilter || 'all', list = f === 'all' ? all : all.filter((e) => e.kind === f);
+    const ws = all.filter((e) => e.kind === 'weight').reverse();
+    const lastVet = all.find((e) => e.kind === 'vet'), lastWeight = all.find((e) => e.kind === 'weight');
+    return `<section class="screen carelog">
+      <header class="topbar"><button class="icon-btn" data-action="back" aria-label="Back">${icon('back')}</button><h1 class="h-title mid">Care log</h1><button class="icon-btn" data-action="log-add" aria-label="Add an entry">${icon('plus')}</button></header>
+      <p class="muted">Vet visits, vaccines, weight and medicine for ${esc(name)}. Stays on this device and in your backup.</p>
+      ${all.length ? `<div class="log-facts">${lastVet ? `<div><b>${esc(fmtDay(lastVet.date))}</b><span>Last vet visit</span></div>` : ''}${lastWeight ? `<div><b>${esc(showWeight(lastWeight.weight))}</b><span>Latest weight</span></div>` : ''}<div><b>${all.length}</b><span>${all.length === 1 ? 'entry' : 'entries'}</span></div></div>` : ''}
+      ${ws.length > 1 ? `<div class="panel"><h2 class="panel-h">${icon('scale')} Weight</h2><div class="wchart-wrap">${weightChart(ws)}</div></div>` : ''}
+      <div class="chip-row log-filter" role="radiogroup" aria-label="Show">${[['all', 'All'], ...LOG_KEYS.map((k) => [k, LOG[k][1]])].map(([k, l]) => `<button class="chip ${f === k ? 'stage' : 'ghost'}" role="radio" aria-checked="${f === k}" data-action="log-filter" data-v="${k}">${esc(l)}</button>`).join('')}</div>
+      ${list.length ? `<ul class="log-list">${list.map((e) => `<li class="log-row"><span class="log-ic">${icon(LOG[e.kind][0])}</span><div class="log-body"><b>${esc(LOG[e.kind][1])}${e.kind === 'weight' ? ' · ' + esc(showWeight(e.weight)) : ''}</b><span class="muted small">${esc(fmtDay(e.date))}${e.note ? ' · ' + esc(e.note) : ''}</span></div><button class="x" data-action="log-del" data-id="${esc(e.id)}" aria-label="Delete this entry">${icon('trash')}</button></li>`).join('')}</ul>`
+        : `<div class="empty"><h2>No entries yet</h2><p class="muted">Add the next vet visit, a vaccine, or ${esc(name)}'s weight. Everything is kept in one place.</p><button class="btn btn-primary" data-action="log-add">Add the first entry</button></div>`}
+    </section>`;
+  }
   function viewSettings() {
     const st = S.state.settings;
     const perm = P.native.notifyState();
@@ -323,6 +350,8 @@
       <div class="panel profile-dog">
         <label class="field"><span>${icon('paw')} My dog</span><input data-dog-name maxlength="30" placeholder="Name" value="${esc(st.dogName || '')}"></label>
         <label class="field"><span>${icon('cake')} Birthday or gotcha date</span><input type="date" data-dog-bday max="${todayStr()}" value="${esc(st.dogBirthday || '')}"></label>
+        <a class="btn btn-small btn-ghost" href="#/log">${icon('cross')} Open the care log</a>
+        <div class="field"><span>Weight unit</span>${seg('set-weight-unit', [['kg', 'Kilograms'], ['lb', 'Pounds']], st.weightUnit, 'aria-label="Weight unit"')}</div>
         ${P.dogAge(st.dogBirthday) ? `<p class="dog-age" role="status"><b>${esc(st.dogName || 'Your dog')}</b> is ${esc(P.dogAgeText(P.dogAge(st.dogBirthday)))}</p><button class="btn btn-small" data-action="dog-bday-add">Add the birthday as a countdown</button>` : '<p class="muted small">Add a date to see their age and make a birthday countdown.</p>'}
       </div>
       <p class="muted small">Stays on this device and in your backup. Sign-in with Google or Apple, so your profile follows you between phones, is planned.</p>
@@ -615,6 +644,7 @@
       case 'welcome': html = viewWelcome(); title = 'Welcome'; break;
       case 'memories': html = viewMemories(); tab = 'memories'; title = 'Memories'; break;
       case 'settings': html = viewSettings(); title = 'Settings'; break;
+      case 'log': html = viewLog(); title = 'Care log'; break;
       case 'c': html = viewDetail(r.id); { const c = S.get(r.id); title = c ? c.title : 'Countdown'; } break;
       case 'new':
         if (!ui.draft || ui.flow !== 'new') { ui.draft = newDraft(S.state.onboarded ? 'intl_trip' : 'intl_trip', ui.welcomeBreedChosen); ui.flow = 'new'; ui.step = 0; }
@@ -886,6 +916,29 @@
       const c = P.cleanCountdown({ title, type: 'birthday', targetAt: st.dogBirthday + 'T00:00', allDay: true, recurrence: 'yearly', dog: { breed: 'scott', name }, person: { name, birthYear: +st.dogBirthday.slice(0, 4) }, createdAt: new Date().toISOString() });
       if (!c) return; S.upsert(c); toast(`${name}'s birthday is on your list`); location.hash = '#/c/' + c.id;
     },
+    'log-filter'(el) { ui.logFilter = el.dataset.v; render({ keepScroll: true, noAnim: true }); },
+    'log-add'() {
+      const unit = S.state.settings.weightUnit, kind = ui.logKind || 'vet';
+      openSheet(`<h2 class="sheet-t">Add to the care log</h2>
+        <div class="field"><span>What</span>${seg('log-kind', LOG_KEYS.map((k) => [k, LOG[k][1]]), kind, 'aria-label="Kind of entry"')}</div>
+        <label class="field"><span>Date</span><input type="date" id="logDate" max="${todayStr()}" value="${todayStr()}"></label>
+        ${kind === 'weight' ? `<label class="field"><span>Weight (${unit})</span><input type="number" id="logWeight" inputmode="decimal" min="0.1" max="500" step="0.1" placeholder="${unit === 'lb' ? '35' : '16'}"></label>` : ''}
+        <label class="field"><span>Note (optional)</span><input id="logNote" maxlength="200" placeholder="${kind === 'vaccine' ? 'Rabies booster' : kind === 'vet' ? 'Yearly checkup' : kind === 'meds' ? 'Flea & tick' : ''}" autocomplete="off"></label>
+        <div class="stack"><button class="btn btn-primary" data-action="log-save">Save</button><button class="btn btn-ghost" data-action="close-sheet">Cancel</button></div>`, 'Add a care log entry');
+    },
+    'log-kind'(el) { ui.logKind = el.dataset.v; closeSheet(); setTimeout(() => actions['log-add'](), 300); },
+    'log-save'() {
+      const kind = ui.logKind || 'vet', date = ($('#logDate') || {}).value || todayStr(), note = (($('#logNote') || {}).value || '').trim().slice(0, 200);
+      const e = { id: P.uuid(), kind, date, note };
+      if (kind === 'weight') {
+        const raw = parseFloat(($('#logWeight') || {}).value); if (!(raw > 0 && raw < 500)) { toast('Enter a weight'); return; }
+        e.weight = Math.round((S.state.settings.weightUnit === 'lb' ? raw * KG_PER_LB : raw) * 10) / 10;
+      }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { toast('Pick a date'); return; }
+      (S.state.log = S.state.log || []).push(e); S.state.log = S.state.log.slice(-500); S.commit(); closeSheet(); toast('Added to the care log'); ui.logKind = 'vet'; render({ keepScroll: true, noAnim: true });
+    },
+    'log-del'(el) { S.state.log = (S.state.log || []).filter((e) => e.id !== el.dataset.id); S.commit(); toast('Entry removed'); render({ keepScroll: true, noAnim: true }); },
+    'set-weight-unit'(el) { S.set('weightUnit', el.dataset.v === 'lb' ? 'lb' : 'kg'); render({ keepScroll: true, noAnim: true }); },
     'set-default-mode'(el) { S.set('displayMode', el.dataset.v); render({ keepScroll: true, noAnim: true }); },
     'set-sex'(el) { ui.draft.sex = el.dataset.v === 'girl' || el.dataset.v === 'boy' ? el.dataset.v : ''; P.haptic('tick'); rerenderFlowBody(); },
     'set-parent'(el) { S.set('parentTitle', el.dataset.v === 'parent' ? 'parent' : el.dataset.v); render({ keepScroll: true, noAnim: true }); P.haptic('tick'); },

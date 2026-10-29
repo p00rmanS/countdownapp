@@ -6,7 +6,7 @@
   "scripts": {
     "start": "python serve.py 5173",
     "build": "node scripts/build-www.js",
-    "test": "node tests/countdown.test.js && node tests/ui.test.js",
+    "test": "node tests/countdown.test.js && node tests/ui.test.js && node tests/native-sync.test.js",
     "export:native": "node tools/export-native.js",
     "fuzz": "node tools/fuzz.js && node tools/fuzz-ui.js"
   },

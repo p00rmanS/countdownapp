@@ -42,6 +42,7 @@ sealed interface Route {
     data object Home : Route
     data object Memories : Route
     data object Settings : Route
+    data object Log : Route
     data class Detail(val id: String) : Route
     data class Flow(val editId: String?) : Route
 }
@@ -132,6 +133,7 @@ fun PawApp(vm: AppViewModel) {
                         Route.Home -> HomeScreen(vm)
                         Route.Memories -> MemoriesScreen(vm)
                         Route.Settings -> SettingsScreen(vm)
+                        Route.Log -> CareLogScreen(vm)
                         is Route.Detail -> DetailScreen(vm, r.id)
                         is Route.Flow -> FlowScreen(vm, r.editId)
                     }

@@ -23,6 +23,13 @@ final class LogicTests: XCTestCase {
         XCTAssertEqual(dogAgeText("2027-04-10", today: utc(2030, 6, 15)), "3 years 2 months old")
         XCTAssertNil(dogAgeText("2031-01-01", today: utc(2030, 6, 15)))
     }
+    func testCareLogRoundTripAndCleaning() throws {
+        let json = #"{"countdowns":[],"log":[{"id":"a","kind":"weight","date":"2030-01-10","weight":16.04},{"kind":"hack","date":"2030-01-01"},{"kind":"weight","date":"2030-01-01","weight":-3},{"kind":"note","date":"bad"},{"id":"../x","kind":"note","date":"2030-01-02","note":"hi"}],"settings":{"weightUnit":"stone"}}"#
+        let d = try JSONDecoder().decode(AppData.self, from: Data(json.utf8))
+        XCTAssertEqual(d.log.count, 2); XCTAssertEqual(d.log[0].weightKg ?? 0, 16.0, accuracy: 0.001); XCTAssertFalse(d.log[1].id.contains("."))
+        XCTAssertEqual(d.settings.weightUnit, "kg")
+        let back = try JSONDecoder().decode(AppData.self, from: JSONEncoder().encode(d)); XCTAssertEqual(back.log, d.log)
+    }
     func testCareCheckInIsOnePerDay() {
         var s = Settings(); s.careReminders = true; s.careTime = "18:00"
         let plan = planCare(s, [cd("2031-01-01T10:00")], now: now)

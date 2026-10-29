@@ -39,7 +39,7 @@ Tap it to bark, hold to pet, shake the phone to make it sneeze. On top of that:
 | Memories with photos, backup export / import | ✅ | ✅ | ✅ |
 
 ### For fur parents
-Made for people who love their dogs. Scott (a fluffy black pup) is the default companion, with 26 breeds to choose from (American Bully, American Bulldog, Dachshund, Pug, Beagle, Poodle, Labrador, German Shepherd, Border Collie and more), and every dog can be played with:
+Made for people who love their dogs. Scott (a fluffy black pup) is the default companion, with 40 breeds to choose from (American Bully, Great Dane, Saint Bernard, Bernese, Akita, American Bulldog, Dachshund, Pug, Beagle, Poodle, Labrador, German Shepherd, Border Collie and more), and every dog can be played with:
 
 | | |
 |---|---|
@@ -49,6 +49,7 @@ Made for people who love their dogs. Scott (a fluffy black pup) is the default c
 | **Daily check-in** | A nudge from your dog at a time you pick (Android and iPhone) |
 | **My dog** | Name, birthday or gotcha date, age, and a one-tap yearly birthday countdown |
 | **Profile** | Your name and photo, and what your dog calls you (Mama / Papa / Fur parent), asked on first launch |
+| **Care log** | Vet visits, vaccines, weight (with a chart, kg or lb), medicine and notes, in Settings > My dog |
 | **Event types** | Trip, vacation, birthday, anniversary, holiday, **gotcha day**, **vet & grooming**, custom |
 | **Repeats** | Never, weekly (walks, baths), monthly (pills, flea & tick), yearly (birthdays) |
 | **Organising** | Pin a countdown to the top of Home; duplicate a countdown |

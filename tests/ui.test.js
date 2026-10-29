@@ -213,6 +213,31 @@ test('Try the app window: opens, shows both QR codes and the links, closes with 
   doc.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); assert.ok(modal.hidden);
   btn.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); modal.querySelector('.try-x').dispatchEvent(new w.MouseEvent('click', { bubbles: true })); assert.ok(modal.hidden);
 });
+test('care log: add vet / vaccine / weight entries, see them, filter, chart, kg<->lb, delete, and survive a backup', () => {
+  A.S.state.log = []; A.S.set('weightUnit', 'kg');
+  assert.ok(go('#/settings').includes('href="#/log"')); assert.ok(go('#/log').includes('No entries yet'));
+  const add = (kind, date, note, weight) => {
+    A.ui.logKind = kind; A.actions['log-add']();
+    doc.querySelector('#logDate').value = date; doc.querySelector('#logNote').value = note;
+    if (weight != null) doc.querySelector('#logWeight').value = String(weight);
+    A.actions['log-save']();
+  };
+  add('vet', '2030-01-10', 'Yearly checkup'); add('vaccine', '2030-02-01', 'Rabies booster'); add('weight', '2030-01-10', '', 16); add('weight', '2030-03-10', '', 17.5);
+  assert.strictEqual(A.S.state.log.length, 4);
+  A.ui.logKind = 'weight'; A.actions['log-add'](); doc.querySelector('#logDate').value = '2030-04-01'; doc.querySelector('#logWeight').value = ''; A.actions['log-save'](); assert.strictEqual(A.S.state.log.length, 4);   // a weight needs a number
+  A.actions['close-sheet'] && A.actions['close-sheet']();
+  const h = go('#/log'); assert.ok(h.includes('Yearly checkup') && h.includes('Rabies booster') && h.includes('17.5 kg') && h.includes('class="wchart"') && h.includes('<b>4</b>'));
+  A.actions['log-filter']({ dataset: { v: 'vaccine' } }); assert.ok(doc.querySelector('#view').innerHTML.includes('Rabies') && !doc.querySelector('#view').innerHTML.includes('Yearly checkup'));
+  A.actions['log-filter']({ dataset: { v: 'all' } });
+  A.actions['set-weight-unit']({ dataset: { v: 'lb' } }); assert.ok(go('#/log').includes('38.6 lb'));   // 17.5 kg
+  A.S.set('weightUnit', 'kg');
+  const back = A.S.exportJSON(); A.S.state.log = []; A.S.importJSON(back); assert.strictEqual(A.S.state.log.length, 4);
+  A.S.importJSON(JSON.stringify({ data: { countdowns: [], log: [{ kind: 'hack', date: '2030-01-01' }, { kind: 'weight', date: '2030-01-01', weight: -3 }, { kind: 'note', date: 'bad' }, { kind: 'note', date: '2030-01-02', note: '<img onerror=x>'.repeat(40) }] } }));
+  assert.strictEqual(A.S.state.log.length, 1); assert.ok(A.S.state.log[0].note.length <= 200);
+  const rows = go('#/log'); assert.ok(!doc.querySelector('#view img[onerror]'));
+  const id = A.S.state.log[0].id; A.actions['log-del']({ dataset: { id } }); assert.strictEqual(A.S.state.log.length, 0);
+  A.S.state.log = []; A.S.loadSamples(); go('#/');
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

@@ -237,6 +237,9 @@ struct SettingsView: View {
                             .padding(.horizontal, 12).frame(maxWidth: .infinity, minHeight: 54, alignment: .leading).background(RoundedRectangle(cornerRadius: 18).fill(pc.surface))
                             .overlay(RoundedRectangle(cornerRadius: 18).stroke(pc.line, lineWidth: 2))
                     }.padding(.top, 14)
+                    SmallButton(title: "Open the care log", tint: pc.surface) { store.push(.log) }.padding(.top, 14)
+                    Muted("Weight unit", 14).padding(.top, 14).padding(.bottom, 7)
+                    Seg(options: [("kg", "Kilograms"), ("lb", "Pounds")], selected: s.weightUnit, label: "Weight unit") { v in store.setSettings { $0.weightUnit = v } }
                     if let age = dogAgeText(s.dogBirthday) {
                         B("\(s.dogName.isEmpty ? "Your dog" : s.dogName) is \(age)", 16, weight: 800).padding(.top, 12)
                         SmallButton(title: "Add the birthday as a countdown", tint: pc.surface) {

@@ -128,5 +128,10 @@ const meta = {
 const dir = path.join(root, 'native/assets');
 fs.mkdirSync(dir, { recursive: true });
 const out = (n, o) => { const f = path.join(dir, n); fs.writeFileSync(f, JSON.stringify(o)); console.log(n, (fs.statSync(f).size / 1024).toFixed(0) + ' KB'); };
-out('dogs.json', dogs); out('scenes.json', scenes); out('meta.json', meta);
-console.log(Object.keys(dogs).length + ' dog graphs,', Object.keys(scenes).length + ' scenes');
+// one small file per breed variant (dog-<variant>.json) so the apps only load the breeds on screen
+fs.readdirSync(dir).filter((f) => /^dog(s|-.*)\.json$/.test(f)).forEach((f) => fs.unlinkSync(path.join(dir, f)));
+const byVariant = {};
+for (const [key, g] of Object.entries(dogs)) (byVariant[key.split('/')[0]] = byVariant[key.split('/')[0]] || {})[key] = g;
+for (const [variant, graphs] of Object.entries(byVariant)) out(`dog-${variant}.json`, graphs);
+out('scenes.json', scenes); out('meta.json', meta);
+console.log(Object.keys(byVariant).length + ' dog files, ' + Object.keys(dogs).length + ' dog graphs,', Object.keys(scenes).length + ' scenes');

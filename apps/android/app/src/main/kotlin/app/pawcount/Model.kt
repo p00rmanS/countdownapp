@@ -71,14 +71,29 @@ data class Settings(
     val careTime: String = "18:00",
     val dogName: String = "",
     val dogBirthday: String = "",         // YYYY-MM-DD
+    val weightUnit: String = "kg",        // kg | lb
 )
+
+/** one entry in the care log: vet | vaccine | weight | meds | note. Weight is always stored in kg. */
+data class LogEntry(val id: String, val kind: String, val date: String, val note: String, val weightKg: Double? = null)
 
 data class AppData(
     val onboarded: Boolean = false,
     val countdowns: List<Countdown> = emptyList(),
     val celebrated: Set<String> = emptySet(),
     val settings: Settings = Settings(),
+    val log: List<LogEntry> = emptyList(),
 )
+
+private val LOG_KIND_KEYS = setOf("vet", "vaccine", "weight", "meds", "note")
+private fun logEntryFromJson(o: JSONObject): LogEntry {
+    val kind = o.getString("kind"); require(kind in LOG_KIND_KEYS)
+    val date = java.time.LocalDate.parse(o.getString("date")).toString()
+    val w = if (kind == "weight") o.optDouble("weight", Double.NaN) else Double.NaN
+    require(kind != "weight" || (w > 0 && w < 500))
+    return LogEntry(o.optString("id", "").filter { it.isLetterOrDigit() || it == '-' || it == '_' }.take(64).ifEmpty { UUID.randomUUID().toString() }, kind, date,
+        o.optString("note", "").take(200), if (kind == "weight") Math.round(w * 10) / 10.0 else null)
+}
 
 fun newId(): String = UUID.randomUUID().toString()
 
@@ -105,7 +120,7 @@ fun Countdown.toJson(): JSONObject = JSONObject().apply {
 
 /* ---------- untrusted data (shared links, backup files): only known-good shapes survive ---------- */
 private val TYPE_KEYS = setOf("intl_trip", "vacation", "birthday", "anniversary", "holiday", "gotcha", "vet", "custom")
-private val BREED_KEYS = setOf("scott", "golden", "corgi", "shiba", "dachshund", "husky", "bulldog", "labrador", "poodle", "beagle", "pug", "shepherd", "chihuahua", "rottweiler", "doberman", "pomeranian", "collie", "frenchie", "yorkie", "shihtzu", "boxer", "cocker", "dalmatian", "samoyed", "mutt")
+private val BREED_KEYS = setOf("scott", "golden", "corgi", "shiba", "dachshund", "husky", "bulldog", "bully", "labrador", "poodle", "beagle", "pug", "shepherd", "chihuahua", "rottweiler", "doberman", "pomeranian", "collie", "frenchie", "yorkie", "shihtzu", "boxer", "cocker", "dalmatian", "samoyed", "greatdane", "stbernard", "bernese", "aussie", "malamute", "akita", "chow", "schnauzer", "westie", "basset", "greyhound", "jackrussell", "cavalier", "goldendoodle", "mutt")
 private val EAR_KEYS = setOf("floppy", "pointy", "tall", "long")
 private val HEX6 = Regex("^#[0-9A-Fa-f]{6}$")
 private val WALL = Regex("^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2})?$")
@@ -156,10 +171,11 @@ fun AppData.toJson(): JSONObject = JSONObject().apply {
     put("onboarded", onboarded)
     put("countdowns", JSONArray(countdowns.map { it.toJson() }))
     put("celebrated", JSONObject().apply { celebrated.forEach { put(it, 1) } })
+    put("log", JSONArray(log.map { e -> JSONObject().put("id", e.id).put("kind", e.kind).put("date", e.date).put("note", e.note).apply { if (e.weightKg != null) put("weight", e.weightKg) } }))
     put("settings", JSONObject().apply {
         put("displayMode", settings.displayMode.key); put("haptics", settings.haptics); put("sound", settings.sound)
         put("motion", settings.reduceMotion); put("theme", settings.theme); put("notifications", settings.notifications)
-        put("profileName", settings.profileName); put("profilePhoto", settings.profilePhoto); put("parentTitle", settings.parentTitle); put("needsOn", settings.needsOn); put("careReminders", settings.careReminders); put("careTime", settings.careTime); put("dogName", settings.dogName); put("dogBirthday", settings.dogBirthday)
+        put("profileName", settings.profileName); put("profilePhoto", settings.profilePhoto); put("parentTitle", settings.parentTitle); put("needsOn", settings.needsOn); put("careReminders", settings.careReminders); put("careTime", settings.careTime); put("dogName", settings.dogName); put("dogBirthday", settings.dogBirthday); put("weightUnit", settings.weightUnit)
     })
 }
 
@@ -172,6 +188,7 @@ fun appDataFromJson(raw: JSONObject): AppData {
         onboarded = d.optBoolean("onboarded"),
         countdowns = (0 until arr.length()).mapNotNull { runCatching { countdownFromJson(arr.getJSONObject(it)) }.getOrNull() },
         celebrated = cel?.keys()?.asSequence()?.toSet() ?: emptySet(),
+        log = d.optJSONArray("log")?.let { a -> (0 until a.length()).mapNotNull { runCatching { logEntryFromJson(a.getJSONObject(it)) }.getOrNull() }.takeLast(500) } ?: emptyList(),
         settings = Settings(
             displayMode = DisplayMode.of(s?.optStr("displayMode")), haptics = s?.optBoolean("haptics", true) ?: true,
             sound = s?.optBoolean("sound") ?: false, reduceMotion = s?.optString("motion", "system") ?: "system",
@@ -179,6 +196,7 @@ fun appDataFromJson(raw: JSONObject): AppData {
             profileName = (s?.optString("profileName", "") ?: "").take(30), profilePhoto = (s?.optString("profilePhoto", "") ?: "").takeIf { SAFE_PHOTO.matches(it) } ?: "",
             parentTitle = (s?.optString("parentTitle", "") ?: "").takeIf { it in setOf("mama", "papa", "parent") } ?: "",
             needsOn = s?.optBoolean("needsOn", true) ?: true, careReminders = s?.optBoolean("careReminders") ?: false,
+            weightUnit = (s?.optString("weightUnit", "kg") ?: "kg").takeIf { it == "lb" } ?: "kg",
             dogName = (s?.optString("dogName", "") ?: "").take(30),
             dogBirthday = (s?.optString("dogBirthday", "") ?: "").takeIf { b -> runCatching { java.time.LocalDate.parse(b).let { !it.isAfter(java.time.LocalDate.now()) } }.getOrDefault(false) } ?: "",
             careTime = (s?.optString("careTime", "18:00") ?: "18:00").takeIf { it in setOf("08:00", "12:00", "18:00", "21:00") } ?: "18:00",

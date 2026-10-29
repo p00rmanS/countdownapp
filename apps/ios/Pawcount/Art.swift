@@ -274,7 +274,7 @@ final class Meta {
 final class Art {
     let meta: Meta
     let anim: AnimTable
-    private let dogsJson: [String: Any]
+    private var dogFiles: [String: [String: Any]] = [:]   // one file per breed variant, loaded the first time it is drawn
     private let scenesJson: [String: Any]
     private var cache: [String: Node] = [:]
 
@@ -286,7 +286,6 @@ final class Art {
         }
         meta = Meta(load("meta"))
         anim = AnimTable(load("anim"))
-        dogsJson = load("dogs")
         scenesJson = load("scenes")
     }
 
@@ -303,8 +302,16 @@ final class Art {
         if bell { key = "\(variant)/bell" }
         else if stage == .packing || stage == .today { key = "\(variant)/\(stage.rawValue)/\(type)" }
         else { key = "\(variant)/\(stage.rawValue)" }
-        return node(dogsJson, "d:", key)
+        return node(dogFile(variant), "d:", key)
     }
-    func icon(_ variant: String) -> Node? { node(dogsJson, "d:", "\(variant)/icon") }
+    func icon(_ variant: String) -> Node? { node(dogFile(variant), "d:", "\(variant)/icon") }
+    private func dogFile(_ variant: String) -> [String: Any] {
+        if let f = dogFiles[variant] { return f }
+        var obj: [String: Any] = [:]
+        if let url = Bundle.main.url(forResource: "dog-\(variant)", withExtension: "json"), let data = try? Data(contentsOf: url),
+           let parsed = try? JSONSerialization.jsonObject(with: data) as? [String: Any] { obj = parsed }
+        dogFiles[variant] = obj
+        return obj
+    }
     func scene(_ type: String, door: Bool) -> Node? { node(scenesJson, "s:", door ? "\(type)/door" : type) }
 }

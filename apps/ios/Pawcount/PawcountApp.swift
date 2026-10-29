@@ -45,6 +45,7 @@ struct RootView: View {
                 case .home: HomeView()
                 case .memories: MemoriesView()
                 case .settings: SettingsView()
+                case .log: CareLogView()
                 case .detail(let id): DetailView(id: id)
                 case .flow(let id): FlowView(editId: id)
                 }

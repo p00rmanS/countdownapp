@@ -91,6 +91,13 @@ class LogicTest {
         assertEquals("5 days old", dogAgeText("2030-06-10", LocalDate.of(2030, 6, 15)))
         assertEquals(null, dogAgeText("2031-01-01", LocalDate.of(2030, 6, 15)))
     }
+    @Test fun careLogRoundTripAndCleaning() {
+        val json = org.json.JSONObject("""{"countdowns":[],"log":[{"id":"a","kind":"weight","date":"2030-01-10","weight":16.04},{"kind":"hack","date":"2030-01-01"},{"kind":"weight","date":"2030-01-01","weight":-3},{"kind":"note","date":"bad"},{"id":"../x","kind":"note","date":"2030-01-02","note":"hi"}],"settings":{"weightUnit":"stone"}}""")
+        val d = appDataFromJson(json)
+        assertEquals(2, d.log.size); assertEquals(16.0, d.log[0].weightKg!!, 0.001); assertTrue(!d.log[1].id.contains("."))
+        assertEquals("kg", d.settings.weightUnit)
+        assertEquals(d.log, appDataFromJson(d.toJson()).log)
+    }
     @Test fun badDateIsRejected() {
         val o = org.json.JSONObject("""{"id":"a","title":"t","type":"custom","targetAt":"tomorrow","dog":{"breed":"mutt","name":"n"}}""")
         assertTrue(runCatching { countdownFromJson(o) }.isFailure)
