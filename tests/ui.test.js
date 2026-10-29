@@ -201,6 +201,18 @@ test('Twinkle the American Bully (girl) and Toby the Dachshund: search finds the
   const back = A.S.exportJSON(); A.S.importJSON(back); assert.strictEqual(A.S.get(twinkle.id).dog.sex, 'girl');
   A.S.remove(twinkle.id); A.S.remove(toby.id); A.ui.draft = null; go('#/');
 });
+test('Try the app window: opens, shows both QR codes and the links, closes with Escape', () => {
+  const modal = doc.querySelector('#tryModal'), btn = doc.querySelector('#tryBtn');
+  assert.ok(modal && btn && modal.hidden);
+  btn.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); assert.ok(!modal.hidden);
+  const imgs = [...modal.querySelectorAll('img')].map((i) => i.getAttribute('src')); assert.deepStrictEqual(imgs, ['icons/qr-web.svg', 'icons/qr-android.svg']);
+  imgs.forEach((f) => assert.ok(fs.existsSync(path.join(root, f)) && fs.readFileSync(path.join(root, f), 'utf8').includes('<svg'), f));
+  const links = [...modal.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+  assert.ok(links.includes('https://p00rmans.github.io/countdownapp/?app') && links.some((l) => /releases\/download\/android-latest\/pawcount\.apk$/.test(l)));
+  assert.ok(/Coming soon/.test(modal.textContent) && doc.querySelector('.try-card').getAttribute('aria-modal') === 'true');
+  doc.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); assert.ok(modal.hidden);
+  btn.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); modal.querySelector('.try-x').dispatchEvent(new w.MouseEvent('click', { bubbles: true })); assert.ok(modal.hidden);
+});
 test('no script errors were thrown', () => assert.deepStrictEqual(errors, []));
 
 console.log(`\n${passed} passed`);

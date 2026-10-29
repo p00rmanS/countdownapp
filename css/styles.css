@@ -539,3 +539,24 @@ button, a, .dog-hit { -webkit-touch-callout: none; }
 .breed-search-wrap { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; padding: 0 14px; min-height: 48px; border-radius: 16px; background: var(--surface); border: 2px solid var(--line); color: var(--ink-2); }
 .breed-search-wrap .i { width: 20px; height: 20px; } .breed-search { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; color: var(--ink); outline: 0; }
 .w-body .breed-search-wrap { margin: 8px auto 12px; max-width: 360px; }
+
+/* landing page: Try the app window */
+.brand-cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.app-only .brand-panel { display: none !important; }
+.try-modal { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px; }
+.try-modal[hidden] { display: none; }
+.try-backdrop { position: absolute; inset: 0; background: rgba(15, 17, 30, .66); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.try-card { position: relative; width: min(920px, 100%); max-height: calc(100vh - 40px); overflow: auto; background: var(--surface, #fff); color: var(--ink); border-radius: 28px; padding: 30px 28px 26px; box-shadow: 0 30px 80px rgba(0, 0, 0, .45); outline: 0; animation: tryIn .28s var(--spring, ease-out); }
+@keyframes tryIn { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+.try-card h2 { font-family: var(--display); font-size: 30px; line-height: 1.1; margin: 0 40px 6px 0; }
+.try-sub { margin: 0 0 18px; color: var(--ink-2); font-size: 16px; }
+.try-x { position: absolute; top: 14px; right: 16px; width: 40px; height: 40px; border-radius: 50%; font-size: 26px; line-height: 1; color: var(--ink-2); background: var(--line, rgba(0, 0, 0, .06)); }
+.try-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.try-opt { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 18px 14px 16px; border-radius: 22px; background: var(--bg, #FFF8EE); border: 2px solid var(--line, rgba(0, 0, 0, .08)); }
+.try-opt h3 { font-family: var(--display); font-size: 20px; margin: 0; }
+.try-opt img { width: 168px; height: 168px; border-radius: 14px; background: #fff; padding: 4px; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); }
+.try-opt p { margin: 0; font-size: 14px; color: var(--ink-2); flex: 1; }
+.try-soon-box { width: 168px; height: 168px; display: grid; place-items: center; border-radius: 14px; border: 2.5px dashed var(--line, rgba(0, 0, 0, .2)); font-family: var(--display); font-size: 20px; color: var(--ink-2); }
+.try-soon .btn[aria-disabled='true'] { opacity: .6; pointer-events: none; }
+.try-open body { overflow: hidden; }
+@media (max-width: 760px) { .try-grid { grid-template-columns: 1fr; } .try-card { padding: 24px 18px 20px; } }

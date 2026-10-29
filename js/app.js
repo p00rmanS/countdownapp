@@ -373,7 +373,7 @@
     let inner;
     if (ui.installEvt) inner = `<p class="set-note">Install Pawcount for a full-screen app, offline use and reminders.</p><div class="pad"><button class="btn btn-primary" data-action="install">${icon('download')} Install app</button></div>`;
     else if (N.isIOS) inner = `<ol class="steps"><li>Tap the <b>Share</b> button <span class="kbd-ic" aria-hidden="true">⎋</span> in Safari</li><li>Choose <b>Add to Home Screen</b></li><li>Open Pawcount from your Home Screen</li></ol>`;
-    else if (N.isAndroid) inner = `<ol class="steps"><li>Tap the <b>⋮</b> menu in Chrome</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b></li></ol>`;
+    else if (N.isAndroid) inner = `<ol class="steps"><li>Tap the <b>⋮</b> menu in Chrome</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b></li></ol><p class="muted small">Or get the Android app: <a class="strong" href="https://github.com/p00rmanS/countdownapp/releases/download/android-latest/pawcount.apk" rel="noopener">download the APK</a> (a test build; allow installs from your browser).</p>`;
     else return '';
     return `<h2 class="group-h">Install</h2><div class="panel">${inner}</div>`;
   }
@@ -1032,6 +1032,17 @@
   $('[data-tab="home"] .tab-ic').innerHTML = icon('home');
   $('[data-tab="memories"] .tab-ic').innerHTML = icon('album');
   $('.tab-fab span').innerHTML = icon('plus');
+  /* the "Try the app" window on the landing page: QR codes and links for the web app, Android and (soon) iPhone */
+  (function () {
+    const modal = $('#tryModal'), btn = $('#tryBtn'); if (!modal || !btn) return;
+    let opener = null;
+    const open = () => { opener = document.activeElement; modal.hidden = false; document.documentElement.classList.add('try-open'); setTimeout(() => $('.try-card', modal).focus(), 0); };
+    const close = () => { modal.hidden = true; document.documentElement.classList.remove('try-open'); if (opener && opener.focus) opener.focus(); };
+    btn.addEventListener('click', open);
+    modal.addEventListener('click', (e) => { if (e.target.closest('[data-try-close]')) close(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) close(); });
+    P.tryApp = { open, close };
+  })();
   $('#brandSamples').addEventListener('click', () => { S.loadSamples(); location.hash = '#/'; render(); });
   // Keep our own list of visited screens. Going back to the previous entry pops it, anything else pushes.
   // That lets the on-screen Back button know whether there is somewhere inside the app to go

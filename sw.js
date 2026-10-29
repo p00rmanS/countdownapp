@@ -1,8 +1,8 @@
-const CACHE = 'pawcount-v20';
+const CACHE = 'pawcount-v21';
 const ASSETS = ['./', 'index.html', 'manifest.json', 'icon.svg', 'css/styles.css',
   'js/util.js', 'js/countdown.js', 'js/store.js', 'js/dogs.js', 'js/scenes.js', 'js/fx.js', 'js/native.js', 'js/app.js',
   'fonts/fredoka.woff2', 'fonts/nunito.woff2', 'fonts/flags.woff2',
-  'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-192.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'];
+  'icons/qr-web.svg', 'icons/qr-android.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-192.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'];
 self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())));
 self.addEventListener('activate', (e) => e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())));
 // network first (always fresh when online), cache fallback (fully offline-first once installed)

@@ -32,6 +32,23 @@ jobs:
       - uses: actions/upload-artifact@v4
         with: { name: android-debug-apk, path: apps/android/app/build/outputs/apk/debug/app-debug.apk }
 
+  # Publishes the Android test build as a public download (the QR code on the landing page points here), on every push to main.
+  publish-apk:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: android
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: android-debug-apk }
+      - name: Update the android-latest release
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          cp app-debug.apk pawcount.apk
+          gh release view android-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create android-latest --repo "$GITHUB_REPOSITORY" --title "Pawcount for Android (latest test build)" --notes "Test build"
+          gh release upload android-latest pawcount.apk --clobber --repo "$GITHUB_REPOSITORY"
+          gh release edit android-latest --repo "$GITHUB_REPOSITORY" --notes "Latest test build of Pawcount for Android, built from commit $GITHUB_SHA. It is a debug build: allow installs from your browser to open it."
+
   # iOS: builds the native SwiftUI app, runs the Swift unit tests in the simulator, then launches the app on
   # several screens and uploads screenshots. Needs no Apple account.
   ios:

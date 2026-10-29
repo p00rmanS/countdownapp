@@ -10,7 +10,7 @@ Three apps, one design:
 | **iPhone** | Swift + SwiftUI (native) | `apps/ios` |
 | **Web / PWA** | HTML + CSS + JS (installable) | repo root (`index.html`, `js/`, `css/`) |
 
-Live web app: https://p00rmans.github.io/countdownapp/
+Live web app: https://p00rmans.github.io/countdownapp/ (on a computer, the page has a **Try the app** window with QR codes for the web app and the Android test build; `node tools/make-qr.js` regenerates the QR pictures)
 
 ## How the three stay the same
 - **Art.** The dogs and scenes are drawn once, in `js/dogs.js` and `js/scenes.js`. `node tools/export-native.js` turns them into

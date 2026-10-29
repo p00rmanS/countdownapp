@@ -17,6 +17,7 @@
 <link rel="preload" href="fonts/fredoka.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/styles.css">
+<script>if (/[?&]app\b/.test(location.search)) document.documentElement.classList.add('app-only');</script>
 </head>
 <body>
 <div class="stage">
@@ -30,7 +31,10 @@
       <li><b>Tap</b> to bark &nbsp;·&nbsp; <b>hold</b> to pet &nbsp;·&nbsp; <b>shake</b> to sneeze <kbd>S</kbd></li>
       <li><b>Time-zone true.</b> Count to the moment in Tokyo, not your living room.</li>
     </ul>
-    <button class="btn btn-ghost" id="brandSamples" type="button">Load the sample adventures</button>
+    <div class="brand-cta">
+      <button class="btn btn-primary" id="tryBtn" type="button" aria-haspopup="dialog">Try the app</button>
+      <button class="btn btn-ghost" id="brandSamples" type="button">Load the sample adventures</button>
+    </div>
   </aside>
 
   <div id="app" class="device">
@@ -44,6 +48,34 @@
     <div id="sheet-root"></div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <canvas id="confetti" aria-hidden="true"></canvas>
+  </div>
+</div>
+<div id="tryModal" class="try-modal" hidden>
+  <div class="try-backdrop" data-try-close></div>
+  <div class="try-card" role="dialog" aria-modal="true" aria-labelledby="tryTitle" tabindex="-1">
+    <button class="try-x" type="button" data-try-close aria-label="Close">&times;</button>
+    <h2 id="tryTitle">Try Pawcount on your phone</h2>
+    <p class="try-sub">Scan a code with your phone camera, or open the app right here.</p>
+    <div class="try-grid">
+      <section class="try-opt">
+        <h3>Web app</h3>
+        <img src="icons/qr-web.svg" width="168" height="168" alt="QR code that opens the Pawcount web app">
+        <p>Works on any phone. After it opens, choose <b>Add to Home Screen</b>.</p>
+        <a class="btn btn-small btn-primary" href="https://p00rmans.github.io/countdownapp/?app" target="_blank" rel="noopener">Open in a new tab</a>
+      </section>
+      <section class="try-opt">
+        <h3>Android app</h3>
+        <img src="icons/qr-android.svg" width="168" height="168" alt="QR code that downloads the Pawcount Android app">
+        <p>Test build (APK). Your phone will ask to allow installs from your browser.</p>
+        <a class="btn btn-small btn-primary" href="https://github.com/p00rmanS/countdownapp/releases/download/android-latest/pawcount.apk" rel="noopener">Download the APK</a>
+      </section>
+      <section class="try-opt try-soon">
+        <h3>iPhone app</h3>
+        <div class="try-soon-box" aria-hidden="true">Coming soon</div>
+        <p>Until then, open the web app in Safari, tap <b>Share</b>, then <b>Add to Home Screen</b>.</p>
+        <span class="btn btn-small btn-ghost" aria-disabled="true">Coming soon</span>
+      </section>
+    </div>
   </div>
 </div>
 <script src="js/util.js"></script>
